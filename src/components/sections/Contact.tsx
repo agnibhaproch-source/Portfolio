@@ -4,6 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { contactCopy, profile, sections } from "@/content";
 import { MagicCircle } from "@/components/motion/MagicCircle";
 import { SpeedLines } from "@/components/motion/SpeedLines";
+import { Grimoire } from "./contact/Grimoire";
 import { buttonClass } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { gsap, SplitText } from "@/lib/gsap";
@@ -40,6 +41,15 @@ export function Contact() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [turn, setTurn] = useState(0);
+  const [cast, setCast] = useState(0);
+  const typed = useRef(0);
+  const charge =
+    Number(!!values.name.trim()) +
+    Number(EMAIL.test(values.email.trim())) +
+    Number(values.message.trim().length >= 10);
+  const bookOpen = focused || sent || Object.values(values).some((v) => v.trim());
 
   const links = [
     { label: profile.email, href: `mailto:${profile.email}` },
@@ -101,6 +111,21 @@ export function Contact() {
     );
   };
 
+  // A dimension slash cuts across the form panel when the message is sent.
+  const cut = () => {
+    if (prefersReducedMotion()) return;
+    const line = formRef.current?.parentElement?.querySelector("[data-cut]");
+    if (!line) return;
+    gsap
+      .timeline()
+      .fromTo(
+        line,
+        { drawSVG: "0% 0%", opacity: 1 },
+        { drawSVG: "0% 100%", duration: 0.22, ease: "power2.in" },
+      )
+      .to(line, { drawSVG: "100% 100%", opacity: 0, duration: 0.35, ease: "power2.out" });
+  };
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (sending) return;
@@ -131,6 +156,8 @@ export function Contact() {
       });
       if (!res.ok) throw new Error(String(res.status));
       burst();
+      setCast((c) => c + 1);
+      cut();
       setSent(true);
     } catch {
       setFailed(true);
@@ -142,6 +169,10 @@ export function Contact() {
   const update = (field: Field, value: string) => {
     const next = { ...values, [field]: value };
     setValues(next);
+    // flip a page of the grimoire every dozen characters
+    const total = Object.values(next).join("").length;
+    if (Math.floor(total / 12) > typed.current) setTurn((t) => t + 1);
+    typed.current = Math.floor(total / 12);
     if (tried) setErrors(validate(next));
   };
 
@@ -177,25 +208,77 @@ export function Contact() {
                 {profile.availability}
               </p>
             )}
-            <p data-contact-rise className="mt-10 text-14 text-muted">
+
+            <div data-contact-rise className="my-6 md:my-10">
+              <Grimoire
+                open={bookOpen}
+                charge={charge}
+                turn={turn}
+                cast={cast}
+                className="h-80 md:h-96"
+              />
+              <p className="text-center text-14 text-muted">{contactCopy.charge(charge)}</p>
+            </div>
+
+            <p data-contact-rise className="text-14 text-muted">
               {contactCopy.directLabel}
             </p>
-            <ul className="mt-3 space-y-3">
+            <ul className="mt-3 divide-y-2 divide-washi/15 border-y-2 border-washi/15">
               {links.map((l) => (
                 <li key={l.href} data-contact-rise>
                   <a
                     href={l.href}
-                    className="ink-link font-display text-24 break-all md:text-36"
+                    className="group/link relative flex items-center gap-4 overflow-hidden py-3 font-display text-24 break-all transition-colors hover:text-kiln md:text-36"
                     {...(l.href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
                   >
-                    {l.label}
+                    <span
+                      aria-hidden
+                      className="size-3 shrink-0 rotate-45 border-2 border-aura transition-[background-color,rotate] duration-300 group-hover/link:rotate-[225deg] group-hover/link:bg-aura"
+                    />
+                    <span className="relative group-hover/link:animate-[ink-jitter_0.18s_steps(2)_2]">
+                      {l.label}
+                    </span>
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute top-1/2 -right-2 -left-2 h-[2px] origin-left scale-x-0 -rotate-[4deg] bg-kiln opacity-0 shadow-[0_0_6px_var(--kiln)] group-hover/link:animate-[slash-through_0.5s_var(--ease-snap)_forwards]"
+                    />
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div data-contact-rise className="relative border-[3px] border-washi p-6 md:p-10">
+          <div
+            data-contact-rise
+            className="relative self-start border-[3px] border-washi bg-[linear-gradient(160deg,var(--twilight),var(--sumi)_70%)] p-6 md:p-10"
+          >
+            {["top-3 left-3", "top-3 right-3", "bottom-3 left-3", "bottom-3 right-3"].map((pos) => (
+              <span
+                key={pos}
+                aria-hidden
+                className={cn("absolute size-2.5 rotate-45 border-2 border-aura", pos)}
+              />
+            ))}
+            <svg
+              aria-hidden
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible"
+            >
+              <line
+                data-cut
+                x1="-8"
+                y1="92"
+                x2="108"
+                y2="8"
+                stroke="var(--kiln)"
+                strokeWidth="4"
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                opacity="0"
+                className="[filter:drop-shadow(0_0_8px_var(--kiln))]"
+              />
+            </svg>
             <svg
               aria-hidden
               data-burst
@@ -224,6 +307,12 @@ export function Contact() {
             {sent ? (
               <div role="status" className="relative grid min-h-80 place-items-center text-center">
                 <MagicCircle trigger="mount" className="absolute size-72 opacity-50" />
+                <p
+                  aria-hidden
+                  className="absolute -top-2 right-0 sfx animate-[stamp-in_0.5s_steps(4)_both] border-[3px] border-kiln px-3 py-1 text-36 text-kiln [-webkit-text-stroke:0]"
+                >
+                  {contactCopy.stamp}
+                </p>
                 <div className="relative">
                   <p className="font-display text-56">{contactCopy.successTitle}</p>
                   <p className="mx-auto mt-4 max-w-md text-18">
@@ -248,7 +337,16 @@ export function Contact() {
                 </div>
               </div>
             ) : (
-              <form ref={formRef} noValidate onSubmit={onSubmit} className="relative space-y-7">
+              <form
+                ref={formRef}
+                noValidate
+                onSubmit={onSubmit}
+                onFocus={() => setFocused(true)}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
+                }}
+                className="relative space-y-7"
+              >
                 <p className="font-display text-24">{contactCopy.formTitle}</p>
                 {Object.keys(errors).length > 0 && (
                   <p role="alert" className="text-18 text-kiln">

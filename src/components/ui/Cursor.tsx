@@ -9,6 +9,9 @@ type Mode = "default" | "link" | "charge" | "drag" | "text";
 
 const SLASHES = 4;
 const SPLATS = 6;
+const TRAIL = 12;
+const SHOCKS = 3;
+const SPARKS = 10;
 const COMBO_MS = 550;
 
 function seeded(seed: number) {
@@ -139,6 +142,11 @@ export function Cursor() {
         angle += ((((next - angle) % 360) + 540) % 360) - 180;
         rot(angle);
       }
+      const v = Math.hypot(vx, vy);
+      speed = Math.max(speed, v);
+      mx = e.clientX;
+      my = e.clientY;
+      if (v > 38) spark(e.clientX, e.clientY, vx, vy);
       lastX = e.clientX;
       lastY = e.clientY;
     };
@@ -149,6 +157,8 @@ export function Cursor() {
     };
 
     let slashIndex = 0;
+    const shocks = Array.from(el.querySelectorAll<HTMLElement>("[data-shock]"));
+    let shockIndex = 0;
     const onDown = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       const line = slashes[slashIndex++ % SLASHES];
@@ -171,6 +181,17 @@ export function Cursor() {
         .to(line, { drawSVG: "0% 100%", duration: 0.1, ease: "power2.in" })
         .to(line, { drawSVG: "100% 100%", opacity: 0, duration: 0.25, ease: "power2.out" });
       gsap.fromTo(circle, { scale: "-=0.25" }, { scale: "+=0.25", duration: 0.3, ease: "heat" });
+
+      // Shockwave ring.
+      const shock = shocks[shockIndex++ % SHOCKS];
+      if (shock) {
+        gsap.killTweensOf(shock);
+        gsap.fromTo(
+          shock,
+          { x: e.clientX, y: e.clientY, scale: 0.2, opacity: 0.9 },
+          { scale: 2.6, opacity: 0, duration: 0.55, ease: "power2.out" },
+        );
+      }
 
       // Ink splat: dark ink on paper, pale ink on night.
       const splat = splats[splatIndex++ % SPLATS];
@@ -219,12 +240,64 @@ export function Cursor() {
       gsap.to([dot, ring], { autoAlpha: 0, duration: 0.2 });
     };
 
+    // Energy trail: each droplet chases the one ahead; fades when idle.
+    const trail = Array.from(el.querySelectorAll<HTMLElement>("[data-trail]"));
+    const pts = trail.map(() => ({ x: -100, y: -100 }));
+    const setters = trail.map((t) => ({
+      x: gsap.quickSetter(t, "x", "px"),
+      y: gsap.quickSetter(t, "y", "px"),
+    }));
+    const trailWrap = el.querySelector<HTMLElement>("[data-trail-wrap]");
+    let mx = -100;
+    let my = -100;
+    let speed = 0;
+    const tick = () => {
+      pts.forEach((p, i) => {
+        const lead = i === 0 ? { x: mx, y: my } : pts[i - 1]!;
+        p.x += (lead.x - p.x) * 0.42;
+        p.y += (lead.y - p.y) * 0.42;
+        setters[i]!.x(p.x);
+        setters[i]!.y(p.y);
+      });
+      speed *= 0.9;
+      if (trailWrap) trailWrap.style.opacity = String(Math.min(speed / 18, 1));
+    };
+    gsap.ticker.add(tick);
+
+    // Anti-magic sparks fly off fast movement.
+    const sparks = Array.from(el.querySelectorAll<SVGPolylineElement>("[data-spark]"));
+    let sparkIndex = 0;
+    let lastSpark = 0;
+    const spark = (x: number, y: number, vx: number, vy: number) => {
+      const now = performance.now();
+      if (now - lastSpark < 45) return;
+      lastSpark = now;
+      const sp = sparks[sparkIndex++ % SPARKS];
+      if (!sp) return;
+      const a = Math.atan2(-vy, -vx) + (Math.random() - 0.5) * 1.4;
+      const d = 30 + Math.random() * 40;
+      gsap.killTweensOf(sp);
+      gsap.fromTo(
+        sp,
+        { x, y, rotation: (a * 180) / Math.PI, opacity: 1, scale: 1 },
+        {
+          x: x + Math.cos(a) * d,
+          y: y + Math.sin(a) * d,
+          opacity: 0,
+          scale: 0.3,
+          duration: 0.45,
+          ease: "power2.out",
+        },
+      );
+    };
+
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerover", onOver, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
     document.documentElement.addEventListener("pointerleave", onLeave);
 
     return () => {
+      gsap.ticker.remove(tick);
       html.classList.remove("has-cursor");
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerover", onOver);
@@ -269,11 +342,63 @@ export function Cursor() {
           />
         ))}
       </svg>
+      <div data-trail-wrap className="absolute inset-0 opacity-0">
+        {Array.from({ length: TRAIL }, (_, i) => (
+          <span
+            key={i}
+            data-trail
+            className="absolute top-0 left-0 rounded-full"
+            style={{
+              width: 9 - i * 0.6,
+              height: 9 - i * 0.6,
+              marginLeft: -(9 - i * 0.6) / 2,
+              marginTop: -(9 - i * 0.6) / 2,
+              background: i < 4 ? "var(--kiln)" : "var(--agni)",
+              opacity: 1 - i / TRAIL,
+              boxShadow: i < 3 ? "0 0 8px var(--kiln)" : undefined,
+            }}
+          />
+        ))}
+      </div>
+      {Array.from({ length: SHOCKS }, (_, i) => (
+        <span
+          key={`shock-${i}`}
+          data-shock
+          className="absolute top-0 left-0 -mt-6 -ml-6 size-12 rounded-full border-2 border-kiln opacity-0 shadow-[0_0_10px_var(--kiln)]"
+        />
+      ))}
+      <svg className="absolute inset-0 h-full w-full overflow-visible">
+        {Array.from({ length: SPARKS }, (_, i) => (
+          <polyline
+            key={`spark-${i}`}
+            data-spark
+            points="0,0 6,-3 10,2 16,-2"
+            fill="none"
+            stroke="var(--agni)"
+            strokeWidth="2"
+            opacity="0"
+          />
+        ))}
+      </svg>
       <span
         data-combo
         className="absolute top-0 left-0 sfx text-36 whitespace-nowrap text-kiln opacity-0"
       />
       <div data-ring className="invisible absolute top-0 left-0 opacity-0">
+        <svg
+          viewBox="0 0 48 48"
+          className="absolute -top-6 -left-6 size-12 animate-[rune-spin_6s_linear_infinite] text-aura/80"
+        >
+          <circle
+            cx="24"
+            cy="24"
+            r="22"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeDasharray="2 5 8 5"
+          />
+        </svg>
         <div
           data-ring-circle
           className="absolute -top-5 -left-5 size-10 rounded-full border-[1.5px] border-washi shadow-none [outline:1px_solid_rgb(29_22_20/0.5)]"

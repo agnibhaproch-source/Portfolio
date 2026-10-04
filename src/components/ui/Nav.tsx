@@ -4,13 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { nav, navCopy, profile } from "@/content";
+import { MagicCircle } from "@/components/motion/MagicCircle";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { onIntroDone } from "@/lib/intro";
 import { prefersReducedMotion } from "@/lib/motion";
 import { printMode, usePrintMode } from "@/lib/print-mode";
 import { useLenis } from "@/lib/smooth-scroll";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
 import { FlameMark } from "./FlameMark";
+import { JaggedEdge } from "./JaggedEdge";
 
 /**
  * Hides on scroll down, returns on scroll up. The active section gets the
@@ -44,18 +47,37 @@ export function Nav() {
         },
       });
 
-      if (!onHome) return;
-      nav.forEach((s) => {
-        const target = document.getElementById(s.id);
-        if (!target) return;
-        ScrollTrigger.create({
-          trigger: target,
-          start: "top 50%",
-          end: "bottom 50%",
-          onToggle: (self) =>
-            setActive((cur) => (self.isActive ? s.id : cur === s.id ? null : cur)),
+      // Items ink in once the intro is done (and the hero has started its reveal).
+      let stopIntro = () => {};
+      if (!ctx.reduced) {
+        const items = el.querySelectorAll("[data-nav-item]");
+        gsap.set(items, { yPercent: -160, opacity: 0 });
+        stopIntro = onIntroDone(() => {
+          gsap.to(items, {
+            yPercent: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.07,
+            ease: "steps(5)",
+            delay: onHome ? 1.4 : 0.1,
+          });
         });
-      });
+      }
+
+      if (onHome) {
+        nav.forEach((s) => {
+          const target = document.getElementById(s.id);
+          if (!target) return;
+          ScrollTrigger.create({
+            trigger: target,
+            start: "top 50%",
+            end: "bottom 50%",
+            onToggle: (self) =>
+              setActive((cur) => (self.isActive ? s.id : cur === s.id ? null : cur)),
+          });
+        });
+      }
+      return () => stopIntro();
     },
     bar,
     [onHome],
@@ -82,8 +104,12 @@ export function Nav() {
           .set(el, { autoAlpha: 1 })
           .fromTo(
             el,
-            { clipPath: "inset(0% 0% 100% 0%)" },
-            { clipPath: "inset(0% 0% 0% 0%)", duration: 0.45, ease: "snap" },
+            { clipPath: "polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)" },
+            {
+              clipPath: "polygon(0% 0%, 140% 0%, 100% 100%, -40% 100%)",
+              duration: 0.5,
+              ease: "snap",
+            },
           )
           .fromTo(
             links,
@@ -93,7 +119,7 @@ export function Nav() {
           );
       } else {
         gsap.to(el, {
-          clipPath: "inset(0% 0% 100% 0%)",
+          clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)",
           duration: 0.3,
           ease: "snap",
           onComplete: () => void gsap.set(el, { autoAlpha: 0 }),
@@ -136,56 +162,131 @@ export function Nav() {
       <header
         ref={bar}
         data-mode="colour"
-        className="fixed inset-x-0 top-0 z-50 bg-transparent transition-[background-color,box-shadow] duration-300 data-solid:bg-sumi data-solid:shadow-[0_3px_0_0_var(--washi)]"
+        className="group/bar fixed inset-x-0 top-0 z-50 transition-[background-color] duration-300 data-solid:bg-sumi/92 data-solid:backdrop-blur-sm"
       >
-        <nav
-          aria-label="Main"
-          className="flex h-16 items-center justify-between bg-transparent px-4 md:px-10"
+        {/* Grimoire spine: a flowing mana line and a jagged anti-magic rim once solid */}
+        <div
+          aria-hidden
+          className="mana-line absolute inset-x-0 bottom-0 h-[2px] opacity-0 transition-opacity duration-300 group-data-solid/bar:opacity-100"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-full opacity-0 transition-opacity duration-300 group-data-solid/bar:opacity-100"
         >
+          <JaggedEdge height={10} seed={4} />
+        </div>
+
+        <nav aria-label="Main" className="flex h-16 items-center justify-between px-4 md:px-10">
           <Link
             href={onHome ? "#top" : "/"}
-            className="flex items-center gap-2 font-display text-24 lowercase"
+            data-nav-item
+            className="group/logo flex items-center gap-3 font-display text-24 lowercase"
           >
-            <FlameMark className="h-6 w-auto" />
-            {profile.name.alias}
+            <span aria-hidden className="relative grid size-10 place-items-center">
+              <svg
+                viewBox="0 0 40 40"
+                className="absolute inset-0 animate-[rune-spin_14s_linear_infinite] text-aura"
+              >
+                <circle
+                  cx="20"
+                  cy="20"
+                  r="18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeDasharray="3 4"
+                />
+                {Array.from({ length: 6 }, (_, i) => {
+                  const a = (i / 6) * Math.PI * 2;
+                  return (
+                    <rect
+                      key={i}
+                      x={20 + Math.cos(a) * 18 - 1.5}
+                      y={20 + Math.sin(a) * 18 - 1.5}
+                      width="3"
+                      height="3"
+                      fill="currentColor"
+                      transform={`rotate(45 ${20 + Math.cos(a) * 18} ${20 + Math.sin(a) * 18})`}
+                    />
+                  );
+                })}
+              </svg>
+              <svg
+                viewBox="0 0 40 40"
+                className="absolute inset-1 animate-[rune-spin-back_9s_linear_infinite] text-agni"
+              >
+                <circle
+                  cx="20"
+                  cy="20"
+                  r="17"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeDasharray="10 6 2 6"
+                />
+              </svg>
+              <FlameMark className="relative h-5 w-auto animate-[flame-flicker_1.6s_ease-in-out_infinite]" />
+            </span>
+            <span className="relative inline-grid overflow-hidden [grid-template-areas:'s']">
+              <span className="transition-transform duration-300 ease-[steps(3)] [grid-area:s] group-hover/logo:-translate-y-full">
+                {profile.name.alias}
+              </span>
+              <span
+                lang="ja"
+                aria-hidden
+                className="translate-y-full text-aura transition-transform duration-300 ease-[steps(3)] [grid-area:s] group-hover/logo:translate-y-0"
+              >
+                {profile.name.aliasJa}
+              </span>
+            </span>
           </Link>
 
-          <ul className="hidden items-center gap-8 md:flex">
+          <ul className="hidden items-center gap-9 md:flex">
             {nav.map((s) => {
               const isActive = active === s.id;
               return (
-                <li key={s.id}>
+                <li key={s.id} data-nav-item>
                   <a
                     href={href(s.id)}
                     aria-current={isActive ? "true" : undefined}
                     className={cn(
-                      "flex items-center gap-2 font-display text-18",
-                      isActive
-                        ? "text-aura"
-                        : "ink-link bg-[length:0%_2px] hover:bg-[length:100%_2px]",
+                      "group/link relative flex items-center gap-2 py-2 font-display text-18 transition-colors",
+                      isActive ? "text-aura" : "hover:text-kiln",
                     )}
                   >
                     <FlameMark
                       className={cn(
-                        "h-4 w-auto transition-opacity",
-                        isActive ? "opacity-100" : "opacity-0",
+                        "h-4 w-auto transition-[opacity,scale] duration-300",
+                        isActive ? "scale-100 opacity-100" : "scale-0 opacity-0",
                       )}
                     />
-                    {s.heading}
+                    <span className="relative group-hover/link:animate-[ink-jitter_0.18s_steps(2)_2]">
+                      {s.heading}
+                    </span>
+                    {/* blade slash streaks through on hover */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute top-1/2 -right-2 -left-2 h-[2px] origin-left scale-x-0 -rotate-[12deg] bg-kiln opacity-0 shadow-[0_0_6px_var(--kiln)] group-hover/link:animate-[slash-through_0.45s_var(--ease-snap)_forwards]"
+                    />
+                    {isActive && (
+                      <span aria-hidden className="absolute inset-x-0 -bottom-1">
+                        <JaggedEdge height={6} seed={s.id.length} />
+                      </span>
+                    )}
                   </a>
                 </li>
               );
             })}
           </ul>
 
-          <div className="flex items-center gap-5">
+          <div data-nav-item className="flex items-center gap-4">
             <button
               type="button"
               aria-pressed={print}
               aria-label={navCopy.printLabel}
               onClick={() => printMode.toggle()}
               className={cn(
-                "border-2 border-current px-2 py-0.5 font-display text-14 transition-colors",
+                "border-2 border-current px-2.5 py-0.5 font-display text-14 transition-[color,background-color,box-shadow] duration-200 [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)] hover:shadow-[inset_0_0_0_30px_rgb(201_162_74/0.25)]",
                 print && "bg-fg text-bg",
               )}
             >
@@ -212,9 +313,10 @@ export function Nav() {
         role="dialog"
         aria-modal="true"
         aria-label={navCopy.menuLabel}
-        className="invisible fixed inset-0 z-[70] flex flex-col bg-washi px-4 pt-6 pb-10 opacity-0 md:hidden"
+        className="invisible fixed inset-0 z-[70] flex flex-col overflow-hidden bg-washi px-4 pt-6 pb-10 opacity-0 md:hidden"
       >
-        <div className="flex items-center justify-between">
+        <MagicCircle className="pointer-events-none absolute -right-1/3 bottom-[-15%] size-[120vw] text-sumi opacity-15" />
+        <div className="relative flex items-center justify-between">
           <span className="flex items-center gap-2 font-display text-24 lowercase">
             <FlameMark className="h-6 w-auto" />
             {profile.name.alias}
@@ -223,7 +325,7 @@ export function Nav() {
             {navCopy.closeMenu}
           </button>
         </div>
-        <ul className="mt-10 grid flex-1 content-start gap-3">
+        <ul className="relative mt-10 grid flex-1 content-start gap-3">
           {nav.map((s, i) => (
             <li key={s.id}>
               <a
@@ -231,11 +333,15 @@ export function Nav() {
                 href={href(s.id)}
                 onClick={(e) => goFromMenu(e, s.id)}
                 className={cn(
-                  "block border-[3px] border-sumi px-5 py-4 font-display text-56",
+                  "group/link relative block overflow-hidden border-[3px] border-sumi bg-washi px-5 py-4 font-display text-56",
                   i % 2 ? "text-right" : "",
                 )}
               >
                 {s.heading}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-1/2 -right-2 -left-2 h-[3px] origin-left scale-x-0 -rotate-[8deg] bg-agni opacity-0 group-hover/link:animate-[slash-through_0.45s_var(--ease-snap)_forwards] group-active/link:animate-[slash-through_0.45s_var(--ease-snap)_forwards]"
+                />
               </a>
             </li>
           ))}

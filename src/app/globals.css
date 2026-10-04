@@ -426,6 +426,172 @@ html[data-print] .hero canvas {
 }
 
 /* ------------------------------------------------------------------
+   Grimoire chrome: header, footer and contact ambient loops (CSS only,
+   frozen by the reduced-motion rule below)
+   ------------------------------------------------------------------ */
+@keyframes mana-flow {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes rune-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes rune-spin-back {
+  to {
+    rotate: -360deg;
+  }
+}
+
+@keyframes flame-flicker {
+  0%,
+  100% {
+    scale: 1 1;
+    filter: drop-shadow(0 0 2px var(--kiln));
+  }
+  40% {
+    scale: 0.94 1.06;
+    filter: drop-shadow(0 0 6px var(--kiln));
+  }
+  70% {
+    scale: 1.03 0.97;
+  }
+}
+
+/* flicker "on twos": hard swaps between jagged variants */
+@keyframes jag-a {
+  0%,
+  33% {
+    opacity: 1;
+  }
+  34%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes jag-b {
+  0%,
+  33% {
+    opacity: 0;
+  }
+  34%,
+  66% {
+    opacity: 1;
+  }
+  67%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes jag-c {
+  0%,
+  66% {
+    opacity: 0;
+  }
+  67%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ink-jitter {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: 1px -1px;
+  }
+  50% {
+    translate: -1px 1px;
+  }
+  75% {
+    translate: 1px 1px;
+  }
+}
+
+@keyframes ember-rise {
+  from {
+    translate: 0 0;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    translate: var(--drift, 0px) -60svh;
+    opacity: 0;
+  }
+}
+
+@keyframes slash-through {
+  0% {
+    scale: 0 1;
+    opacity: 1;
+  }
+  45% {
+    scale: 1 1;
+    opacity: 1;
+  }
+  100% {
+    scale: 1 1;
+    opacity: 0;
+  }
+}
+
+@keyframes grimoire-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+@keyframes stamp-in {
+  from {
+    scale: 2.4;
+    rotate: -24deg;
+    opacity: 0;
+  }
+  to {
+    scale: 1;
+    rotate: -12deg;
+    opacity: 1;
+  }
+}
+
+.mana-line {
+  background: linear-gradient(
+    90deg,
+    var(--agni),
+    var(--kiln),
+    var(--agni) 40%,
+    transparent 50%,
+    var(--agni) 60%,
+    var(--kiln),
+    var(--agni)
+  );
+  background-size: 200% 100%;
+  animation: mana-flow 3.5s linear infinite;
+}
+
+.jag > :nth-child(1) {
+  animation: jag-a 0.25s steps(1) infinite;
+}
+.jag > :nth-child(2) {
+  animation: jag-b 0.25s steps(1) infinite;
+}
+.jag > :nth-child(3) {
+  animation: jag-c 0.25s steps(1) infinite;
+}
+
+/* ------------------------------------------------------------------
    Reduced motion: no smooth-scroll hijack, near-instant transitions
    ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {

@@ -111,6 +111,9 @@ export const workCopy = {
 
 export const contactCopy = {
   directLabel: "Or reach me directly",
+  charge: (n: number) =>
+    n >= 3 ? "Fully charged. Send it." : `Summoning circle ${n} of 3 charged`,
+  stamp: "SENT",
   formTitle: "Send a message",
   name: "Name",
   email: "Email",
