@@ -1,5 +1,6 @@
 import { About } from "@/components/sections/About";
 import { Achievements } from "@/components/sections/Achievements";
+import { BurnTransition } from "@/components/sections/BurnTransition";
 import { Contact } from "@/components/sections/Contact";
 import { Experience } from "@/components/sections/Experience";
 import { Footer } from "@/components/sections/Footer";
@@ -13,6 +14,7 @@ export default function Home() {
       <main id="main">
         <Hero />
         <About />
+        <BurnTransition />
         <Skills />
         <Experience />
         <Work />

@@ -36,3 +36,11 @@ export const credits = {
   ],
   backToTop: "Back to top",
 };
+
+export const aboutCopy = {
+  from: "From",
+  offline: "Off the clock",
+  studying: "Studying",
+  classOf: "Class of",
+  sfx: "DON!",
+};

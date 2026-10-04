@@ -5,6 +5,7 @@ import { heroCopy, profile, sections } from "@/content";
 import { Flame } from "@/components/gl/Flame";
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
+import { Silhouette } from "@/components/ui/Silhouette";
 import { antiMagic } from "@/lib/anti-magic";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { onIntroDone } from "@/lib/intro";
@@ -29,15 +30,6 @@ const printPanel = {
   width: `${(100 / (100 + FLAME_INSET.side * 2)) * 100}%`,
   height: `${(100 / (100 + FLAME_INSET.top + FLAME_INSET.bottom)) * 100}%`,
 };
-
-function Silhouette({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden viewBox="0 0 200 250" className={className}>
-      <circle cx="100" cy="80" r="42" fill="currentColor" />
-      <path d="M20 250c0-60 36-100 80-100s80 40 80 100z" fill="currentColor" />
-    </svg>
-  );
-}
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
