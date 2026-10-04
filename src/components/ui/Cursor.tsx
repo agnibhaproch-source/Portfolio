@@ -1,12 +1,38 @@
 "use client";
 
 import { useRef } from "react";
+import { comboCopy } from "@/content";
 import { gsap } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
 
 type Mode = "default" | "link" | "charge" | "drag" | "text";
 
 const SLASHES = 4;
+const SPLATS = 6;
+const COMBO_MS = 550;
+
+function seeded(seed: number) {
+  let s = (seed * 2654435761) % 2147483647 || 1;
+  const next = () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646;
+  for (let i = 0; i < 5; i++) next();
+  return next;
+}
+
+/** Three original ink-splat shapes: a lumpy blob plus a few droplets. */
+const SPLAT_SHAPES = [3, 11, 23].map((seed) => {
+  const rand = seeded(seed);
+  const pts = Array.from({ length: 14 }, (_, i) => {
+    const a = (i / 14) * Math.PI * 2;
+    const r = 9 + rand() * 9 + (i % 4 === 0 ? 6 : 0);
+    return `${(Math.cos(a) * r).toFixed(1)},${(Math.sin(a) * r).toFixed(1)}`;
+  }).join(" ");
+  const drops = Array.from({ length: 4 }, () => {
+    const a = rand() * Math.PI * 2;
+    const d = 26 + rand() * 14;
+    return { x: Math.cos(a) * d, y: Math.sin(a) * d, r: 1.5 + rand() * 2.5 };
+  });
+  return { pts, drops };
+});
 
 function modeFor(target: EventTarget | null): { mode: Mode; label: string } {
   const el = (target as Element | null)?.closest?.(
@@ -38,6 +64,11 @@ export function Cursor() {
     const blade = q("[data-blade]")[0] as HTMLElement;
     const label = q("[data-label]")[0] as HTMLElement;
     const slashes = Array.from(el.querySelectorAll<SVGLineElement>("[data-slash]"));
+    const splats = Array.from(el.querySelectorAll<SVGGElement>("[data-splat]"));
+    const combo = el.querySelector<HTMLElement>("[data-combo]");
+    let splatIndex = 0;
+    let lastClick = 0;
+    let streak = 0;
 
     html.classList.add("has-cursor");
     gsap.set(el, { autoAlpha: 1 });
@@ -140,6 +171,47 @@ export function Cursor() {
         .to(line, { drawSVG: "0% 100%", duration: 0.1, ease: "power2.in" })
         .to(line, { drawSVG: "100% 100%", opacity: 0, duration: 0.25, ease: "power2.out" });
       gsap.fromTo(circle, { scale: "-=0.25" }, { scale: "+=0.25", duration: 0.3, ease: "heat" });
+
+      // Ink splat: dark ink on paper, pale ink on night.
+      const splat = splats[splatIndex++ % SPLATS];
+      if (splat) {
+        const onPaper =
+          (e.target as Element | null)?.closest?.("[data-mode]")?.getAttribute("data-mode") ===
+          "print";
+        gsap.killTweensOf(splat);
+        gsap.set(splat, {
+          x: e.clientX,
+          y: e.clientY,
+          rotation: Math.random() * 360,
+          fill: onPaper ? "var(--sumi)" : "var(--washi)",
+        });
+        gsap
+          .timeline()
+          .fromTo(
+            splat,
+            { scale: 0.2, opacity: 0.85 },
+            { scale: 1, duration: 0.14, ease: "power3.out" },
+          )
+          .to(splat, { opacity: 0, duration: 0.9, ease: "power1.in" }, 0.35);
+      }
+
+      // Combo counter for rapid clicks.
+      const now = performance.now();
+      streak = now - lastClick < COMBO_MS ? streak + 1 : 1;
+      lastClick = now;
+      if (combo && streak >= 3) {
+        combo.textContent = `×${streak} ${comboCopy.combo}`;
+        gsap.killTweensOf(combo);
+        gsap.set(combo, { x: e.clientX + 18, y: e.clientY - 46 });
+        gsap
+          .timeline()
+          .fromTo(
+            combo,
+            { scale: 1.7, opacity: 1, rotation: -12 },
+            { scale: 1, rotation: -8, duration: 0.2, ease: "steps(3)" },
+          )
+          .to(combo, { opacity: 0, duration: 0.4 }, 0.8);
+      }
     };
 
     const onLeave = () => {
@@ -168,6 +240,23 @@ export function Cursor() {
       className="pointer-events-none invisible fixed inset-0 z-[200] opacity-0"
     >
       <svg className="absolute inset-0 h-full w-full overflow-visible">
+        {Array.from({ length: SPLATS }, (_, i) => {
+          const shape = SPLAT_SHAPES[i % SPLAT_SHAPES.length]!;
+          return (
+            <g key={`splat-${i}`} data-splat opacity="0">
+              <polygon
+                points={shape.pts}
+                strokeLinejoin="round"
+                strokeWidth="6"
+                stroke="currentColor"
+                className="[stroke:inherit]"
+              />
+              {shape.drops.map((d, j) => (
+                <circle key={j} cx={d.x} cy={d.y} r={d.r} />
+              ))}
+            </g>
+          );
+        })}
         {Array.from({ length: SLASHES }, (_, i) => (
           <line
             key={i}
@@ -179,6 +268,10 @@ export function Cursor() {
           />
         ))}
       </svg>
+      <span
+        data-combo
+        className="absolute top-0 left-0 sfx text-36 whitespace-nowrap text-kiln opacity-0"
+      />
       <div data-ring className="invisible absolute top-0 left-0 opacity-0">
         <div
           data-ring-circle

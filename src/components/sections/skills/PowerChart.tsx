@@ -68,7 +68,9 @@ function anchor(i: number) {
   return Math.abs(c) < 0.2 ? "middle" : c > 0 ? "start" : "end";
 }
 
-export function PowerChart() {
+export function PowerChart({ highlight = [] }: { highlight?: string[] }) {
+  const lit = (name: string) => highlight.includes(name);
+  const dimOthers = highlight.length > 0;
   const ref = useRef<HTMLElement>(null);
 
   useMotion((ctx, el) => {
@@ -212,6 +214,30 @@ export function PowerChart() {
           <polygon key={i} data-pulse points={pts(FINAL)} stroke="var(--aura)" strokeWidth="2" />
         ))}
 
+        {/* Spell-cast highlight: a lit spoke out to each highlighted value */}
+        {topSkills.map((s, i) => {
+          const [x, y] = at(i, FINAL[i]!);
+          return (
+            <g
+              key={`lit-${s.name}`}
+              aria-hidden
+              className="transition-opacity duration-300"
+              opacity={lit(s.name) ? 1 : 0}
+            >
+              <line
+                x1={C}
+                y1={C}
+                x2={x}
+                y2={y}
+                stroke="var(--aura)"
+                strokeWidth="3"
+                className="[filter:drop-shadow(0_0_6px_var(--aura))]"
+              />
+              <circle cx={x} cy={y} r="5" fill="var(--aura)" />
+            </g>
+          );
+        })}
+
         {topSkills.map((s, i) => {
           const [x, y] = at(i, R + 26);
           return (
@@ -222,8 +248,9 @@ export function PowerChart() {
               y={y}
               textAnchor={anchor(i)}
               dominantBaseline="middle"
-              fill="var(--washi)"
-              className="text-[15px] max-sm:text-[20px]"
+              fill={lit(s.name) ? "var(--aura)" : "var(--washi)"}
+              fillOpacity={dimOthers && !lit(s.name) ? 0.4 : 1}
+              className="text-[15px] transition-[fill-opacity] duration-300 max-sm:text-[20px]"
             >
               {s.name}{" "}
               <tspan data-value fill="var(--aura)">

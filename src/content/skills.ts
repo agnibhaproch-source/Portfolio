@@ -1,3 +1,4 @@
+import { projects, sideQuests } from "./projects";
 import type { RatedSkill, SkillGroup } from "./types";
 
 export const skillGroups: SkillGroup[] = [
@@ -19,3 +20,27 @@ export const topSkills: RatedSkill[] = [
 ];
 
 export const learning: string | null = "Dart and Flutter";
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9+]/g, "");
+
+/** Does a stack entry like "React 18" or "Node.js + Express" mention this skill? */
+export function mentions(entry: string, skill: string) {
+  const a = norm(entry);
+  const b = norm(skill);
+  return a === b || a.startsWith(b) || a.includes(b);
+}
+
+/** Radar skills that belong to a group (for the spell-cast highlight). */
+export function radarSkillsFor(group: SkillGroup) {
+  return topSkills
+    .filter((t) => group.items.some((item) => mentions(t.name, item) || mentions(item, t.name)))
+    .map((t) => t.name);
+}
+
+/** Projects and side quests whose stack uses any skill in the group. */
+export function projectsUsing(group: SkillGroup) {
+  const all = [...projects.map((p) => ({ name: p.name, stack: p.stack })), ...sideQuests];
+  return all
+    .filter((p) => p.stack.some((entry) => group.items.some((item) => mentions(entry, item))))
+    .map((p) => p.name);
+}

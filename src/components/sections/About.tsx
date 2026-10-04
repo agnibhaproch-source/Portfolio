@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { aboutCopy, education, profile, sections } from "@/content";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Panel } from "@/components/ui/Panel";
@@ -18,6 +18,25 @@ const FROM = [
   { x: 0.45, y: 0.25, r: 12 },
 ];
 
+/** Manga speech bubble that pops over a panel's top edge on hover, focus or tap. */
+function Bubble({ id, text, open }: { id: string; text: string; open: boolean }) {
+  return (
+    <span
+      id={id}
+      data-open={open || undefined}
+      className="pointer-events-none absolute -top-12 right-4 z-20 max-w-[15rem] origin-bottom-left scale-50 -rotate-3 opacity-0 transition-[opacity,scale] duration-300 ease-heat group-hover/panel:scale-100 group-hover/panel:opacity-100 group-focus-visible/panel:scale-100 group-focus-visible/panel:opacity-100 data-open:scale-100 data-open:opacity-100"
+    >
+      <span className="relative block rounded-[50%] border-[3px] border-sumi bg-washi px-6 py-3 text-center text-14 font-bold text-sumi">
+        {text}
+      </span>
+      <svg aria-hidden viewBox="0 0 20 18" className="absolute -bottom-[13px] left-10 w-5">
+        <path d="M1 0 L19 0 L5 17 Z" fill="var(--washi)" />
+        <path d="M1 1 L5 17 L19 1" fill="none" stroke="var(--sumi)" strokeWidth="3" />
+      </svg>
+    </span>
+  );
+}
+
 function Label({ children }: { children: string }) {
   return <p className="text-14 text-muted">{children}</p>;
 }
@@ -31,6 +50,18 @@ function Label({ children }: { children: string }) {
 export function About() {
   const ref = useRef<HTMLElement>(null);
   const { bio, origin, bigLine, location, interests } = profile;
+  const [open, setOpen] = useState<number | null>(null);
+  const bubble = (i: number) => {
+    const text = aboutCopy.bubbles[i];
+    if (!text) return {};
+    const id = `about-bubble-${i}`;
+    return {
+      tabIndex: 0,
+      "aria-describedby": id,
+      onClick: () => setOpen((o) => (o === i ? null : i)),
+      overlay: <Bubble id={id} text={text} open={open === i} />,
+    };
+  };
 
   useMotion((ctx, el) => {
     const q = gsap.utils.selector(el);
@@ -166,6 +197,7 @@ export function About() {
         {/* 1: photo (silhouette until the owner's photo arrives) */}
         <Panel
           data-about-panel
+          {...bubble(0)}
           tone
           className="min-h-72 md:min-h-[22rem] lg:col-span-4"
           innerClassName="overflow-hidden"
@@ -184,6 +216,7 @@ export function About() {
         {/* 2: bio + origin */}
         <Panel
           data-about-panel
+          {...bubble(1)}
           className="md:min-h-[22rem] lg:col-span-8"
           innerClassName="flex flex-col justify-center gap-5 p-6 md:p-10"
         >
@@ -202,6 +235,7 @@ export function About() {
         {/* 3: where from, off the clock */}
         <Panel
           data-about-panel
+          {...bubble(2)}
           className="md:min-h-[18rem] lg:col-span-3"
           innerClassName="flex flex-col justify-between gap-6 p-6"
         >
@@ -221,6 +255,7 @@ export function About() {
         {bigLine && (
           <Panel
             data-about-panel
+            {...bubble(3)}
             shape="cut-right"
             fill={false}
             className="min-h-64 text-sumi md:order-last md:col-span-2 md:min-h-[18rem] lg:order-none lg:col-span-6"
@@ -236,6 +271,7 @@ export function About() {
         {/* 5: studying */}
         <Panel
           data-about-panel
+          {...bubble(4)}
           shape="cut-left"
           className="md:min-h-[18rem] lg:col-span-3"
           innerClassName="flex flex-col justify-between gap-6 p-6 pl-10 md:pl-12"

@@ -54,6 +54,8 @@ type PanelProps = {
   className?: string;
   innerClassName?: string;
   children?: ReactNode;
+  /** Rendered above the border, outside the clip (e.g. speech bubbles). */
+  overlay?: ReactNode;
 } & Omit<ComponentPropsWithoutRef<"div">, "className" | "children">;
 
 /**
@@ -69,6 +71,7 @@ export function Panel({
   className,
   innerClassName,
   children,
+  overlay,
   ...rest
 }: PanelProps) {
   // All panel tags share div attributes; narrow for the JSX checker.
@@ -77,7 +80,7 @@ export function Panel({
   const clip = clipPolygon(points);
 
   return (
-    <Tag className={cn("relative isolate", className)} {...rest}>
+    <Tag className={cn("group/panel relative isolate", className)} {...rest}>
       <div
         data-panel-content
         className={cn("relative h-full", fill && "bg-bg", tone && "tone", innerClassName)}
@@ -101,6 +104,7 @@ export function Panel({
           vectorEffect="non-scaling-stroke"
         />
       </svg>
+      {overlay}
     </Tag>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { heroCopy, profile, sections } from "@/content";
+import { heroCopy, heroTiltCopy, profile, sections } from "@/content";
 import { Flame } from "@/components/gl/Flame";
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
@@ -34,6 +34,8 @@ const printPanel = {
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const [interactive, setInteractive] = useState(false);
+  const [tiltAsk, setTiltAsk] = useState(false);
+  const tiltRequest = useRef<(() => Promise<void>) | null>(null);
   const { tagline, resume, role, name } = profile;
 
   useMotion((ctx, el) => {
@@ -51,10 +53,58 @@ export function Hero() {
       onLeave: () => antiMagic.set(false),
     });
 
+    // Depth layers: pointer on desktop, device tilt on phones. Off under reduced motion.
+    const parallax = (): (() => void) => {
+      if (ctx.reduced) return () => {};
+      const layers = q("[data-depth]").map((node) => ({
+        x: gsap.quickTo(node, "x", { duration: 0.9, ease: "power3" }),
+        y: gsap.quickTo(node, "y", { duration: 0.9, ease: "power3" }),
+        d: Number((node as HTMLElement).dataset.depth),
+      }));
+      const apply = (px: number, py: number) => {
+        if (!el.hasAttribute("data-revealed")) return;
+        layers.forEach((l) => {
+          l.x(px * l.d);
+          l.y(py * l.d);
+        });
+      };
+      if (ctx.desktop) {
+        const onMove = (e: PointerEvent) =>
+          apply(e.clientX / window.innerWidth - 0.5, e.clientY / window.innerHeight - 0.5);
+        window.addEventListener("pointermove", onMove, { passive: true });
+        return () => window.removeEventListener("pointermove", onMove);
+      }
+      const clamp = gsap.utils.clamp(-0.5, 0.5);
+      let heard = false;
+      const onTilt = (e: DeviceOrientationEvent) => {
+        if (e.gamma == null || e.beta == null) return;
+        heard = true;
+        apply(clamp(e.gamma / 60), clamp((e.beta - 45) / 60));
+      };
+      // Listen straight away (Android sends events freely). If nothing arrives and the
+      // browser gates motion behind a permission (iOS), offer a button to ask.
+      window.addEventListener("deviceorientation", onTilt);
+      const DOE = window.DeviceOrientationEvent as unknown as
+        { requestPermission?: () => Promise<"granted" | "denied"> } | undefined;
+      const askTimer = window.setTimeout(() => {
+        if (heard || typeof DOE?.requestPermission !== "function") return;
+        tiltRequest.current = async () => {
+          await DOE.requestPermission!().catch(() => "denied" as const);
+          setTiltAsk(false);
+        };
+        setTiltAsk(true);
+      }, 1200);
+      return () => {
+        window.clearTimeout(askTimer);
+        window.removeEventListener("deviceorientation", onTilt);
+        tiltRequest.current = null;
+      };
+    };
+
     if (ctx.reduced || played) {
       played = true;
       reveal();
-      return;
+      return parallax();
     }
 
     const paper = el.querySelector<HTMLElement>("[data-hero-paper]");
@@ -115,26 +165,7 @@ export function Hero() {
       tl.play();
     });
 
-    // After the reveal, name, portrait and flame drift with the pointer.
-    let off = () => {};
-    if (ctx.desktop) {
-      const layers = q("[data-depth]").map((node) => ({
-        x: gsap.quickTo(node, "x", { duration: 0.9, ease: "power3" }),
-        y: gsap.quickTo(node, "y", { duration: 0.9, ease: "power3" }),
-        d: Number((node as HTMLElement).dataset.depth),
-      }));
-      const onMove = (e: PointerEvent) => {
-        if (!el.hasAttribute("data-revealed")) return;
-        const px = e.clientX / window.innerWidth - 0.5;
-        const py = e.clientY / window.innerHeight - 0.5;
-        layers.forEach((l) => {
-          l.x(px * l.d);
-          l.y(py * l.d);
-        });
-      };
-      window.addEventListener("pointermove", onMove, { passive: true });
-      off = () => window.removeEventListener("pointermove", onMove);
-    }
+    const off = parallax();
 
     return () => {
       stop();
@@ -217,6 +248,11 @@ export function Hero() {
       <div data-hero-late className="mt-8 flex items-center gap-4 text-14 text-muted">
         <span>{heroCopy.chapterLabel}</span>
         <span aria-hidden className="h-px flex-1 bg-current" />
+        {tiltAsk && (
+          <button type="button" onClick={() => void tiltRequest.current?.()} className="ink-link">
+            {heroTiltCopy.enable}
+          </button>
+        )}
         <span>{heroCopy.scrollCue}</span>
       </div>
 
