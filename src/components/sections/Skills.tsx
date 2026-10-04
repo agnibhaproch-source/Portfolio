@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Rune } from "@/components/ui/Rune";
 import {
   learning,
   projectsUsing,
@@ -90,6 +91,9 @@ export function Skills() {
               {learning}
             </p>
           )}
+          <div className="mt-4 flex justify-center">
+            <Rune index={2} />
+          </div>
         </div>
 
         <ul data-skill-cards className="grid gap-gutter sm:grid-cols-2">
@@ -111,8 +115,8 @@ export function Skills() {
                   onPointerLeave={() => setActive(null)}
                   onBlur={() => setActive(null)}
                   fill={false}
-                  className="group h-full text-washi/70 transition-[color,filter] duration-300 outline-none hover:text-aura hover:[filter:drop-shadow(0_0_10px_rgb(201_162_74/0.35))] focus-visible:text-aura focus-visible:[filter:drop-shadow(0_0_10px_rgb(201_162_74/0.35))]"
-                  innerClassName="bg-[linear-gradient(150deg,rgb(42_26_34/0.95),rgb(29_22_20/0.95)_60%)] p-6 text-washi"
+                  className="group h-full text-washi/70 transition-[color,filter] duration-300 outline-none hover:text-aura hover:[filter:drop-shadow(0_0_10px_color-mix(in_srgb,var(--aura)_35%,transparent))] focus-visible:text-aura focus-visible:[filter:drop-shadow(0_0_10px_color-mix(in_srgb,var(--aura)_35%,transparent))]"
+                  innerClassName="bg-[linear-gradient(150deg,var(--twilight),var(--sumi)_60%)] p-6 text-washi"
                 >
                   <svg
                     aria-hidden

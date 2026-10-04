@@ -26,7 +26,7 @@ function FilmArt({ project }: { project: Project }) {
       <p data-parallax className="relative font-display text-56 text-washi lg:text-96">
         {project.name}
       </p>
-      <p className="absolute right-6 bottom-10 rotate-[-8deg] border-[3px] border-agni px-3 py-1 font-display text-18 text-agni uppercase">
+      <p className="absolute right-6 bottom-10 rotate-[-8deg] border-[3px] border-kiln px-3 py-1 font-display text-18 text-kiln uppercase">
         {workCopy.status[project.status]}
       </p>
     </div>

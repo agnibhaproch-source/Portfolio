@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Rune } from "@/components/ui/Rune";
 import { aboutCopy, education, profile, sections } from "@/content";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Panel } from "@/components/ui/Panel";
@@ -192,6 +193,7 @@ export function About() {
       className="relative overflow-x-clip px-4 pt-24 pb-24 md:px-10 md:pt-32 md:pb-32"
     >
       <SectionHeading copy={sections.about} />
+      <Rune index={1} className="absolute top-28 right-4 md:top-36 md:right-10" />
 
       <div data-about-stage className="relative grid gap-gutter md:grid-cols-2 lg:grid-cols-12">
         {/* 1: photo (silhouette until the owner's photo arrives) */}

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Dela_Gothic_One, Rampart_One, Zen_Kaku_Gothic_New } from "next/font/google";
 import { profile } from "@/content";
 import { SlashWipeProvider } from "@/components/motion/SlashWipe";
@@ -7,6 +8,7 @@ import { Cursor } from "@/components/ui/Cursor";
 import { Nav } from "@/components/ui/Nav";
 import { Preloader } from "@/components/ui/Preloader";
 import { ProgressLine } from "@/components/ui/ProgressLine";
+import { Toast } from "@/components/ui/Toast";
 import { headScript } from "@/lib/intro";
 import { SmoothScroll } from "@/lib/smooth-scroll";
 import "./globals.css";
@@ -71,9 +73,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Nav />
             {children}
             <AntiMagicLayer />
+            <Toast />
             <Cursor />
           </SlashWipeProvider>
         </SmoothScroll>
+        {/* Vercel serves the analytics script only on its own deployments. */}
+        {process.env.VERCEL && <Analytics />}
       </body>
     </html>
   );

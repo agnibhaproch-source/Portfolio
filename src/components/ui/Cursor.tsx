@@ -235,6 +235,7 @@ export function Cursor() {
 
   return (
     <div
+      data-no-print
       ref={ref}
       aria-hidden
       className="pointer-events-none invisible fixed inset-0 z-[200] opacity-0"

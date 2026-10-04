@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Rune } from "@/components/ui/Rune";
 import { arcs, experienceCopy, sections } from "@/content";
 import { ScrambleText } from "@/components/motion/ScrambleText";
 import { SpeedLines } from "@/components/motion/SpeedLines";
@@ -202,6 +203,7 @@ export function Experience() {
             );
           })}
         </ol>
+        <Rune index={3} className="relative mt-8 -ml-1.5 md:ml-[calc(9rem+1.5rem-18px)]" />
       </div>
     </section>
   );

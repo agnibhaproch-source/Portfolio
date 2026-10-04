@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { Rune } from "@/components/ui/Rune";
 import { credits, profile } from "@/content";
 import { gsap } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
@@ -54,6 +55,9 @@ export function Footer() {
             ))}
           </dl>
           <p className="mt-20 font-display text-56 md:text-96">{credits.ending}</p>
+          <div className="mt-6 flex justify-center">
+            <Rune index={4} />
+          </div>
           <div
             aria-hidden
             className="mx-auto mt-5 h-[3px] w-40 bg-[linear-gradient(90deg,var(--agni),var(--kiln))]"

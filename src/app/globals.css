@@ -9,6 +9,7 @@
   --washi: #e6d9bc; /* yellowed old-book paper */
   --tone: #8a7f6e; /* screentone dots, secondary text on night */
   --tone-ink: #5e5548; /* secondary text on paper (AA on washi) */
+  --tone-light: #93887a; /* secondary text on night (AA on sumi and twilight panels) */
   --agni: #b8232f; /* deep crimson flame, primary accent */
   --kiln: #e2622b; /* ember, flame core, hover heat */
   --twilight: #2a1a22; /* dark wine night, depth gradients */
@@ -38,7 +39,7 @@
 [data-mode="colour"] {
   --bg: var(--sumi);
   --fg: var(--washi);
-  --muted: var(--tone);
+  --muted: var(--tone-light);
   /* crimson is under 3:1 on sumi, so focus uses ember in colour mode */
   --ring: var(--kiln);
   --tone-dot: var(--washi);
@@ -395,6 +396,36 @@ section[id] {
 }
 
 /* ------------------------------------------------------------------
+   Print reading mode: swap the tokens so ink and paper trade places in
+   colour sections, and every flame and gold turns to grey ink.
+   ------------------------------------------------------------------ */
+html[data-print] {
+  --sumi: #e6d9bc;
+  --washi: #1d1614;
+  --agni: #3a302b;
+  --kiln: #4a403a;
+  --aura: #4a403a;
+  --twilight: #ddd0b2;
+  --tone: #5e5548;
+}
+
+html[data-print] [data-mode] {
+  --bg: #e6d9bc;
+  --fg: #1d1614;
+  --muted: #5e5548;
+  --ring: #1d1614;
+  --tone-dot: #1d1614;
+}
+
+html[data-print] :is(img, canvas) {
+  filter: grayscale(1) contrast(1.05);
+}
+
+html[data-print] .hero canvas {
+  display: none;
+}
+
+/* ------------------------------------------------------------------
    Reduced motion: no smooth-scroll hijack, near-instant transitions
    ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
@@ -405,5 +436,26 @@ section[id] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.2s !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Printing (the /resume page): drop the chrome and effects, plain ink on white. */
+@media print {
+  .grain::after,
+  [data-no-print],
+  header,
+  footer {
+    display: none !important;
+  }
+
+  html,
+  body,
+  [data-mode] {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  a {
+    text-decoration: none;
   }
 }

@@ -19,10 +19,13 @@ export const heroCopy = {
   scrollCue: "Scroll",
   viewWork: "View work",
   downloadResume: "Download resume",
+  viewResume: "View resume",
   antiMagicHint: "Shows the name in Japanese and switches the page to anti-magic mode",
 };
 
 export const navCopy = {
+  printOff: "Print",
+  printLabel: "Read in black-and-white print mode",
   home: "Home",
   openMenu: "Open menu",
   closeMenu: "Close menu",
@@ -153,3 +156,36 @@ export const statsCopy = {
 
 export const heroTiltCopy = { enable: "Enable tilt" };
 export const comboCopy = { combo: "COMBO" };
+
+export const runeCopy = {
+  total: 5,
+  label: "Hidden rune",
+  found: (n: number, total: number) => `Rune ${n} of ${total} found`,
+  allFound: "All five runes found. A sealed page has opened.",
+  open: "Open it",
+  secretPath: "/final-form",
+  // secret page
+  sealedTitle: "Sealed",
+  sealedBody:
+    "This page opens once all five hidden runes are found. They are somewhere on the home page.",
+  unlockedTitle: "Final form",
+  unlockedBody: "You found every rune. Thanks for exploring this far.",
+  progress: (n: number, total: number) => `${n} of ${total} runes found`,
+  back: "Back to the first page",
+  contact: "Say hello",
+  close: "Close notice",
+};
+
+export const resumeCopy = {
+  title: "Resume",
+  print: "Save as PDF",
+  printHint: "Opens your browser's print dialog; choose “Save as PDF”.",
+  education: "Education",
+  experience: "Experience",
+  projects: "Projects",
+  sideProjects: "Other builds",
+  skills: "Skills",
+  cgpa: "First-year CGPA",
+  live: "Live",
+  code: "Code",
+};

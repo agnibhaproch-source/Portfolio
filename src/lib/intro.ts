@@ -34,4 +34,4 @@ export const PRELOADED_KEY = "agni:preloaded";
  * Runs in <head> before first paint: flags JS, and decides whether the
  * preloader should show (first visit in this session, motion allowed).
  */
-export const headScript = `(function(){try{var d=document.documentElement;d.setAttribute('data-js','');var r=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!r&&!sessionStorage.getItem('${PRELOADED_KEY}'))d.setAttribute('data-preload','');}catch(e){}})();`;
+export const headScript = `(function(){try{var d=document.documentElement;d.setAttribute('data-js','');var r=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!r&&!sessionStorage.getItem('${PRELOADED_KEY}'))d.setAttribute('data-preload','');try{if(localStorage.getItem('agni:print')==='1')d.setAttribute('data-print','');}catch(e){}}catch(e){}})();`;

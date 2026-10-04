@@ -5,3 +5,4 @@ export * from "./skills";
 export * from "./experience";
 export * from "./projects";
 export * from "./achievements";
+export * from "./log";

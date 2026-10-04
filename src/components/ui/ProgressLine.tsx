@@ -36,7 +36,12 @@ export function ProgressLine() {
   }, ref);
 
   return (
-    <div ref={ref} aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[55] h-[3px]">
+    <div
+      data-no-print
+      ref={ref}
+      aria-hidden
+      className="pointer-events-none fixed inset-x-0 top-0 z-[55] h-[3px]"
+    >
       <div
         data-bar
         className="h-full origin-left bg-[linear-gradient(90deg,var(--agni),var(--kiln))]"

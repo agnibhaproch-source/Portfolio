@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { nav, navCopy, profile } from "@/content";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
+import { printMode, usePrintMode } from "@/lib/print-mode";
 import { useLenis } from "@/lib/smooth-scroll";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ export function Nav() {
   const menuButton = useRef<HTMLButtonElement>(null);
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const print = usePrintMode();
   const href = (id: string) => (onHome ? `#${id}` : `/#${id}`);
 
   useMotion(
@@ -176,16 +178,30 @@ export function Nav() {
             })}
           </ul>
 
-          <button
-            ref={menuButton}
-            type="button"
-            aria-expanded={open}
-            aria-controls="site-menu"
-            onClick={() => toggle(!open)}
-            className="font-display text-18 md:hidden"
-          >
-            {open ? navCopy.closeMenu : navCopy.menuLabel}
-          </button>
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              aria-pressed={print}
+              aria-label={navCopy.printLabel}
+              onClick={() => printMode.toggle()}
+              className={cn(
+                "border-2 border-current px-2 py-0.5 font-display text-14 transition-colors",
+                print && "bg-fg text-bg",
+              )}
+            >
+              {navCopy.printOff}
+            </button>
+            <button
+              ref={menuButton}
+              type="button"
+              aria-expanded={open}
+              aria-controls="site-menu"
+              onClick={() => toggle(!open)}
+              className="font-display text-18 md:hidden"
+            >
+              {open ? navCopy.closeMenu : navCopy.menuLabel}
+            </button>
+          </div>
         </nav>
       </header>
 

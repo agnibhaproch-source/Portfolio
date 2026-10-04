@@ -1,9 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Rune } from "@/components/ui/Rune";
 import { heroCopy, heroTiltCopy, profile, sections } from "@/content";
 import { Flame } from "@/components/gl/Flame";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonClass } from "@/components/ui/Button";
+import { TransitionLink } from "@/components/ui/TransitionLink";
 import { Panel } from "@/components/ui/Panel";
 import { Silhouette } from "@/components/ui/Silhouette";
 import { antiMagic } from "@/lib/anti-magic";
@@ -212,10 +214,14 @@ export function Hero() {
           )}
           <div data-hero-late className="mt-10 flex flex-wrap gap-4">
             <Button href={`#${sections.work.id}`}>{heroCopy.viewWork}</Button>
-            {resume && (
+            {resume ? (
               <Button href={resume} variant="ghost" download>
                 {heroCopy.downloadResume}
               </Button>
+            ) : (
+              <TransitionLink href="/resume" className={buttonClass("ghost")}>
+                {heroCopy.viewResume}
+              </TransitionLink>
             )}
           </div>
         </div>
@@ -247,6 +253,7 @@ export function Hero() {
 
       <div data-hero-late className="mt-8 flex items-center gap-4 text-14 text-muted">
         <span>{heroCopy.chapterLabel}</span>
+        <Rune index={0} className="-my-2" />
         <span aria-hidden className="h-px flex-1 bg-current" />
         {tiltAsk && (
           <button type="button" onClick={() => void tiltRequest.current?.()} className="ink-link">
