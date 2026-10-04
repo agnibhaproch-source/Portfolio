@@ -226,6 +226,98 @@
 }
 
 /* ------------------------------------------------------------------
+   Intro states. Only with JS (html[data-js], set before paint) and motion
+   allowed; without either, the final colour hero simply shows.
+   Each state has a CSS failsafe so nothing can stay hidden.
+   ------------------------------------------------------------------ */
+.preloader {
+  display: none;
+}
+
+.hero-paper,
+.hero-print {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-preload] .preloader {
+    display: flex;
+    animation: failsafe-hide 0.2s 2.6s forwards;
+  }
+
+  /* art stays hidden until the timeline takes over, so it never flashes drawn */
+  html[data-preload] .preloader:not([data-started]) :is([data-fade], [data-frame]) {
+    opacity: 0;
+  }
+
+  html[data-js] .hero:not([data-revealed]) :is(.hero-paper, .hero-print) {
+    visibility: visible;
+    animation: failsafe-hide 0.2s 7s forwards;
+  }
+
+  html[data-js] .hero:not([data-revealed]) :is([data-hero-late], [data-name-latin] [data-ch]) {
+    opacity: 0;
+    animation: failsafe-show 0.2s 7s forwards;
+  }
+
+  /* ink on paper, paper on night: the text flips exactly at the cut */
+  html[data-js] .hero:not([data-revealed]) [data-hero-copy] {
+    mix-blend-mode: difference;
+  }
+}
+
+@keyframes failsafe-hide {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes failsafe-show {
+  to {
+    opacity: 1;
+  }
+}
+
+.hero[data-revealed] [data-hero-name] {
+  text-shadow: 0 0 48px rgb(226 98 43 / 0.22);
+}
+
+/* CSS flame: shown for SSR, no JS, reduced motion and small screens */
+.flame-fallback {
+  background:
+    radial-gradient(34% 46% at 50% 100%, var(--kiln) 0%, transparent 70%),
+    radial-gradient(52% 78% at 50% 100%, var(--agni) 0%, transparent 72%);
+  filter: blur(16px);
+  transform-origin: 50% 100%;
+  transition: opacity 0.7s;
+  animation: flame-breathe 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes flame-breathe {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.06, 1.14) translateY(-2%);
+  }
+}
+
+/* Custom cursor replaces the native one on desktop */
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+
+html.has-cursor :is(input, textarea, select) {
+  cursor: text !important;
+}
+
+section[id] {
+  scroll-margin-top: 4rem;
+}
+
+/* ------------------------------------------------------------------
    Reduced motion: no smooth-scroll hijack, near-instant transitions
    ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {

@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, type ElementType, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { DUR, gsap, SplitText, STAGGER } from "@/lib/gsap";
 import { triggerFor, type Trigger } from "@/lib/motion";
 import { useMotion } from "@/lib/use-motion";
 
+type TextTag = "p" | "span" | "div" | "h2" | "h3" | "blockquote";
+
 type Props = {
-  as?: ElementType;
+  as?: TextTag;
   by?: "lines" | "words" | "chars";
   /** Animate "on twos": stepped motion that reads as hand-drawn. */
   stepped?: boolean;
@@ -30,6 +32,7 @@ export function SplitReveal({
   children,
 }: Props) {
   const ref = useRef<HTMLElement>(null);
+  const El = Tag as "p";
 
   useMotion((ctx, el) => {
     if (ctx.reduced) {
@@ -55,8 +58,8 @@ export function SplitReveal({
   }, ref);
 
   return (
-    <Tag ref={ref} className={className}>
+    <El ref={ref as React.RefObject<HTMLParagraphElement>} className={className}>
       {children}
-    </Tag>
+    </El>
   );
 }

@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /** Panel outlines as [x%, y%] points. Diagonal cuts give the manga-page feel. */
@@ -42,31 +42,37 @@ export function clipPolygon(points: Points) {
   return `polygon(${points.map(([x, y]) => `${x}% ${y}%`).join(", ")})`;
 }
 
-type PanelProps<T extends ElementType> = {
-  as?: T;
+type PanelTag = "div" | "section" | "article" | "li" | "figure";
+
+type PanelProps = {
+  as?: PanelTag;
   shape?: PanelShape;
   /** Screentone fill behind the content. */
   tone?: boolean;
+  /** Paint the mode background inside the panel (default true). */
+  fill?: boolean;
   className?: string;
   innerClassName?: string;
   children?: ReactNode;
-} & Omit<ComponentPropsWithoutRef<T>, "as" | "className" | "children">;
+} & Omit<ComponentPropsWithoutRef<"div">, "className" | "children">;
 
 /**
  * A ruled manga panel. Content is clipped to the shape; the 3px ink border
  * is an SVG polygon with non-scaling stroke, so it stays 3px at any size and
  * can be drawn on with DrawSVG (data-panel-border).
  */
-export function Panel<T extends ElementType = "div">({
+export function Panel({
   as,
   shape = "rect",
   tone = false,
+  fill = true,
   className,
   innerClassName,
   children,
   ...rest
-}: PanelProps<T>) {
-  const Tag: ElementType = as ?? "div";
+}: PanelProps) {
+  // All panel tags share div attributes; narrow for the JSX checker.
+  const Tag = (as ?? "div") as "div";
   const points = PANEL_SHAPES[shape];
   const clip = clipPolygon(points);
 
@@ -74,7 +80,7 @@ export function Panel<T extends ElementType = "div">({
     <Tag className={cn("relative isolate", className)} {...rest}>
       <div
         data-panel-content
-        className={cn("relative h-full bg-bg", tone && "tone", innerClassName)}
+        className={cn("relative h-full", fill && "bg-bg", tone && "tone", innerClassName)}
         style={{ clipPath: clip }}
       >
         {children}

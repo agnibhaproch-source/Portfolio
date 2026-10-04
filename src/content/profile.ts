@@ -7,10 +7,11 @@ export const profile: Profile = {
     last: "Bhattacharya",
     alias: "Agni",
     aliasJa: "アグニ",
+    ja: { first: "アグニバ", last: "バッタチャリヤ" },
   },
   role: "Full-stack developer",
   location: "Kolkata, India",
-  tagline: null, // TODO(phase 3): one-line tagline
+  tagline: "Born with zero talent, coding with pure grit.",
   bio: null, // TODO(phase 4): short bio, 2 to 3 sentences
   origin: null, // TODO(phase 4): how he got into code
   bigLine: null, // TODO(phase 4): one line set large in About
@@ -25,8 +26,8 @@ export const profile: Profile = {
     },
     others: [], // TODO(phase 8): X, Instagram, LeetCode, others
   },
-  resume: null, // TODO(phase 3): "/resume.pdf" once dropped in public/
-  portrait: null, // TODO(phase 3): public/me/portrait.jpg
+  resume: null, // TODO: "/resume.pdf" once the owner sends it
+  portrait: null, // TODO: public/me/portrait.jpg once the owner sends it
   pose: null, // TODO(phase 4): public/me/pose.jpg (optional)
 };
 

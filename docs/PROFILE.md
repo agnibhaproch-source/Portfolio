@@ -8,8 +8,8 @@ Single source of truth. `ASK` = not known yet, ask at the phase that needs it. `
 - Alias used on the site: Agni (short for Agnibha, matches the flame concept)
 - Role line: Full-stack developer
 - Location: Kolkata, India (shown on site). Studying in Punjab.
-- Name in Japanese script for decorative use: アグニ (Agni), approved. Full name in katakana: ASK owner to approve a rendering before use
-- One-line tagline: ASK
+- Name in Japanese script for decorative use: アグニ (Agni), approved. Full name in katakana: アグニバ・バッタチャリヤ, approved
+- One-line tagline: "Born with zero talent, coding with pure grit."
 - Short bio, 2 to 3 sentences, first person: ASK
 - Longer origin story, how he got into code: ASK
 - Favourite anime: Black Clover. Favourite characters: Asta, Yami, Nacht. Used for visual direction only (dark ink, grimoire, slash and shadow energy, underdog grit). Never shown on the site by name, likeness, symbol or logo.
@@ -55,11 +55,11 @@ For each project collect: one-line pitch, problem, his role, stack, 2 to 4 highl
 - Email: agnibhapro.ch@gmail.com (shown publicly)
 - Phone: kept private, not shown on the site (owner decision)
 - X, Instagram, LeetCode, others: ASK
-- Resume PDF, drop at `public/resume.pdf`: ASK
+- Resume PDF, drop at `public/resume.pdf`: not yet, owner will send later (button hidden until then)
 
 ## Assets
 
-- Portrait photo, high resolution, plain background if possible, drop at `public/me/portrait.jpg`: ASK
+- Portrait photo, high resolution, plain background if possible, drop at `public/me/portrait.jpg`: not yet, owner will send later (silhouette panel until then)
 - Optional second photo, full body or action pose, `public/me/pose.jpg`: ASK
 - Optional original illustrated avatar that he owns the rights to, `public/me/avatar.png`: ASK
 - Favicon preference: ASK
@@ -69,6 +69,7 @@ For each project collect: one-line pitch, problem, his role, stack, 2 to 4 highl
 - Design concept "ink to flame": approved 2026-10-04
 - Palette: "aged grimoire" retro (crimson, ember, tarnished gold on brown-black and yellowed paper, film grain)
 - Black Clover motifs, all approved: grimoire Work section (chapters, not episodes), dimension-slash transitions, shadow creep at the mode switch, anti-magic aura on the skills chart
+- Hero name hover "anti-magic" (owner request, phase 3): name switches to アグニバ・バッタチャリヤ, whole page drains to black and white with only crimson surviving, and an original jagged anti-magic sigil projects behind the name with crimson cracks across the screen. Phones: tap the name to toggle. Keyboard: Enter/Space on the name.
 - Extra Black Clover inspired features, all approved: grimoire preloader, magic circles, blade cursor with click slash, limit-break Konami easter egg
 - Section wording: plain headings, theme only in subtitles (Skills: "spell list", Experience: "missions so far", Work: "grimoire")
 - Domain: none yet, ship on the Vercel URL first

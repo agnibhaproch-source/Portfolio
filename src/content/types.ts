@@ -8,7 +8,15 @@
 export type Link = { label: string; href: string };
 
 export type Profile = {
-  name: { full: string; first: string; last: string; alias: string; aliasJa: string };
+  name: {
+    full: string;
+    first: string;
+    last: string;
+    alias: string;
+    aliasJa: string;
+    /** Approved katakana rendering of the full name, by line. */
+    ja: { first: string; last: string };
+  };
   role: string;
   location: string;
   tagline: string | null;

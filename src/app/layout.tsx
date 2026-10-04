@@ -2,6 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Dela_Gothic_One, Rampart_One, Zen_Kaku_Gothic_New } from "next/font/google";
 import { profile } from "@/content";
 import { SlashWipeProvider } from "@/components/motion/SlashWipe";
+import { AntiMagicLayer } from "@/components/ui/AntiMagicLayer";
+import { Cursor } from "@/components/ui/Cursor";
+import { Nav } from "@/components/ui/Nav";
+import { Preloader } from "@/components/ui/Preloader";
+import { ProgressLine } from "@/components/ui/ProgressLine";
+import { headScript } from "@/lib/intro";
 import { SmoothScroll } from "@/lib/smooth-scroll";
 import "./globals.css";
 
@@ -43,7 +49,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${dela.variable} ${zen.variable} ${rampart.variable}`}>
+    <html
+      lang="en"
+      className={`${dela.variable} ${zen.variable} ${rampart.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: headScript }} />
+      </head>
       <body className="grain">
         <a
           href="#main"
@@ -52,7 +65,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <SmoothScroll>
-          <SlashWipeProvider>{children}</SlashWipeProvider>
+          <SlashWipeProvider>
+            <Preloader />
+            <ProgressLine />
+            <Nav />
+            {children}
+            <AntiMagicLayer />
+            <Cursor />
+          </SlashWipeProvider>
         </SmoothScroll>
       </body>
     </html>

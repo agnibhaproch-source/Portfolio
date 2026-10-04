@@ -35,19 +35,20 @@ type ButtonRest = Omit<AsButton, keyof Common>;
 export function Button(props: AsLink | AsButton) {
   const { variant = "primary", className, children, ...rest } = props;
   const classes = cn(base, variants[variant], className);
+  const cursor = { "data-cursor": "charge" };
 
   if (rest.href !== undefined) {
     const { href, ...anchor } = rest as LinkRest;
     const external = /^https?:|^mailto:/.test(href) || anchor.download !== undefined;
     if (external) {
       return (
-        <a href={href} className={classes} {...anchor}>
+        <a href={href} className={classes} {...cursor} {...anchor}>
           {children}
         </a>
       );
     }
     return (
-      <Link href={href} className={classes} {...anchor}>
+      <Link href={href} className={classes} {...cursor} {...anchor}>
         {children}
       </Link>
     );
@@ -55,7 +56,7 @@ export function Button(props: AsLink | AsButton) {
 
   const { type = "button", ...button } = rest as ButtonRest;
   return (
-    <button type={type} className={classes} {...button}>
+    <button type={type} className={classes} {...cursor} {...button}>
       {children}
     </button>
   );

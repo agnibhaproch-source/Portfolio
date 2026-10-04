@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ElementType } from "react";
+import { useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { triggerFor, type Trigger } from "@/lib/motion";
 import { useMotion } from "@/lib/use-motion";
@@ -9,7 +9,7 @@ const KATAKANA =
   "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン";
 
 type Props = {
-  as?: ElementType;
+  as?: "span" | "p" | "h2" | "h3";
   text: string;
   trigger?: Trigger;
   duration?: number;
@@ -28,6 +28,7 @@ export function ScrambleText({
   className,
 }: Props) {
   const ref = useRef<HTMLElement>(null);
+  const El = Tag as "span";
 
   useMotion(
     (ctx, el) => {
@@ -46,7 +47,7 @@ export function ScrambleText({
   );
 
   return (
-    <Tag ref={ref} className={className}>
+    <El ref={ref as React.RefObject<HTMLSpanElement>} className={className}>
       <span className="sr-only">{text}</span>
       {/* The invisible copy reserves the final size; katakana are wider than
           Latin, so the scrambling layer is clipped to it to avoid reflow. */}
@@ -56,6 +57,6 @@ export function ScrambleText({
           {text}
         </span>
       </span>
-    </Tag>
+    </El>
   );
 }

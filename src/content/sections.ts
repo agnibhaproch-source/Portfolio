@@ -17,6 +17,14 @@ export const heroCopy = {
   scrollCue: "Scroll",
   viewWork: "View work",
   downloadResume: "Download resume",
+  antiMagicHint: "Shows the name in Japanese and switches the page to anti-magic mode",
+};
+
+export const navCopy = {
+  home: "Home",
+  openMenu: "Open menu",
+  closeMenu: "Close menu",
+  menuLabel: "Menu",
 };
 
 export const credits = {
