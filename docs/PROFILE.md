@@ -85,4 +85,11 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 - Open to work / internships / freelance (drives the contact status line): looking for an internship
 - Contact form destination (email service or just mailto): mailto (default, not yet confirmed by owner)
 - Sound effects wanted: yes, original sounds in a Black Clover feel, off by default with nav toggle
-- Analytics wanted: ASK
+- Analytics wanted: yes, Vercel Web Analytics (cookieless)
+
+## Extra features chosen by owner (2026-10-04)
+
+- Info: live GitHub stats (contribution heatmap as screentone, repo count, top languages); more projects (UBuy, Hackathon-Mindmap-AI, CampusAi, others: ASK which and where); coding profiles (platforms and usernames: ASK)
+- Animation: spell-cast hover on skill cards (rune burst + radar axis highlight + projects using it); manga speech bubbles on About panels (lines: ASK); ink-splatter click with combo counter; phone tilt parallax on the hero
+- Features: hidden rune hunt (five original runes, unlocks a secret page); anime watch list from AniList, text only (username: ASK); real message delivery via Resend (account + API key: ASK)
+- Extras: print reading mode toggle; dev log / blog ("Training arc log", posts: ASK); interactive printable /resume page; Vercel Web Analytics
