@@ -17,7 +17,7 @@ export const profile: Profile = {
     "I started out curious about how the apps and sites I used every day actually worked. I built small things, broke them, fixed them, and got hooked on the feeling of something finally running. Since then I've kept picking projects slightly bigger than what I know how to build.",
   bigLine: "Every project is a training arc.",
   interests: ["Anime", "Gaming", "Music"],
-  availability: null, // TODO(phase 8): open to internships / freelance
+  availability: "Looking for an internship",
   email: "agnibhapro.ch@gmail.com",
   links: {
     github: { label: "GitHub", href: "https://github.com/agnibhaproch-source" },
@@ -39,5 +39,5 @@ export const education: Education = {
   region: "Punjab",
   start: 2025,
   end: 2029,
-  highlights: [], // TODO(phase 6): anything to highlight (CGPA optional)
+  highlights: ["First-year CGPA 9.09: 8.65 in semester 1, 9.65 in semester 2"],
 };

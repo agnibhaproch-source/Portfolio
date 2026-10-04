@@ -42,6 +42,8 @@ export type Education = {
   highlights: string[];
 };
 
+export type Stat = { value: number; decimals: number; label: string };
+
 export type Arc = {
   role: string;
   org: string;
@@ -49,6 +51,9 @@ export type Arc = {
   end: string;
   outcomes: string[];
   stack: string[];
+  /** Big numbers that count up, e.g. CGPA. */
+  stats?: Stat[];
+  links?: Link[];
 };
 
 export type SkillGroup = { name: string; items: string[] };

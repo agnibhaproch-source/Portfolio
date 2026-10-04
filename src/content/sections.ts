@@ -51,3 +51,10 @@ export const skillsCopy = {
   learning: "Currently learning",
   outOf: "out of 10",
 };
+
+export const experienceCopy = {
+  mission: "Mission",
+  to: "to",
+  builtLabel: "Built",
+  opensInNewTab: "(opens GitHub)",
+};

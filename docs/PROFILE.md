@@ -22,18 +22,24 @@ Single source of truth. `ASK` = not known yet, ask at the phase that needs it. `
 - In association with Kalvium (Work Integrated Program)
 - Start year: 2025
 - Expected graduation: 2029
-- CGPA or notable academic results to show: ASK
+- CGPA or notable academic results to show: first-year CGPA 9.09 (semester 1: 8.65, semester 2: 9.65)
 
 ## Experience
 
-- GSSoC 2026 (GirlScript Summer of Code), open-source contributor: confirmed by owner. Repos, merged PRs, rank or badges: ASK (phase 6)
-- Internships, other open-source programs, hackathons, clubs, freelance: ASK
+- GSSoC 2026 (GirlScript Summer of Code), open-source contributor: 7 pull requests. Repos, rank, months active: not given
+- Internships: none yet; looking for one
+- Hackathons: took part in 1, no award (name not given; not shown until named)
+- Clubs, freelance: none given
 
 ## Projects
 
 For each project collect: one-line pitch, problem, the owner's role, stack, 2 to 4 highlights, live URL, repo URL, 3 to 6 screenshots or a short screen recording, status (live, in progress, archived).
 
-- Which projects to feature, and the order: ASK
+- First-year projects (owner-provided links, details read from GitHub 2026-10-04):
+  - ReelHouse, https://github.com/agnibhaproch-source/ReelHouse : cinematic movie-discovery website (TMDB data, motion-heavy), TypeScript. Status: in progress
+  - NightOwl, https://github.com/agnibhaproch-source/NightOwl , live https://night-owl-neon.vercel.app : late-night hostel snack delivery, customer app + store admin; React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, Lenis, Zustand, Recharts. Owner's link said NightOwl-Store.in: CONFIRM this is the same project
+  - Nova-Ai: owner's link https://github.com/agnibhaproch-source/Nova-Ai returns Not Found (private or renamed): ASK for correct link
+- Which projects to feature, and the order: ASK (phase 7)
 - Which single project is the flagship: ASK
 
 ## Skills
@@ -75,7 +81,7 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 - Extra Black Clover inspired features, all approved: grimoire preloader, magic circles, blade cursor with click slash, limit-break Konami easter egg
 - Section wording: plain headings, theme only in subtitles (Skills: "spell list", Experience: "missions so far", Work: "grimoire")
 - Domain: none yet, ship on the Vercel URL first
-- Open to work / internships / freelance (drives the contact status line): ASK
+- Open to work / internships / freelance (drives the contact status line): looking for an internship
 - Contact form destination (email service or just mailto): ASK
 - Sound effects wanted: yes, original sounds in a Black Clover feel, off by default with nav toggle
 - Analytics wanted: ASK
