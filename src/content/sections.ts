@@ -1,3 +1,4 @@
+import { profile } from "./profile";
 import type { SectionCopy } from "./types";
 
 /** Plain headings for recruiters; the theme lives in the subtitle line. */
@@ -30,10 +31,15 @@ export const navCopy = {
 export const credits = {
   heading: "Credits",
   rows: [
+    { label: "Starring", value: profile.name.full },
+    { label: "Written, designed and built by", value: profile.name.full },
     { label: "Built with", value: "Next.js, TypeScript, Tailwind CSS" },
     { label: "Motion", value: "GSAP, Lenis, three.js" },
     { label: "Type", value: "Dela Gothic One, Zen Kaku Gothic New, Rampart One" },
+    { label: "Inspired by", value: "Manga ink, and the underdog energy of shōnen anime" },
+    { label: "Special thanks", value: "You, for scrolling this far" },
   ],
+  ending: "To be continued",
   backToTop: "Back to top",
 };
 
@@ -62,4 +68,54 @@ export const experienceCopy = {
 export const transitionCopy = {
   /** Revealed on the night side of the paper burn, just before Skills. */
   burnLine: "The grimoire opens",
+};
+
+export const workCopy = {
+  chapter: "Chapter",
+  introTitle: "Grimoire",
+  introLine: "Every project is a chapter. Scroll to turn the pages.",
+  chaptersSoFar: "chapters so far",
+  viewProject: "View project",
+  liveSite: "Live site",
+  sourceCode: "Source code",
+  status: { live: "Live", "in progress": "In progress", archived: "Archived" },
+  closingTitle: "More chapters",
+  closingLine: "Everything else I am building lives on GitHub.",
+  allWork: "All work on GitHub",
+  // detail page
+  problem: "The problem",
+  built: "What I built",
+  role: "My role",
+  stack: "Stack",
+  gallery: "Gallery",
+  links: "Links",
+  nextChapter: "Next chapter",
+  backToGrimoire: "Back to the grimoire",
+};
+
+export const contactCopy = {
+  directLabel: "Or reach me directly",
+  formTitle: "Send a message",
+  name: "Name",
+  email: "Email",
+  message: "Message",
+  send: "Send message",
+  errors: {
+    name: "Enter your name.",
+    email: "Enter an email address like name@example.com.",
+    message: "Write a message of at least 10 characters.",
+  },
+  errorSummary: "Fix the highlighted fields, then send again.",
+  successTitle: "Message ready",
+  successBody:
+    "Your email app should have opened with the message filled in. Press send there and it reaches me. If nothing opened, email me at",
+  again: "Write another",
+  subject: "Hello from your portfolio",
+};
+
+export const notFoundCopy = {
+  title: "Page not found",
+  body: "This page is missing from the grimoire.",
+  sfx: "SHIIN...",
+  home: "Back to the first page",
 };

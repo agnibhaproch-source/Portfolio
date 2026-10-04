@@ -39,8 +39,9 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
   - ReelHouse, https://github.com/agnibhaproch-source/ReelHouse : cinematic movie-discovery website (TMDB data, motion-heavy), TypeScript. Status: in progress
   - NightOwl, https://github.com/agnibhaproch-source/NightOwl , live https://night-owl-neon.vercel.app : late-night hostel snack delivery, customer app + store admin; React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, Lenis, Zustand, Recharts. Owner's link said NightOwl-Store.in: CONFIRM this is the same project
   - Nova-Ai: owner's link https://github.com/agnibhaproch-source/Nova-Ai returns Not Found (private or renamed): ASK for correct link
-- Which projects to feature, and the order: ASK (phase 7)
-- Which single project is the flagship: ASK
+- Which projects to feature, and the order: defaults applied (owner did not pick): Chapter 01 NightOwl (flagship), Chapter 02 ReelHouse. Pitch, problem, role and highlights drafted by Claude from the READMEs and live site: CONFIRM
+- NightOwl screenshots captured from the live site into public/projects/nightowl/ (welcome, sign-in, mobile). /admin returns a Vercel 404 on the deployment. ReelHouse: no live build, no screenshots
+- Which single project is the flagship: NightOwl (default)
 
 ## Skills
 
@@ -82,6 +83,6 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 - Section wording: plain headings, theme only in subtitles (Skills: "spell list", Experience: "missions so far", Work: "grimoire")
 - Domain: none yet, ship on the Vercel URL first
 - Open to work / internships / freelance (drives the contact status line): looking for an internship
-- Contact form destination (email service or just mailto): ASK
+- Contact form destination (email service or just mailto): mailto (default, not yet confirmed by owner)
 - Sound effects wanted: yes, original sounds in a Black Clover feel, off by default with nav toggle
 - Analytics wanted: ASK
