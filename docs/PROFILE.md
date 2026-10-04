@@ -11,7 +11,7 @@ Single source of truth. `ASK` = not known yet, ask at the phase that needs it. `
 - Name in Japanese script for decorative use: アグニ (Agni), approved. Full name in katakana: アグニバ・バッタチャリヤ, approved
 - One-line tagline: "Born with zero talent, coding with pure grit."
 - Short bio, 2 to 3 sentences, first person: ASK
-- Longer origin story, how he got into code: ASK
+- Longer origin story, how the owner got into code: ASK
 - Favourite anime: Black Clover. Favourite characters: Asta, Yami, Nacht. Used for visual direction only (dark ink, grimoire, slash and shadow energy, underdog grit). Never shown on the site by name, likeness, symbol or logo.
 - Things outside code (hobbies, sports, music): ASK
 
@@ -29,7 +29,7 @@ Single source of truth. `ASK` = not known yet, ask at the phase that needs it. `
 
 ## Projects
 
-For each project collect: one-line pitch, problem, his role, stack, 2 to 4 highlights, live URL, repo URL, 3 to 6 screenshots or a short screen recording, status (live, in progress, archived).
+For each project collect: one-line pitch, problem, the owner's role, stack, 2 to 4 highlights, live URL, repo URL, 3 to 6 screenshots or a short screen recording, status (live, in progress, archived).
 
 - Which projects to feature, and the order: ASK
 - Which single project is the flagship: ASK
@@ -61,7 +61,7 @@ For each project collect: one-line pitch, problem, his role, stack, 2 to 4 highl
 
 - Portrait photo, high resolution, plain background if possible, drop at `public/me/portrait.jpg`: not yet, owner will send later (silhouette panel until then)
 - Optional second photo, full body or action pose, `public/me/pose.jpg`: ASK
-- Optional original illustrated avatar that he owns the rights to, `public/me/avatar.png`: ASK
+- Optional original illustrated avatar that the owner owns the rights to, `public/me/avatar.png`: ASK
 - Favicon preference: ASK
 
 ## Site settings

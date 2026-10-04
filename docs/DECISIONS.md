@@ -35,3 +35,4 @@
 | 2026-10-04 | Anti-magic is two fixed layers: a backdrop-filter drain and a separate `mix-blend-mode: screen` projection layer. | Chrome isolates a layer containing blend children, which silently disabled the drain. |
 | 2026-10-04 | Nav sound toggle deferred to phase 9 with the sound system, so no control ships that does nothing. | Avoid a dead control. |
 | 2026-10-04 | Polymorphic `as` props narrowed to explicit tag unions. | @react-three/fiber augments global JSX (e.g. `line`, `mesh`), which breaks `ElementType` props. |
+| 2026-10-04 | Template placeholder roles removed from 03-SECTIONS and 04-PHASES; phase 6 now asks generically about internships and open source. Wireframe name and pronouns in docs neutralised. | Owner request. |

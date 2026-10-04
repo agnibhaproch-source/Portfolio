@@ -6,5 +6,5 @@ export const skillGroups: SkillGroup[] = [];
 // TODO(phase 5): top 6 with an honest rating out of 10
 export const topSkills: RatedSkill[] = [];
 
-// TODO(phase 5): what he is learning right now
+// TODO(phase 5): what the owner is learning right now
 export const learning: string | null = null;

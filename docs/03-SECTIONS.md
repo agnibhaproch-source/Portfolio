@@ -16,7 +16,7 @@ Motion spec: moment 1. Shows only the counter, the flame mark and one line of te
 ## 2. About
 
 - Print mode, five panels (see wireframe in 01-DESIGN).
-- Panel 1: second photo or cropped portrait. Panel 2: short bio. Panel 3 and 5: two facts (location, studying at LPU with Kalvium, graduating 2029). Panel 4: one line in his own words, set large.
+- Panel 1: second photo or cropped portrait. Panel 2: short bio. Panel 3 and 5: two facts (location, studying at LPU with Kalvium, graduating 2029). Panel 4: one line in the owner's own words, set large.
 - Motion: moment 4. Ends with moment 5 (mode switch).
 
 ## 3. Skills
@@ -42,7 +42,7 @@ Motion spec: moment 1. Shows only the counter, the flame mark and one line of te
 
 ### Project detail page `/work/[slug]`
 
-- Opens with the project's title card, then: problem, what he built, his role, stack, highlights, screenshot gallery in panel layout, links, next project link styled as "next episode".
+- Opens with the project's title card, then: problem, what was built, the owner's role, stack, highlights, screenshot gallery in panel layout, links, next project link styled as "next episode".
 - Statically generated from `src/content/projects.ts`.
 
 ## 6. Achievements (only if PROFILE.md has content)

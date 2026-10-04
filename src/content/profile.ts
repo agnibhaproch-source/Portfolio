@@ -13,7 +13,7 @@ export const profile: Profile = {
   location: "Kolkata, India",
   tagline: "Born with zero talent, coding with pure grit.",
   bio: null, // TODO(phase 4): short bio, 2 to 3 sentences
-  origin: null, // TODO(phase 4): how he got into code
+  origin: null, // TODO(phase 4): how the owner got into code
   bigLine: null, // TODO(phase 4): one line set large in About
   interests: [], // TODO(phase 4): interests outside code
   availability: null, // TODO(phase 8): open to internships / freelance

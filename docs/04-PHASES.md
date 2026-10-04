@@ -72,7 +72,7 @@ Accept: chart is accessible (values available as text); cards usable by keyboard
 Ask before starting:
 1. Internships or jobs: for each, what you built, stack, 2 to 3 outcomes (numbers if you have them).
 2. Open-source programs or contributions: repos, merged PRs, any rank or badge.
-3. LPU and Kalvium: start year, anything to highlight (CGPA optional).
+3. LPU and Kalvium: anything to highlight (CGPA optional).
 4. Any other roles, hackathons, clubs or freelance work.
 
 Do: moment 7.
