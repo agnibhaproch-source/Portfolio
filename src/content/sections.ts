@@ -58,3 +58,8 @@ export const experienceCopy = {
   builtLabel: "Built",
   opensInNewTab: "(opens GitHub)",
 };
+
+export const transitionCopy = {
+  /** Revealed on the night side of the paper burn, just before Skills. */
+  burnLine: "The grimoire opens",
+};

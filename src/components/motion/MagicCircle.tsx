@@ -50,51 +50,64 @@ function rune(i: number) {
   );
 }
 
-type Props = { trigger?: Trigger; spin?: boolean; className?: string };
+type Props = {
+  trigger?: Trigger;
+  spin?: boolean;
+  /** "external": skip the built-in draw so a parent timeline can scrub it. */
+  draw?: "self" | "external";
+  className?: string;
+};
 
 /** Draws itself stroke by stroke, then turns slowly while on screen. */
-export function MagicCircle({ trigger = "scroll", spin = true, className }: Props) {
+export function MagicCircle({ trigger = "scroll", spin = true, draw = "self", className }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useMotion((ctx, el) => {
-    const q = gsap.utils.selector(el);
-    if (ctx.reduced) {
-      gsap.from(el, { opacity: 0, duration: 0.2, scrollTrigger: triggerFor(el, trigger) });
-      return;
-    }
-    gsap
-      .timeline({ scrollTrigger: triggerFor(el, trigger) })
-      .from(q("[data-ring]"), { drawSVG: "0%", duration: 0.9, ease: "ink", stagger: 0.12 })
-      .from(
-        q("[data-runes] > *"),
-        {
-          opacity: 0,
-          scale: 0,
-          transformOrigin: "50% 50%",
-          duration: 0.25,
-          ease: "heat",
-          stagger: 0.02,
-        },
-        "-=0.5",
-      )
-      .from(q("[data-star]"), { drawSVG: "0%", duration: 1, ease: "steps(14)" }, "-=0.4")
-      .from(q("[data-core]"), { drawSVG: "50% 50%", duration: 0.5 }, "-=0.2");
+  useMotion(
+    (ctx, el) => {
+      const q = gsap.utils.selector(el);
+      if (ctx.reduced) {
+        if (draw === "self") {
+          gsap.from(el, { opacity: 0, duration: 0.2, scrollTrigger: triggerFor(el, trigger) });
+        }
+        return;
+      }
+      if (draw === "self")
+        gsap
+          .timeline({ scrollTrigger: triggerFor(el, trigger) })
+          .from(q("[data-ring]"), { drawSVG: "0%", duration: 0.9, ease: "ink", stagger: 0.12 })
+          .from(
+            q("[data-runes] > *"),
+            {
+              opacity: 0,
+              scale: 0,
+              transformOrigin: "50% 50%",
+              duration: 0.25,
+              ease: "heat",
+              stagger: 0.02,
+            },
+            "-=0.5",
+          )
+          .from(q("[data-star]"), { drawSVG: "0%", duration: 1, ease: "steps(14)" }, "-=0.4")
+          .from(q("[data-core]"), { drawSVG: "50% 50%", duration: 0.5 }, "-=0.2");
 
-    if (!spin) return;
-    gsap.to(q("[data-runes]"), {
-      rotation: 360,
-      svgOrigin: `${C} ${C}`,
-      duration: 60,
-      repeat: -1,
-      ease: "none",
-      scrollTrigger: {
-        trigger: el,
-        start: "top bottom",
-        end: "bottom top",
-        toggleActions: "play pause resume pause",
-      },
-    });
-  }, ref);
+      if (!spin) return;
+      gsap.to(q("[data-runes]"), {
+        rotation: 360,
+        svgOrigin: `${C} ${C}`,
+        duration: 60,
+        repeat: -1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: el,
+          start: "top bottom",
+          end: "bottom top",
+          toggleActions: "play pause resume pause",
+        },
+      });
+    },
+    ref,
+    [draw],
+  );
 
   return (
     <div ref={ref} aria-hidden className={cn("text-aura", className)}>

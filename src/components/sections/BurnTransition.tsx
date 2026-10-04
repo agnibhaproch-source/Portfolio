@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap } from "@/lib/gsap";
+import { MagicCircle } from "@/components/motion/MagicCircle";
+import { transitionCopy } from "@/content";
+import { gsap, SplitText } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
 
 /*
@@ -74,10 +76,14 @@ export function BurnTransition() {
   useMotion((ctx, el) => {
     const q = gsap.utils.selector(el);
     if (ctx.reduced) {
-      // Static: half burnt, nothing moves.
-      gsap.set(q("[data-burn-paper]"), { yPercent: -55 });
+      // Static: fully burnt, the grimoire reveal shown as a still frame.
+      gsap.set(q("[data-burn-paper], [data-tendrils]"), { autoAlpha: 0 });
       return;
     }
+
+    const chars = SplitText.create(q("[data-burn-line]"), { type: "words,chars" }).chars;
+
+    // One scrubbed timeline, 0 to 1 across the block: burn, then reveal, then hold.
     gsap
       .timeline({
         scrollTrigger: { trigger: el, start: "top 55%", end: "bottom bottom", scrub: 0.4 },
@@ -85,28 +91,50 @@ export function BurnTransition() {
       .fromTo(
         q("[data-burn-paper]"),
         { yPercent: 0 },
-        { yPercent: -100, ease: "none", duration: 1 },
+        { yPercent: -100, ease: "none", duration: 0.55 },
         0,
       )
       // the rim glow lags the paper a little so the edge looks alive
-      .fromTo(q("[data-burn-rim]"), { y: 0 }, { y: 24, ease: "sine.inOut", duration: 1 }, 0)
+      .fromTo(q("[data-burn-rim]"), { y: 0 }, { y: 24, ease: "sine.inOut", duration: 0.55 }, 0)
       .fromTo(
         q("[data-tendril]"),
         { scaleY: 0 },
         {
           scaleY: 1,
           ease: "power2.out",
-          duration: 0.7,
-          stagger: 0.03,
+          duration: 0.35,
+          stagger: 0.015,
           transformOrigin: "50% 100%",
         },
-        0.05,
+        0.03,
       )
       .to(
         q("[data-tendrils]"),
-        { yPercent: -30, opacity: 0, ease: "power1.in", duration: 0.3 },
-        0.7,
-      );
+        { yPercent: -30, opacity: 0, ease: "power1.in", duration: 0.15 },
+        0.4,
+      )
+      // the grimoire reveal underneath
+      .fromTo(
+        q("[data-burn-glow]"),
+        { opacity: 0, scale: 0.6 },
+        { opacity: 1, scale: 1, duration: 0.3 },
+        0.3,
+      )
+      .from(q("[data-ring]"), { drawSVG: "0%", duration: 0.25, stagger: 0.04, ease: "none" }, 0.3)
+      .from(
+        q("[data-runes] > *"),
+        { opacity: 0, scale: 0, transformOrigin: "50% 50%", duration: 0.1, stagger: 0.005 },
+        0.45,
+      )
+      .from(q("[data-star]"), { drawSVG: "0%", duration: 0.25, ease: "steps(14)" }, 0.5)
+      .from(q("[data-core]"), { drawSVG: "50% 50%", duration: 0.1 }, 0.7)
+      .from(
+        chars,
+        { yPercent: 120, scale: 1.5, opacity: 0, duration: 0.12, stagger: 0.008, ease: "steps(4)" },
+        0.68,
+      )
+      .from(q("[data-burn-underline]"), { scaleX: 0, duration: 0.1, ease: "ink" }, 0.86)
+      .to({}, { duration: 0.04 }, 0.96);
   }, ref);
 
   return (
@@ -114,9 +142,27 @@ export function BurnTransition() {
       ref={ref}
       aria-hidden
       data-mode="colour"
-      className="relative h-[140svh] motion-reduce:h-svh"
+      className="relative h-[220svh] motion-reduce:h-svh"
     >
       <div className="sticky top-0 h-svh overflow-hidden bg-[linear-gradient(to_bottom,var(--twilight),var(--sumi)_60%)]">
+        {/* Revealed as the paper burns away: an original magic circle and a title line */}
+        <div className="absolute inset-0 grid place-items-center">
+          <div
+            data-burn-glow
+            className="absolute size-[min(95vw,85svh)] rounded-full bg-[radial-gradient(circle,rgb(201_162_74/0.2),transparent_65%)]"
+          />
+          <MagicCircle draw="external" className="absolute size-[min(86vw,72svh)] opacity-80" />
+          <div className="relative px-4 text-center">
+            <p
+              data-burn-line
+              className="font-display text-56 text-washi [text-shadow:0_0_40px_rgb(201_162_74/0.4)] md:text-96"
+            >
+              {transitionCopy.burnLine}
+            </p>
+            <div data-burn-underline className="mx-auto mt-4 h-[3px] w-1/2 bg-aura" />
+          </div>
+        </div>
+
         <svg
           data-tendrils
           viewBox="0 0 1600 1000"
