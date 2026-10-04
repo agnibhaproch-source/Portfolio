@@ -9,6 +9,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
+import { sound } from "@/lib/sound";
 import { usePathname, useRouter } from "next/navigation";
 import { DUR, gsap, ScrollTrigger } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
@@ -68,6 +69,7 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
           return;
         }
 
+        sound.play("slash");
         gsap
           .timeline({ onComplete: () => resolve() })
           .set(q("[data-half]"), { opacity: 1 })

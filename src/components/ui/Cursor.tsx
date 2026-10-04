@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { sound } from "@/lib/sound";
 import { comboCopy } from "@/content";
 import { gsap } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
@@ -161,6 +162,7 @@ export function Cursor() {
     let shockIndex = 0;
     const onDown = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
+      sound.play("tick");
       const line = slashes[slashIndex++ % SLASHES];
       if (!line) return;
       const a = ((-30 + (Math.random() - 0.5) * 40) * Math.PI) / 180;

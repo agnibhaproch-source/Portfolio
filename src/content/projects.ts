@@ -34,6 +34,11 @@ export const projects: Project[] = [
     repoUrl: "https://github.com/agnibhaproch-source/NightOwl",
     status: "live",
     flagship: true,
+    preview: {
+      src: "/projects/nightowl/preview.webm",
+      poster: "/projects/nightowl/preview-poster.webp",
+      label: "NightOwl onboarding: splash, then three intro screens",
+    },
     media: [
       {
         src: "/projects/nightowl/welcome.webp",

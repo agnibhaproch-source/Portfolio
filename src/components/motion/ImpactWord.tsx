@@ -1,6 +1,7 @@
 "use client";
 
 import { useImperativeHandle, useRef, type Ref } from "react";
+import { sound } from "@/lib/sound";
 import { gsap } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ export function ImpactWord({
       const node = el.current;
       if (!node || prefersReducedMotion()) return;
       node.textContent = text;
+      sound.play("impact");
       gsap.killTweensOf(node);
       gsap
         .timeline()

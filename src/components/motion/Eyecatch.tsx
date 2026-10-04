@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { sound } from "@/lib/sound";
 import type { SectionCopy } from "@/content";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
@@ -23,6 +24,7 @@ export function Eyecatch({ items }: { items: SectionCopy[] }) {
 
     const play = (it: SectionCopy) => {
       title.textContent = it.heading;
+      sound.play("slash");
       sub.textContent = it.subtitle;
       tl?.kill();
       tl = gsap

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { sound } from "@/lib/sound";
 import { FlameMark } from "@/components/ui/FlameMark";
 import { gsap } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
@@ -66,7 +67,9 @@ export function Grimoire({
 
   // A page flips with typing.
   useEffect(() => {
-    if (!turn || reduced.current) return;
+    if (!turn) return;
+    sound.play("page");
+    if (reduced.current) return;
     const page = root.current?.querySelector("[data-flip]");
     if (!page) return;
     gsap.fromTo(

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { sound, useSoundOn } from "@/lib/sound";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { nav, navCopy, profile } from "@/content";
@@ -29,6 +30,8 @@ export function Nav() {
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const print = usePrintMode();
+  const soundOn = useSoundOn();
+  useEffect(() => sound.restore(), []);
 
   const href = (id: string) => (onHome ? `#${id}` : `/#${id}`);
 
@@ -295,6 +298,31 @@ export function Nav() {
               )}
             >
               {navCopy.printOff}
+            </button>
+            <button
+              type="button"
+              aria-pressed={soundOn}
+              aria-label={navCopy.soundLabel}
+              onClick={() => sound.toggle()}
+              className={cn(
+                "flex items-center gap-1.5 border-2 border-current px-2.5 py-0.5 font-display text-14 transition-[color,background-color] duration-200 [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)]",
+                soundOn && "bg-fg text-bg",
+              )}
+            >
+              <svg aria-hidden viewBox="0 0 16 16" className="size-3.5">
+                <path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor" />
+                {soundOn ? (
+                  <path
+                    d="M11 5c1.5 1.5 1.5 4.5 0 6M13 3c3 3 3 7 0 10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                ) : (
+                  <path d="M11 6l4 4M15 6l-4 4" stroke="currentColor" strokeWidth="1.5" />
+                )}
+              </svg>
+              {navCopy.sound}
             </button>
             <button
               ref={menuButton}

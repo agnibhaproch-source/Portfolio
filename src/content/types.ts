@@ -72,6 +72,8 @@ export type Project = {
   status: "live" | "in progress" | "archived";
   flagship: boolean;
   media: { src: string; alt: string; kind: "image" | "video"; width: number; height: number }[];
+  /** Silent screen-recording loop played on hover (desktop). */
+  preview?: { src: string; poster: string; label: string } | null;
 };
 
 export type Achievement = { title: string; issuer: string; year: string; href: string | null };

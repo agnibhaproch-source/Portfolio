@@ -5,6 +5,7 @@ import { Magnetic } from "@/components/motion/Magnetic";
 import { buttonClass } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
 import { TransitionLink } from "@/components/ui/TransitionLink";
+import { PreviewVideo } from "./PreviewVideo";
 import { cn } from "@/lib/utils";
 
 export const chapterLabel = (i: number) => `${workCopy.chapter} ${String(i + 1).padStart(2, "0")}`;
@@ -82,7 +83,8 @@ export function Chapter({ project, index }: { project: Project; index: number })
         }
         innerClassName="grid gap-6 bg-[linear-gradient(160deg,var(--twilight),var(--sumi)_70%)] p-5 md:p-8 lg:grid-cols-[1.2fr_1fr] lg:gap-10"
       >
-        <div className="chapter-media min-h-0">
+        <div className="chapter-media relative min-h-0">
+          {project.preview && <PreviewVideo {...project.preview} />}
           {project.media.length > 0 ? (
             project.media.slice(0, 3).map((m, i) => (
               <figure

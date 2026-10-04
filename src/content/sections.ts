@@ -26,6 +26,8 @@ export const heroCopy = {
 export const navCopy = {
   printOff: "Print",
   printLabel: "Read in black-and-white print mode",
+  sound: "Sound",
+  soundLabel: "Sound effects",
   home: "Home",
   openMenu: "Open menu",
   closeMenu: "Close menu",
@@ -93,6 +95,7 @@ export const workCopy = {
   liveSite: "Live site",
   sourceCode: "Source code",
   status: { live: "Live", "in progress": "In progress", archived: "Archived" },
+  preview: "Live preview",
   sideQuests: "Side quests",
   sideQuestsLine: "Smaller builds between chapters.",
   closingTitle: "More chapters",
@@ -195,3 +198,15 @@ export const resumeCopy = {
 
 /** Sound-effect lettering for impacts (Latin romanisations of manga SFX). */
 export const sfxCopy = { strike: "ZAN!", slam: "DOON!", hit: "BAM!", clash: "GIN!" };
+
+export const limitBreakCopy = {
+  word: "LIMIT BREAK!",
+  consoleHint: "Old habits die hard. Try the oldest cheat code on this page.",
+};
+
+export const progressCopy = {
+  label: "Chapters",
+  opening: "Opening",
+  jump: (name: string) => `Jump to ${name}`,
+  page: (n: number, total: number) => `p. ${n} / ${total}`,
+};

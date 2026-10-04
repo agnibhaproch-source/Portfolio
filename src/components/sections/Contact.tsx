@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { sound } from "@/lib/sound";
 import { contactCopy, profile, sections, sfxCopy } from "@/content";
 import { MangaBackdrop } from "@/components/motion/MangaBackdrop";
 import { SpeedLines } from "@/components/motion/SpeedLines";
@@ -207,6 +208,7 @@ export function Contact() {
       burst();
       setCast((c) => c + 1);
       cut();
+      window.setTimeout(() => sound.play("stamp"), 450);
       finisher();
       setSent(true);
     } catch {

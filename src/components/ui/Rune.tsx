@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { sound } from "@/lib/sound";
 import { runeCopy } from "@/content";
 import { gsap } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
@@ -29,6 +30,7 @@ export function Rune({ index, className }: { index: number; className?: string }
     const n = runes.collect(id);
     if (n === null) return;
     const total = runeCopy.total;
+    sound.play("chime");
     toasts.show(
       n >= total
         ? { text: runeCopy.allFound, link: { href: runeCopy.secretPath, label: runeCopy.open } }

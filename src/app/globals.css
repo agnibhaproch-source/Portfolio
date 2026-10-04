@@ -646,6 +646,13 @@ html {
   }
 }
 
+/* Limit break (Konami): for three seconds the flame palette turns to aura gold */
+html[data-limit] {
+  --agni: #c9a24a;
+  --kiln: #f0d27a;
+  --twilight: #3a2c12;
+}
+
 /* ------------------------------------------------------------------
    Reduced motion: no smooth-scroll hijack, near-instant transitions
    ------------------------------------------------------------------ */
