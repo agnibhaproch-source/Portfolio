@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { nav, navCopy, profile, sfxCopy } from "@/content";
-import { ClashField, type ClashHandle } from "@/components/motion/ClashField";
-import { ImpactWord, type ImpactWordHandle } from "@/components/motion/ImpactWord";
+import { nav, navCopy, profile } from "@/content";
 import { MagicCircle } from "@/components/motion/MagicCircle";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { onIntroDone } from "@/lib/intro";
@@ -31,36 +29,7 @@ export function Nav() {
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const print = usePrintMode();
-  const stage = useRef<HTMLDivElement>(null);
-  const navRow = useRef<HTMLElement>(null);
-  const field = useRef<ClashHandle>(null);
-  const word = useRef<ImpactWordHandle>(null);
 
-  // Cinematic beat: a blade strike across the bar every ~6.5s while visible.
-  useEffect(() => {
-    if (prefersReducedMotion()) return;
-    const strike = () => {
-      if (document.hidden) return;
-      const line = stage.current?.querySelector("[data-strike]");
-      if (!line) return;
-      const x = 18 + Math.random() * 64;
-      gsap
-        .timeline()
-        .set(line, { attr: { x1: x - 6, x2: x + 6 }, opacity: 1, drawSVG: "0% 0%" })
-        .to(line, { drawSVG: "0% 100%", duration: 0.12, ease: "power2.in" })
-        .call(() => {
-          field.current?.impact(0.55, (Math.random() - 0.5) * 0.6);
-          word.current?.play(Math.random() < 0.5 ? sfxCopy.strike : sfxCopy.clash, x, 50);
-        })
-        .to(line, { drawSVG: "100% 100%", opacity: 0, duration: 0.3, ease: "power2.out" });
-    };
-    const first = window.setTimeout(strike, 2600);
-    const id = window.setInterval(strike, 6500);
-    return () => {
-      window.clearTimeout(first);
-      window.clearInterval(id);
-    };
-  }, []);
   const href = (id: string) => (onHome ? `#${id}` : `/#${id}`);
 
   useMotion(
@@ -191,50 +160,24 @@ export function Nav() {
 
   return (
     <>
-      <header ref={bar} data-mode="colour" className="group/bar fixed inset-x-0 top-0 z-50 bg-sumi">
+      <header
+        ref={bar}
+        data-mode="colour"
+        className="group/bar fixed inset-x-0 top-0 z-50 transition-[background-color] duration-300 data-solid:bg-sumi/92 data-solid:backdrop-blur-sm"
+      >
         {/* Grimoire spine: a flowing mana line and a jagged anti-magic rim once solid */}
-        <div aria-hidden className="mana-line absolute inset-x-0 bottom-0 z-10 h-[2px]" />
-        <div aria-hidden className="absolute inset-x-0 top-full">
+        <div
+          aria-hidden
+          className="mana-line absolute inset-x-0 bottom-0 z-10 h-[2px] opacity-0 transition-opacity duration-300 group-data-solid/bar:opacity-100"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-full opacity-0 transition-opacity duration-300 group-data-solid/bar:opacity-100"
+        >
           <JaggedEdge height={10} seed={4} />
         </div>
 
-        {/* Live clash behind the bar; a blade strike rips across it every few seconds */}
-        <div
-          ref={stage}
-          aria-hidden
-          className="pointer-events-none absolute inset-0 overflow-hidden"
-        >
-          <ClashField
-            ref={field}
-            intensity={0.55}
-            arcs={2}
-            className="absolute inset-0 opacity-90"
-            shakeTarget={navRow}
-          />
-          <svg
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            className="absolute inset-0 h-full w-full overflow-visible"
-          >
-            <line
-              data-strike
-              x1="0"
-              y1="110"
-              x2="0"
-              y2="-10"
-              stroke="var(--washi)"
-              strokeWidth="3"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-              opacity="0"
-              className="[filter:drop-shadow(0_0_6px_var(--kiln))_drop-shadow(0_0_12px_var(--agni))]"
-            />
-          </svg>
-          <ImpactWord ref={word} className="text-36" />
-        </div>
-
         <nav
-          ref={navRow}
           aria-label="Main"
           className="relative flex h-16 items-center justify-between px-4 [text-shadow:0_1px_10px_var(--sumi)] md:px-10"
         >
@@ -309,7 +252,6 @@ export function Nav() {
                 <li key={s.id} data-nav-item>
                   <a
                     href={href(s.id)}
-                    onPointerEnter={() => field.current?.burst(14)}
                     aria-current={isActive ? "true" : undefined}
                     className={cn(
                       "group/link relative flex items-center gap-2 py-2 font-display text-18 transition-colors",

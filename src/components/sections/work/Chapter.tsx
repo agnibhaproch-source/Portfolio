@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Project } from "@/content";
 import { workCopy } from "@/content";
+import { Magnetic } from "@/components/motion/Magnetic";
 import { buttonClass } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
 import { TransitionLink } from "@/components/ui/TransitionLink";
@@ -41,6 +42,15 @@ export function Chapter({ project, index }: { project: Project; index: number })
       aria-labelledby={headingId}
       className="work-chapter relative [perspective:2000px]"
     >
+      {/* Giant ink-outlined chapter number, drifting behind at a slower depth */}
+      <span
+        aria-hidden
+        data-chapter-num
+        className="pointer-events-none absolute -top-[14%] -left-[3%] font-display text-[clamp(9rem,30vh,22rem)] leading-none text-transparent select-none [-webkit-text-stroke:2px_color-mix(in_srgb,var(--washi)_22%,transparent)]"
+      >
+        {String(index + 1).padStart(2, "0")}
+      </span>
+
       {/* Cover: title card. Flips open on the desktop track. */}
       <div
         data-cover
@@ -63,6 +73,13 @@ export function Chapter({ project, index }: { project: Project; index: number })
       <Panel
         fill={false}
         className="chapter-body mt-gutter text-washi"
+        overlay={
+          <div
+            aria-hidden
+            data-flip-shade
+            className="pointer-events-none absolute inset-0 z-[5] bg-[linear-gradient(90deg,rgb(0_0_0/0.8),transparent_65%)] opacity-0"
+          />
+        }
         innerClassName="grid gap-6 bg-[linear-gradient(160deg,var(--twilight),var(--sumi)_70%)] p-5 md:p-8 lg:grid-cols-[1.2fr_1fr] lg:gap-10"
       >
         <div className="chapter-media min-h-0">
@@ -70,6 +87,7 @@ export function Chapter({ project, index }: { project: Project; index: number })
             project.media.slice(0, 3).map((m, i) => (
               <figure
                 key={m.src}
+                data-shot
                 className={cn("relative min-h-48 overflow-hidden bg-sumi", AREAS[i])}
                 style={{ clipPath: CUTS[i] }}
               >
@@ -82,6 +100,11 @@ export function Chapter({ project, index }: { project: Project; index: number })
                   sizes="(min-width: 1024px) 40vw, 82vw"
                   className="h-full w-full scale-110 object-cover object-top"
                 />
+                <span
+                  aria-hidden
+                  data-flash
+                  className="pointer-events-none absolute inset-0 bg-washi opacity-0"
+                />
               </figure>
             ))
           ) : (
@@ -93,35 +116,41 @@ export function Chapter({ project, index }: { project: Project; index: number })
           <p className="font-display text-14 text-muted">
             {chapterLabel(index)} <span aria-hidden>·</span> {workCopy.status[project.status]}
           </p>
-          <h3 id={headingId} className="mt-2 text-56 lg:text-96">
+          <h3 id={headingId} data-title className="mt-2 text-[clamp(2.5rem,9vw,3.5rem)] leading-none lg:text-[clamp(3rem,5.2vw,6rem)]">
             {project.name}
           </h3>
-          <p className="mt-3 max-w-prose text-18 lg:text-24">{project.pitch}</p>
+          <p data-pitch className="mt-3 max-w-prose text-18 lg:text-24">
+            {project.pitch}
+          </p>
           <ul className="mt-5 flex flex-wrap gap-2">
             {project.stack.slice(0, 6).map((t) => (
-              <li key={t} className="border-2 border-washi/40 px-2 py-0.5 text-14">
+              <li key={t} data-chip className="border-2 border-washi/40 px-2 py-0.5 text-14">
                 {t}
               </li>
             ))}
           </ul>
           <div className="mt-7 flex flex-wrap items-center gap-4">
-            <TransitionLink
-              href={`/work/${project.slug}`}
-              className={buttonClass("primary")}
-              data-cursor="charge"
-            >
-              {workCopy.viewProject}
-            </TransitionLink>
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noreferrer"
-                className={buttonClass("ghost")}
+            <Magnetic>
+              <TransitionLink
+                href={`/work/${project.slug}`}
+                className={buttonClass("primary")}
                 data-cursor="charge"
               >
-                {workCopy.liveSite}
-              </a>
+                {workCopy.viewProject}
+              </TransitionLink>
+            </Magnetic>
+            {project.liveUrl && (
+              <Magnetic>
+                <a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={buttonClass("ghost")}
+                  data-cursor="charge"
+                >
+                  {workCopy.liveSite}
+                </a>
+              </Magnetic>
             )}
             {project.repoUrl && (
               <a

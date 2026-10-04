@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ClashField, type ClashHandle } from "@/components/motion/ClashField";
+import { MangaBackdrop } from "@/components/motion/MangaBackdrop";
 import { ImpactWord, type ImpactWordHandle } from "@/components/motion/ImpactWord";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Grimoire } from "@/components/sections/contact/Grimoire";
@@ -30,7 +30,7 @@ export function Footer() {
   const ref = useRef<HTMLElement>(null);
   const [closed, setClosed] = useState(false);
   const endScene = useRef<HTMLDivElement>(null);
-  const clash = useRef<ClashHandle>(null);
+  const [focusLines, setFocusLines] = useState(0.3);
   const word = useRef<ImpactWordHandle>(null);
 
   useMotion((ctx, el) => {
@@ -56,6 +56,17 @@ export function Footer() {
       },
     );
 
+    gsap.from(el.querySelector("[data-final-panel] polygon"), {
+      drawSVG: "0%",
+      duration: 1.2,
+      ease: "ink",
+      scrollTrigger: {
+        trigger: el.querySelector("[data-final-panel]"),
+        start: "top 80%",
+        once: true,
+      },
+    });
+
     // The book closes when the visitor reaches the very end, with a shudder.
     ScrollTrigger.create({
       trigger: el,
@@ -64,7 +75,22 @@ export function Footer() {
         setClosed(true);
         // the book slams shut: BAM, shockwave, shake
         window.setTimeout(() => {
-          clash.current?.impact(1.1, 0.6);
+          setFocusLines(0.95);
+          window.setTimeout(() => setFocusLines(0.3), 500);
+          const scene = endScene.current;
+          if (scene) {
+            gsap.fromTo(
+              scene,
+              { x: 7, y: -4 },
+              {
+                x: 0,
+                y: 0,
+                duration: 0.5,
+                ease: "elastic.out(1.2, 0.25)",
+                clearProps: "transform",
+              },
+            );
+          }
           word.current?.play(sfxCopy.hit, 68, 38);
         }, 380);
         if (book) {
@@ -136,16 +162,26 @@ export function Footer() {
 
       {/* The end: the grimoire closes */}
       <div className="relative overflow-hidden px-4 pt-10 pb-4 text-center md:px-10">
-        <ClashField
-          ref={clash}
-          intensity={0.75}
-          arcs={3}
-          className="absolute inset-0"
-          shakeTarget={endScene}
-        />
-        <div aria-hidden className="pointer-events-none absolute inset-0 text-washi/15">
-          <SpeedLines variant="radial" intensity={0.45} />
+        <MangaBackdrop layout="finale" className="absolute inset-0" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 text-washi/20">
+          <SpeedLines variant="radial" intensity={focusLines} />
         </div>
+        {/* the final panel: an ink border that draws itself around the ending */}
+        <svg
+          aria-hidden
+          data-final-panel
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          className="pointer-events-none absolute inset-x-4 inset-y-6 h-[calc(100%-3rem)] w-[calc(100%-2rem)] overflow-visible md:inset-x-10 md:w-[calc(100%-5rem)]"
+        >
+          <polygon
+            points="0,4 100,0 100,100 0,96"
+            fill="none"
+            stroke="var(--washi)"
+            strokeWidth="3"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
         <div ref={endScene} className="relative [text-shadow:0_2px_16px_var(--sumi)]">
           <ImpactWord ref={word} className="text-96" />
           <p className="font-display text-56 md:text-96">{credits.ending}</p>

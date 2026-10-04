@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { contactCopy, profile, sections, sfxCopy } from "@/content";
-import { ClashField, type ClashHandle } from "@/components/motion/ClashField";
+import { MangaBackdrop } from "@/components/motion/MangaBackdrop";
+import { SpeedLines } from "@/components/motion/SpeedLines";
 import { ImpactWord, type ImpactWordHandle } from "@/components/motion/ImpactWord";
 import { MagicCircle } from "@/components/motion/MagicCircle";
 import { Grimoire } from "./contact/Grimoire";
@@ -17,6 +18,7 @@ type Field = "name" | "email" | "message";
 type Errors = Partial<Record<Field, string>>;
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BASE_FOCUS = 0.18;
 
 function validate(v: Record<Field, string>): Errors {
   const e: Errors = {};
@@ -47,7 +49,26 @@ export function Contact() {
   const [cast, setCast] = useState(0);
   const typed = useRef(0);
   const scene = useRef<HTMLDivElement>(null);
-  const clash = useRef<ClashHandle>(null);
+  const [focusLines, setFocusLines] = useState(BASE_FOCUS);
+
+  // Manga focus lines surge on a hit, then settle.
+  const surge = (level: number) => setFocusLines((f) => Math.max(f, level));
+  useEffect(() => {
+    if (focusLines <= BASE_FOCUS) return;
+    const t = window.setTimeout(() => setFocusLines(BASE_FOCUS), 420);
+    return () => window.clearTimeout(t);
+  }, [focusLines]);
+
+  // Panel shake on impacts (skipped under reduced motion).
+  const shake = (strength = 1) => {
+    if (prefersReducedMotion() || !scene.current) return;
+    const a = 6 * strength;
+    gsap.fromTo(
+      scene.current,
+      { x: a, y: -a * 0.6 },
+      { x: 0, y: 0, duration: 0.45, ease: "elastic.out(1.2, 0.25)", clearProps: "transform" },
+    );
+  };
   const word = useRef<ImpactWordHandle>(null);
   const lastBurst = useRef(0);
   const charge =
@@ -67,10 +88,9 @@ export function Contact() {
     if (ctx.reduced) return;
     const q = gsap.utils.selector(el);
     const heading = q("h2")[0];
-    const split = heading ? SplitText.create(heading, { type: "chars" }) : null;
+    const split = heading ? SplitText.create(heading, { type: "words,chars" }) : null;
     gsap
       .timeline({ scrollTrigger: { trigger: el, start: "top 70%", once: true } })
-      .from(q("[data-letterbox]"), { scaleY: 0, duration: 0.5, ease: "snap" }, 0)
       .from(split?.chars ?? [], {
         yPercent: 80,
         scale: 1.6,
@@ -80,7 +100,8 @@ export function Contact() {
         ease: "steps(4)",
       })
       .call(() => {
-        clash.current?.impact(1);
+        surge(0.85);
+        shake(1);
         word.current?.play(sfxCopy.slam, 32, 16);
       })
       .from(
@@ -138,7 +159,8 @@ export function Contact() {
 
   // Finishing move: a slash across the whole battlefield, the flame side wins.
   const finisher = () => {
-    clash.current?.impact(1.2, 0.9);
+    surge(1);
+    shake(1.2);
     word.current?.play(sfxCopy.strike, 62, 40);
     if (prefersReducedMotion()) return;
     const line = scene.current?.querySelector("[data-finisher]");
@@ -152,13 +174,6 @@ export function Contact() {
       )
       .to(line, { drawSVG: "100% 100%", opacity: 0, duration: 0.45, ease: "power2.out" });
   };
-
-  // When the circle is fully charged, the clash surges.
-  useEffect(() => {
-    if (charge < 3) return;
-    clash.current?.impact(0.45, 0.3);
-    word.current?.play(sfxCopy.clash, 50, 30);
-  }, [charge]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -203,15 +218,24 @@ export function Contact() {
 
   const update = (field: Field, value: string) => {
     const next = { ...values, [field]: value };
+    // The moment the circle becomes fully charged, the focus lines surge.
+    const chargeOf = (v: Record<Field, string>) =>
+      Number(!!v.name.trim()) +
+      Number(EMAIL.test(v.email.trim())) +
+      Number(v.message.trim().length >= 10);
+    if (chargeOf(next) === 3 && chargeOf(values) < 3) {
+      surge(0.7);
+      word.current?.play(sfxCopy.clash, 50, 30);
+    }
     setValues(next);
     // flip a page of the grimoire every dozen characters
     const total = Object.values(next).join("").length;
     if (Math.floor(total / 12) > typed.current) setTurn((t) => t + 1);
     typed.current = Math.floor(total / 12);
     if (tried) setErrors(validate(next));
-    // every keystroke throws sparks into the clash
+    // typing pulls the focus lines in
     lastBurst.current += 1;
-    if (lastBurst.current % 2 === 0) clash.current?.burst(6);
+    if (lastBurst.current % 2 === 0) surge(0.42);
   };
 
   const fieldCls =
@@ -225,24 +249,14 @@ export function Contact() {
       aria-labelledby={`${sections.contact.id}-heading`}
       className="relative overflow-hidden px-4 py-24 md:px-10 md:py-32"
     >
-      {/* The battlefield: flame vs anti-magic, letterbox bars, the finishing slash */}
-      <ClashField
-        ref={clash}
-        intensity={0.85}
-        arcs={3}
-        className="absolute inset-0"
-        shakeTarget={scene}
-      />
+      {/* A manga page: ruled panel gutters, developing screentone, focus lines on the form */}
+      <MangaBackdrop layout="contact" className="absolute inset-0" />
       <div
         aria-hidden
-        data-letterbox
-        className="bg-black pointer-events-none absolute inset-x-0 top-0 z-10 h-[5svh] origin-top"
-      />
-      <div
-        aria-hidden
-        data-letterbox
-        className="bg-black pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[5svh] origin-bottom"
-      />
+        className="pointer-events-none absolute inset-y-0 right-0 w-full text-washi/25 lg:w-[62%]"
+      >
+        <SpeedLines variant="radial" intensity={focusLines} />
+      </div>
 
       <div ref={scene} className="relative [text-shadow:0_2px_14px_var(--sumi)]">
         <svg
@@ -302,7 +316,7 @@ export function Contact() {
                 <li key={l.href} data-contact-rise>
                   <a
                     href={l.href}
-                    className="group/link relative flex items-center gap-4 overflow-hidden py-3 font-display text-24 break-all transition-colors hover:text-kiln xl:text-36"
+                    className="group/link relative flex items-center gap-4 overflow-hidden py-3 font-display text-18 break-all transition-colors hover:text-kiln sm:text-24 2xl:text-36"
                     {...(l.href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
                   >
                     <span

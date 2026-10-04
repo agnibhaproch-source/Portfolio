@@ -6,7 +6,7 @@ import { MagicCircle } from "@/components/motion/MagicCircle";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { gsap } from "@/lib/gsap";
+import { gsap, SplitText } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
 import { Chapter } from "./work/Chapter";
 
@@ -26,6 +26,36 @@ export function Work() {
     const chapters = q("[data-chapter]");
     if (!pin || !track || ctx.reduced) return;
 
+    // Chapter reveal: title slams in by letter, pitch rises, chips pop,
+    // screenshots slam into their panels with an ink flash.
+    const reveal = (ch: Element, tl: gsap.core.Timeline, at: number) => {
+      const c = gsap.utils.selector(ch);
+      const title = c("[data-title]")[0];
+      const chars = title ? SplitText.create(title, { type: "words,chars" }).chars : [];
+      tl.from(
+        chars,
+        { yPercent: 90, scale: 1.6, opacity: 0, duration: 0.3, stagger: 0.04, ease: "steps(4)" },
+        at,
+      )
+        .from(c("[data-pitch]"), { y: 24, opacity: 0, duration: 0.5, ease: "ink" }, at + 0.2)
+        .from(
+          c("[data-chip]"),
+          { scale: 0, rotation: -12, duration: 0.3, stagger: 0.05, ease: "heat" },
+          at + 0.3,
+        )
+        .from(
+          c("[data-shot]"),
+          { scale: 1.25, opacity: 0, duration: 0.3, stagger: 0.12, ease: "steps(4)" },
+          at,
+        )
+        .fromTo(
+          c("[data-flash]"),
+          { opacity: 0.85 },
+          { opacity: 0, duration: 0.45, stagger: 0.12, ease: "power2.out" },
+          at + 0.12,
+        );
+    };
+
     if (!ctx.desktop) {
       // Stacked: each cover slams in like a title card, then its body rises.
       chapters.forEach((ch) => {
@@ -43,6 +73,13 @@ export function Work() {
             0.12,
           )
           .from(c(".chapter-body"), { y: 40, opacity: 0, duration: 0.6, ease: "ink" }, 0.3);
+        reveal(
+          ch,
+          gsap.timeline({
+            scrollTrigger: { trigger: c(".chapter-body")[0], start: "top 80%", once: true },
+          }),
+          0,
+        );
       });
       return;
     }
@@ -69,6 +106,46 @@ export function Work() {
 
     chapters.forEach((ch) => {
       const c = gsap.utils.selector(ch);
+      // Giant chapter number drifts slower than the page (depth).
+      gsap.fromTo(
+        c("[data-chapter-num]"),
+        { xPercent: 40 },
+        {
+          xPercent: -40,
+          ease: "none",
+          scrollTrigger: {
+            containerAnimation: slide,
+            trigger: ch,
+            start: "left right",
+            end: "right left",
+            scrub: true,
+          },
+        },
+      );
+      // Page-turn shadow sweeps off the spread as the cover flips open.
+      gsap.fromTo(
+        c("[data-flip-shade]"),
+        { opacity: 0.85 },
+        {
+          opacity: 0,
+          ease: "power1.in",
+          scrollTrigger: {
+            containerAnimation: slide,
+            trigger: ch,
+            start: "left 60%",
+            end: "left 10%",
+            scrub: true,
+          },
+        },
+      );
+      // Once the page is open, the chapter's contents land.
+      reveal(
+        ch,
+        gsap.timeline({
+          scrollTrigger: { containerAnimation: slide, trigger: ch, start: "left 30%", once: true },
+        }),
+        0,
+      );
       // Title card lands as the chapter enters...
       gsap.from(c("[data-cover-inner]"), {
         scale: 1.35,
