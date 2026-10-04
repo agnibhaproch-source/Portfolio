@@ -595,6 +595,10 @@ html[data-print] .hero canvas {
    Retro print: crimson ink misregistered behind display type
    ------------------------------------------------------------------ */
 .misprint {
+  /* stretches and blurs a little while the page is scrolled fast (--vel from VelocityFx) */
+  scale: 1 calc(1 + var(--vel, 0) * 0.14);
+  filter: blur(calc(var(--vel, 0) * 1.2px));
+  transform-origin: left center;
   text-shadow: var(--mis-x, 0.045em) var(--mis-y, 0.04em) 0
     color-mix(in srgb, var(--agni) 80%, transparent);
 }

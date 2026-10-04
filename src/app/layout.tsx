@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Dela_Gothic_One, Rampart_One, Zen_Kaku_Gothic_New } from "next/font/google";
 import { profile } from "@/content";
 import { SlashWipeProvider } from "@/components/motion/SlashWipe";
+import { VelocityFx } from "@/components/motion/VelocityFx";
 import { AntiMagicLayer } from "@/components/ui/AntiMagicLayer";
 import { Cursor } from "@/components/ui/Cursor";
 import { Nav } from "@/components/ui/Nav";
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {children}
             <AntiMagicLayer />
             <Toast />
+            <VelocityFx />
             <Cursor />
           </SlashWipeProvider>
         </SmoothScroll>

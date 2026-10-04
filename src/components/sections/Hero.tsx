@@ -103,6 +103,45 @@ export function Hero() {
       };
     };
 
+    // Exit shatter: cracks race across the name, the letters break apart and
+    // fly off, the flame flares and the portrait tips away. Scrubbed both ways.
+    if (!ctx.reduced) {
+      const latin = q("[data-name-latin] [data-ch]");
+      const off = { immediateRender: false };
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: 0.4 },
+        })
+        .fromTo(
+          q("[data-crack]"),
+          { drawSVG: "0%", opacity: 1 },
+          { drawSVG: "100%", duration: 0.3, stagger: 0.03, ease: "none" },
+          0,
+        )
+        .fromTo(
+          latin,
+          { x: 0, y: 0, rotation: 0 },
+          {
+            x: (i: number) => (((i * 53) % 11) - 5) * 70,
+            y: (i: number) => -120 - ((i * 37) % 7) * 45,
+            rotation: (i: number) => (((i * 29) % 9) - 4) * 14,
+            duration: 0.7,
+            ease: "power2.in",
+            ...off,
+          },
+          0.25,
+        )
+        .fromTo(q("[data-depth='10']"), { opacity: 1 }, { opacity: 0, duration: 0.3, ...off }, 0.7)
+        .fromTo(q("[data-depth='34']"), { scale: 1 }, { scale: 1.35, duration: 0.7, ...off }, 0.2)
+        .fromTo(
+          q("[data-depth='20']"),
+          { rotation: 0, yPercent: 0 },
+          { rotation: -9, yPercent: -12, duration: 0.7, ...off },
+          0.2,
+        )
+        .fromTo(q("[data-crack]"), { opacity: 1 }, { opacity: 0, duration: 0.2, ...off }, 0.8);
+    }
+
     if (ctx.reduced || played) {
       played = true;
       reveal();
@@ -262,6 +301,65 @@ export function Hero() {
         )}
         <span>{heroCopy.scrollCue}</span>
       </div>
+
+      {/* ink cracks for the exit shatter */}
+      <svg
+        aria-hidden
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute inset-0 z-[1] h-full w-full"
+      >
+        <polyline
+          data-crack
+          opacity="0"
+          points="-2.0,20.0 7.0,24.8 16.0,24.8 26.0,20.0 37.0,12.8 45.0,20.0 57.0,23.6 63.0,17.6 73.0,14.0 83.0,21.2 90.0,18.8"
+          fill="none"
+          stroke="var(--washi)"
+          strokeWidth="2.5"
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="bevel"
+        />
+        <polyline
+          data-crack
+          opacity="0"
+          points="-2.0,34.0 8.0,26.8 20.0,25.6 33.0,32.8 46.0,26.8 60.0,34.0 72.0,40.0 84.0,47.2 92.0,50.8 100.0,53.2"
+          fill="none"
+          stroke="var(--agni)"
+          strokeWidth="1.5"
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="bevel"
+        />
+        <polyline
+          data-crack
+          opacity="0"
+          points="-2.0,48.0 9.0,44.4 15.0,42.0 22.0,44.4 28.0,38.4 39.0,44.4 52.0,40.8 61.0,45.6 75.0,52.8 89.0,46.8 97.0,49.2"
+          fill="none"
+          stroke="var(--washi)"
+          strokeWidth="2.5"
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="bevel"
+        />
+        <polyline
+          data-crack
+          opacity="0"
+          points="-2.0,62.0 10.0,63.2 19.0,59.6 28.0,54.8 35.0,60.8 44.0,53.6 57.0,52.4 71.0,51.2 82.0,46.4 93.0,48.8 101.0,44.0"
+          fill="none"
+          stroke="var(--agni)"
+          strokeWidth="1.5"
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="bevel"
+        />
+        <polyline
+          data-crack
+          opacity="0"
+          points="-2.0,76.0 11.0,80.8 23.0,76.0 35.0,82.0 44.0,88.0 50.0,95.2 64.0,100.0 75.0,96.4 83.0,94.0 91.0,88.0 100.0,95.2"
+          fill="none"
+          stroke="var(--washi)"
+          strokeWidth="2.5"
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="bevel"
+        />
+      </svg>
 
       <svg
         aria-hidden
