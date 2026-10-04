@@ -10,6 +10,7 @@ import { InkBlot } from "@/components/ui/InkBlot";
 import { Silhouette } from "@/components/ui/Silhouette";
 import { DUR, gsap, ScrollTrigger, SplitText, STAGGER } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
+import { cn } from "@/lib/utils";
 
 // Where each of the five panels flies in from on desktop (fractions of the viewport).
 const FROM = [
@@ -51,7 +52,7 @@ function Label({ children }: { children: string }) {
  */
 export function About() {
   const ref = useRef<HTMLElement>(null);
-  const { bio, origin, bigLine, location, interests } = profile;
+  const { bio, origin, bigLine, location, interests, favouriteAnime } = profile;
   const [open, setOpen] = useState<number | null>(null);
   const bubble = (i: number) => {
     const text = aboutCopy.bubbles[i];
@@ -101,9 +102,10 @@ export function About() {
           mask: "lines",
           autoSplit: true,
           onSplit: (self) => {
-            // Masks get breathing room for ascenders/descenders; the negative
-            // margin cancels it so layout does not move.
-            gsap.set(self.masks, { paddingBlock: "0.22em", marginBlock: "-0.22em" });
+            // Masks get breathing room for ascenders/descenders. The whole
+            // negative margin sits on one side: split top/bottom margins would
+            // collapse between stacked lines and grow the text after splitting.
+            gsap.set(self.masks, { paddingBlock: "0.22em", marginBottom: "-0.44em" });
             return gsap.from(self.lines, {
               yPercent: 130,
               duration: DUR.standard,
@@ -127,6 +129,9 @@ export function About() {
         start: () => `top ${Math.max((window.innerHeight - stage.offsetHeight) / 2, 72)}px`,
         end: "+=55%",
         pin: true,
+        // Hold the stage with a transform rather than position: fixed, so
+        // releasing the pin never registers as a layout shift.
+        pinType: "transform",
         invalidateOnRefresh: true,
       });
       const tl = gsap.timeline({
@@ -258,12 +263,32 @@ export function About() {
             <Label>{aboutCopy.from}</Label>
             <p className="mt-1 font-display text-36">{location}</p>
           </div>
-          {interests.length > 0 && (
-            <div>
-              <Label>{aboutCopy.offline}</Label>
-              <p className="mt-1 text-18">{interests.join(", ")}</p>
-            </div>
-          )}
+          <div className="space-y-4">
+            {interests.length > 0 && (
+              <div>
+                <Label>{aboutCopy.offline}</Label>
+                <p className="mt-1 text-18">{interests.join(", ")}</p>
+              </div>
+            )}
+            {favouriteAnime.length > 0 && (
+              <div>
+                <Label>{aboutCopy.favouriteAnime}</Label>
+                <ul className="mt-1.5 flex flex-wrap gap-1">
+                  {favouriteAnime.map((title, i) => (
+                    <li
+                      key={title}
+                      className={cn(
+                        "border-2 border-fg bg-bg px-1.5 py-px text-[13px] font-bold transition-transform duration-200 hover:animate-[ink-jitter_0.18s_steps(2)_2]",
+                        i % 2 ? "rotate-2" : "-rotate-2",
+                      )}
+                    >
+                      {title}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </Panel>
 
         {/* 4: the big line, ink panel */}

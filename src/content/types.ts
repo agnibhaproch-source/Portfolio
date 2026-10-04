@@ -24,6 +24,7 @@ export type Profile = {
   origin: string | null;
   bigLine: string | null;
   interests: string[];
+  favouriteAnime: string[];
   availability: string | null;
   email: string;
   links: { github: Link; linkedin: Link; others: Link[] };

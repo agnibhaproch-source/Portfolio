@@ -12,7 +12,7 @@ Single source of truth. `ASK` = not known yet, ask at the phase that needs it. `
 - One-line tagline: "Born with zero talent, coding with pure grit."
 - Short bio, 2 to 3 sentences, first person: "I'm Agnibha, a full-stack developer studying Software Product Engineering at LPU through Kalvium's work-integrated program. I contribute to open source through GSSoC 2026 and like building real products end to end, not just demos."
 - Longer origin story, how the owner got into code: "I started out curious about how the apps and sites I used every day actually worked. I built small things, broke them, fixed them, and got hooked on the feeling of something finally running. Since then I've kept picking projects slightly bigger than what I know how to build."
-- Favourite anime: Black Clover. Favourite characters: Asta, Yami, Nacht. Used for visual direction only (dark ink, grimoire, slash and shadow energy, underdog grit). Never shown on the site by name, likeness, symbol or logo.
+- Favourite anime: Black Clover (favourite characters: Asta, Yami, Nacht), One Piece, Naruto, Attack on Titan. Titles shown on the site as plain text in About (owner request, 2026-10-05); no character names, art, logos or symbols from any show. Black Clover also drives the visual direction (dark ink, grimoire, slash and shadow energy, underdog grit).
 - Things outside code (hobbies, sports, music): anime (mostly), gaming, music
 - One line set large in About: "Every project is a training arc."
 
@@ -92,5 +92,5 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 
 - Info: live GitHub stats (contribution heatmap as screentone, repo count, top languages); more projects: UBuy and nexus as side quests (UBuy live site currently shows "Error loading collection.", so it is shown without live link or screenshot until fixed); coding profiles: LeetCode 8MuNcqZBRp
 - Animation: spell-cast hover on skill cards (rune burst + radar axis highlight + projects using it); manga speech bubbles on About panels (owner: "you select"; lines chosen by Claude); ink-splatter click with combo counter; phone tilt parallax on the hero
-- Features: hidden rune hunt (five original runes, unlocks a secret page); anime watch list: owner gave a Crunchyroll profile-management link, which is private with no public API; SKIPPED until owner sends titles or an AniList username; real message delivery via Resend: key in .env.local (send-only, git-ignored)
+- Features: hidden rune hunt (five original runes, unlocks a secret page); anime watch list: shown as a static favourites list (Black Clover, One Piece, Naruto, Attack on Titan). Crunchyroll link not used: it is a login-only profile-management page with no public API; real message delivery via Resend: key in .env.local (send-only, git-ignored)
 - Extras: print reading mode toggle; dev log / blog ("Training arc log"): first post "My first year at Kalvium", bullets: ASK (post unpublished until given); interactive printable /resume page; Vercel Web Analytics

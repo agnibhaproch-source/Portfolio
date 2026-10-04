@@ -29,12 +29,12 @@ const zen = Zen_Kaku_Gothic_New({
   variable: "--font-zen",
 });
 
-// Used a handful of times, so not preloaded.
+// Sound-effect lettering. Preloaded: it first appears mid-scroll, and a late
+// font swap there shifted the About panels.
 const rampart = Rampart_One({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
-  preload: false,
   variable: "--font-rampart",
 });
 

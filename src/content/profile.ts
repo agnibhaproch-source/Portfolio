@@ -17,6 +17,7 @@ export const profile: Profile = {
     "I started out curious about how the apps and sites I used every day actually worked. I built small things, broke them, fixed them, and got hooked on the feeling of something finally running. Since then I've kept picking projects slightly bigger than what I know how to build.",
   bigLine: "Every project is a training arc.",
   interests: ["Anime", "Gaming", "Music"],
+  favouriteAnime: ["Black Clover", "One Piece", "Naruto", "Attack on Titan"],
   availability: "Looking for an internship",
   email: "agnibhapro.ch@gmail.com",
   links: {

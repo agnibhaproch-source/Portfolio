@@ -52,6 +52,7 @@ export const credits = {
 export const aboutCopy = {
   from: "From",
   offline: "Off the clock",
+  favouriteAnime: "Favourite anime",
   studying: "Studying",
   classOf: "Class of",
   sfx: "DON!",
