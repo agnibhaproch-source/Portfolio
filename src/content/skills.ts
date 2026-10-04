@@ -1,10 +1,21 @@
 import type { RatedSkill, SkillGroup } from "./types";
 
-// TODO(phase 5): languages, frontend, backend and databases, mobile, tools and cloud
-export const skillGroups: SkillGroup[] = [];
+export const skillGroups: SkillGroup[] = [
+  { name: "Languages", items: ["JavaScript", "TypeScript", "Python", "Java", "C++"] },
+  { name: "Frontend", items: ["React", "Next.js", "Tailwind CSS"] },
+  { name: "Backend and databases", items: ["Node.js", "Express", "MongoDB", "PostgreSQL"] },
+  { name: "Mobile", items: ["React Native", "Flutter"] },
+  { name: "Tools and cloud", items: ["Git", "Docker", "Vercel"] },
+];
 
-// TODO(phase 5): top 6 with an honest rating out of 10
-export const topSkills: RatedSkill[] = [];
+/** Radar chart, clockwise from the top. Honest ratings out of 10, approved by the owner. */
+export const topSkills: RatedSkill[] = [
+  { name: "JavaScript", rating: 7 },
+  { name: "React", rating: 7 },
+  { name: "Next.js", rating: 6 },
+  { name: "Node.js + Express", rating: 6 },
+  { name: "MongoDB", rating: 6 },
+  { name: "Git", rating: 7 },
+];
 
-// TODO(phase 5): what the owner is learning right now
-export const learning: string | null = null;
+export const learning: string | null = "Dart and Flutter";

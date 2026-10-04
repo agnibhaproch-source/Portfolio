@@ -44,3 +44,10 @@ export const aboutCopy = {
   classOf: "Class of",
   sfx: "DON!",
 };
+
+export const skillsCopy = {
+  chartTitle: "Power level",
+  chartCaption: "Top six skills, self-rated out of 10",
+  learning: "Currently learning",
+  outOf: "out of 10",
+};

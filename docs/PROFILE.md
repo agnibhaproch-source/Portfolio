@@ -38,13 +38,13 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 
 ## Skills
 
-- Languages: ASK
-- Frontend: ASK
-- Backend and databases: ASK
-- Mobile: ASK
-- Tools, cloud, DevOps: ASK
-- Top 6 skills with an honest self-rating out of 10 (used for the stat chart): ASK
-- Currently learning: ASK
+- Languages: JavaScript, TypeScript, Python, Java, C++
+- Frontend: React, Next.js, Tailwind CSS
+- Backend and databases: Node.js, Express, MongoDB, PostgreSQL
+- Mobile: React Native, Flutter
+- Tools, cloud, DevOps: Git, Docker, Vercel (not AWS)
+- Top 6 skills with an honest self-rating out of 10 (used for the stat chart): JavaScript 7, React 7, Git 7, Next.js 6, Node.js + Express 6, MongoDB 6 (proposed by Claude at the owner's request, approved by owner 2026-10-04)
+- Currently learning: Dart and Flutter
 
 ## Achievements
 
