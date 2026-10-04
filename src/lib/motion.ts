@@ -20,10 +20,24 @@ export type MotionContext = { [K in keyof typeof MOTION_QUERIES]: boolean };
  * Wraps gsap.matchMedia with the site's contexts. Call inside useGSAP;
  * returns the MatchMedia so the caller can revert it on cleanup.
  */
-export function matchMotion(setup: (ctx: MotionContext) => void | (() => void)) {
+export function matchMotion(
+  setup: (ctx: MotionContext) => void | (() => void),
+  scope?: Element | null,
+) {
   const mm = gsap.matchMedia();
-  mm.add(MOTION_QUERIES, (context) => setup(context.conditions as MotionContext));
+  mm.add(
+    MOTION_QUERIES,
+    (context) => setup(context.conditions as MotionContext),
+    scope ?? undefined,
+  );
   return mm;
+}
+
+export type Trigger = "scroll" | "mount";
+
+/** ScrollTrigger config for "scroll", nothing for "mount" (plays immediately). */
+export function triggerFor(el: Element, trigger: Trigger, start = "top 85%") {
+  return trigger === "scroll" ? { trigger: el, start, once: true } : undefined;
 }
 
 export function prefersReducedMotion() {

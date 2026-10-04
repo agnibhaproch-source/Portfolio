@@ -36,6 +36,11 @@ export const PANEL_SHAPES = {
 } as const satisfies Record<string, ReadonlyArray<readonly [number, number]>>;
 
 export type PanelShape = keyof typeof PANEL_SHAPES;
+export type Points = ReadonlyArray<readonly [number, number]>;
+
+export function clipPolygon(points: Points) {
+  return `polygon(${points.map(([x, y]) => `${x}% ${y}%`).join(", ")})`;
+}
 
 type PanelProps<T extends ElementType> = {
   as?: T;
@@ -63,7 +68,7 @@ export function Panel<T extends ElementType = "div">({
 }: PanelProps<T>) {
   const Tag: ElementType = as ?? "div";
   const points = PANEL_SHAPES[shape];
-  const clip = `polygon(${points.map(([x, y]) => `${x}% ${y}%`).join(", ")})`;
+  const clip = clipPolygon(points);
 
   return (
     <Tag className={cn("relative isolate", className)} {...rest}>

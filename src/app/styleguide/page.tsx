@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Button } from "@/components/ui/Button";
 import { Panel, PANEL_SHAPES, type PanelShape } from "@/components/ui/Panel";
 import { profile } from "@/content";
+import Link from "next/link";
+import { MotionDemos } from "./MotionDemos";
 
 export const metadata: Metadata = {
   title: "Styleguide",
@@ -43,9 +45,11 @@ export default function Styleguide() {
     <main id="main" data-mode="print" className="min-h-svh px-4 py-16 md:px-10">
       <h1 className="text-96">Styleguide</h1>
       <p className="mt-2 max-w-prose text-muted">
-        Tokens, type, panels and buttons for the aged-grimoire theme. Motion primitives join in
-        phase 2.
+        Tokens, type, panels, buttons and motion primitives for the aged-grimoire theme.
       </p>
+      <Link href="/" className="mt-4 inline-block ink-link text-14">
+        Back to home
+      </Link>
 
       <Block title="Palette">
         <ul className="grid grid-cols-2 gap-gutter md:grid-cols-4">
@@ -139,6 +143,10 @@ export default function Styleguide() {
             </a>
           </div>
         </div>
+      </Block>
+
+      <Block title="Motion">
+        <MotionDemos />
       </Block>
 
       <Block title="Modes">

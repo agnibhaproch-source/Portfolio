@@ -41,6 +41,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       setLenis(null);
     };
 
+    // Font swap changes text heights; re-measure every trigger once fonts land.
+    document.fonts.ready.then(() => ScrollTrigger.refresh());
+
     const onChange = () => (reduced.matches ? stop() : start());
     if (!reduced.matches) start();
     reduced.addEventListener("change", onChange);

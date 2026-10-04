@@ -22,3 +22,8 @@
 | 2026-10-04 | Colour roles (`--bg`, `--fg`, `--muted`, `--ring`) switch per section with `data-mode="print|colour"`; Tailwind tokens use `@theme inline` so the switch applies. | Two-mode design in 01-DESIGN. |
 | 2026-10-04 | Unknown content is `null` / empty in `src/content` with `TODO(phase N)` comments; components render nothing for missing items. | Ask-first protocol: never invent facts. |
 | 2026-10-04 | Temporary flame-mark `icon.svg` added so there is no favicon 404; final favicon in phase 9. | Clean console in phase 1. |
+| 2026-10-04 | `InkWipe` primitive built as `SlashWipe` (provider with `cover` / `uncover` / `play`), mounted once in the root layout for route and mode transitions. | Owner chose the dimension-slash transition. |
+| 2026-10-04 | `MagicCircle` added as an 11th primitive (original rune ring + {7/3} star, DrawSVG, spins only while on screen). | Owner-approved extra; reused by headings and contact send. |
+| 2026-10-04 | `ScrambleText` uses GSAP's ScrambleTextPlugin (free since 3.13) with a katakana set; final text reserves the box so wider katakana never reflow. | GSAP stays the only engine; no layout shift. |
+| 2026-10-04 | All primitives go through `useMotion` (useGSAP + scoped gsap.matchMedia: desktop / touch / reduced). Magnetic and Tilt are desktop-only; Parallax and SplitReveal are off/opacity-only under reduced motion. | 02-MOTION contexts and reduced-motion rules. |
+| 2026-10-04 | TitleCard title is sized with container units (`cqi`) so it fits any panel, not only full-screen. | Same card is reused inside the Work track. |

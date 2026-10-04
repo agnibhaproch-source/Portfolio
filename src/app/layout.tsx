@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Dela_Gothic_One, Rampart_One, Zen_Kaku_Gothic_New } from "next/font/google";
 import { profile } from "@/content";
+import { SlashWipeProvider } from "@/components/motion/SlashWipe";
 import { SmoothScroll } from "@/lib/smooth-scroll";
 import "./globals.css";
 
@@ -50,7 +51,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <SmoothScroll>{children}</SmoothScroll>
+        <SmoothScroll>
+          <SlashWipeProvider>{children}</SlashWipeProvider>
+        </SmoothScroll>
       </body>
     </html>
   );
