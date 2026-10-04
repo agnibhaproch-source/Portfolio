@@ -1,0 +1,57 @@
+import type { Metadata, Viewport } from "next";
+import { Dela_Gothic_One, Rampart_One, Zen_Kaku_Gothic_New } from "next/font/google";
+import { profile } from "@/content";
+import { SmoothScroll } from "@/lib/smooth-scroll";
+import "./globals.css";
+
+const dela = Dela_Gothic_One({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dela",
+});
+
+const zen = Zen_Kaku_Gothic_New({
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-zen",
+});
+
+// Used a handful of times, so not preloaded.
+const rampart = Rampart_One({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  preload: false,
+  variable: "--font-rampart",
+});
+
+export const metadata: Metadata = {
+  title: {
+    default: `${profile.name.full}, ${profile.role}`,
+    template: `%s | ${profile.name.alias}`,
+  },
+  description: `${profile.name.full} (${profile.name.alias}), ${profile.role.toLowerCase()} from ${profile.location}.`,
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1d1614",
+  colorScheme: "light dark",
+};
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
+  return (
+    <html lang="en" className={`${dela.variable} ${zen.variable} ${rampart.variable}`}>
+      <body className="grain">
+        <a
+          href="#main"
+          className="sr-only bg-washi px-4 py-2 text-sumi focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[200]"
+        >
+          Skip to content
+        </a>
+        <SmoothScroll>{children}</SmoothScroll>
+      </body>
+    </html>
+  );
+}

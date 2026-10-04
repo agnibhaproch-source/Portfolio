@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Anime portfolio for Agnibha "Agni" Bhattacharya
 
 You are building a personal portfolio website. Read this file fully, then read every file in `docs/` before writing code.

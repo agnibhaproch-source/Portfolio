@@ -1,0 +1,240 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* ------------------------------------------------------------------
+   Design tokens: "aged grimoire" retro palette (docs/01-DESIGN.md)
+   ------------------------------------------------------------------ */
+:root {
+  --sumi: #1d1614; /* brown-black ink, colour-mode background */
+  --washi: #e6d9bc; /* yellowed old-book paper */
+  --tone: #8a7f6e; /* screentone dots, secondary text on night */
+  --tone-ink: #5e5548; /* secondary text on paper (AA on washi) */
+  --agni: #b8232f; /* deep crimson flame, primary accent */
+  --kiln: #e2622b; /* ember, flame core, hover heat */
+  --twilight: #2a1a22; /* dark wine night, depth gradients */
+  --aura: #c9a24a; /* tarnished gold, power states only */
+
+  --ink-w: 3px; /* panel border weight */
+  --gutter: 14px; /* panel gutter, 12 to 16px */
+
+  /* Per-mode roles, overridden by [data-mode] */
+  --bg: var(--washi);
+  --fg: var(--sumi);
+  --muted: var(--tone-ink);
+  --ring: var(--agni);
+  --tone-dot: var(--sumi);
+}
+
+[data-mode="print"] {
+  --bg: var(--washi);
+  --fg: var(--sumi);
+  --muted: var(--tone-ink);
+  --ring: var(--agni);
+  --tone-dot: var(--sumi);
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+[data-mode="colour"] {
+  --bg: var(--sumi);
+  --fg: var(--washi);
+  --muted: var(--tone);
+  /* crimson is under 3:1 on sumi, so focus uses ember in colour mode */
+  --ring: var(--kiln);
+  --tone-dot: var(--washi);
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+/* inline: utilities reference the vars directly, so [data-mode] overrides apply */
+@theme inline {
+  --color-*: initial;
+  --color-sumi: var(--sumi);
+  --color-washi: var(--washi);
+  --color-tone: var(--tone);
+  --color-tone-ink: var(--tone-ink);
+  --color-agni: var(--agni);
+  --color-kiln: var(--kiln);
+  --color-twilight: var(--twilight);
+  --color-aura: var(--aura);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+
+  --font-display: var(--font-dela), "Hiragino Kaku Gothic StdN", system-ui, sans-serif;
+  --font-body: var(--font-zen), "Hiragino Sans", system-ui, sans-serif;
+  --font-sfx: var(--font-rampart), var(--font-dela), sans-serif;
+
+  /* Type scale (desktop): 14, 18, 24, 36, 56, 96, 160 */
+  --text-14: 0.875rem;
+  --text-14--line-height: 1.5;
+  --text-18: 1.125rem;
+  --text-18--line-height: 1.6;
+  --text-24: 1.5rem;
+  --text-24--line-height: 1.3;
+  --text-36: clamp(1.75rem, 1.2rem + 2vw, 2.25rem);
+  --text-36--line-height: 1.15;
+  --text-56: clamp(2.25rem, 1.4rem + 3.6vw, 3.5rem);
+  --text-56--line-height: 1.05;
+  --text-96: clamp(3rem, 1.6rem + 6.4vw, 6rem);
+  --text-96--line-height: 0.98;
+  --text-160: clamp(3.5rem, 1rem + 11vw, 10rem);
+  --text-160--line-height: 0.92;
+  --text-hero: clamp(3.5rem, 15vw, 22vw);
+  --text-hero--line-height: 0.88;
+
+  /* CSS mirrors of the GSAP CustomEases in src/lib/gsap.ts */
+  --ease-ink: cubic-bezier(0.2, 0, 0.1, 1);
+  --ease-snap: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-heat: cubic-bezier(0.3, 1.4, 0.5, 1);
+
+  --spacing-gutter: var(--gutter);
+  --container-prose: 68ch;
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+@layer base {
+  html {
+    background-color: var(--sumi);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      font-size: 1.125rem;
+    }
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--sumi);
+    color: var(--washi);
+  }
+
+  [data-mode="colour"] ::selection {
+    background-color: var(--washi);
+    color: var(--sumi);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Retro texture: static film grain over everything
+   ------------------------------------------------------------------ */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.09;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 1.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------------
+   Screentone: dot size is a registered property so it can "develop"
+   ------------------------------------------------------------------ */
+@property --dot {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 1.2px;
+}
+
+@utility tone {
+  background-image: radial-gradient(
+    circle at center,
+    var(--tone-dot) var(--dot),
+    transparent calc(var(--dot) + 0.6px)
+  );
+  background-size: 6px 6px;
+}
+
+/* Gradient tone: dots fade out across the panel, print-style */
+@utility tone-fade {
+  background-image: radial-gradient(
+    circle at center,
+    var(--tone-dot) var(--dot),
+    transparent calc(var(--dot) + 0.6px)
+  );
+  background-size: 6px 6px;
+  mask-image: linear-gradient(to bottom, #000, transparent);
+}
+
+@utility hatch {
+  background-image: repeating-linear-gradient(-45deg, var(--tone-dot) 0 1px, transparent 1px 7px);
+}
+
+/* Text link: underline redraws from the left on hover */
+@utility ink-link {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 2px;
+  padding-bottom: 2px;
+  transition: background-size 0.35s var(--ease-ink);
+
+  &:hover {
+    animation: ink-redraw 0.45s var(--ease-ink);
+  }
+}
+
+@keyframes ink-redraw {
+  0% {
+    background-size: 0% 2px;
+  }
+  100% {
+    background-size: 100% 2px;
+  }
+}
+
+/* Sound-effect lettering: always rotated, sits across a panel edge */
+@utility sfx {
+  font-family: var(--font-sfx);
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  rotate: -8deg;
+  -webkit-text-stroke: 2px var(--sumi);
+  paint-order: stroke fill;
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion: no smooth-scroll hijack, near-instant transitions
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.2s !important;
+    scroll-behavior: auto !important;
+  }
+}

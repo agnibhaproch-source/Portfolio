@@ -1,0 +1,95 @@
+import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import { cn } from "@/lib/utils";
+
+/** Panel outlines as [x%, y%] points. Diagonal cuts give the manga-page feel. */
+export const PANEL_SHAPES = {
+  rect: [
+    [0, 0],
+    [100, 0],
+    [100, 100],
+    [0, 100],
+  ],
+  "cut-right": [
+    [0, 0],
+    [100, 0],
+    [88, 100],
+    [0, 100],
+  ],
+  "cut-left": [
+    [12, 0],
+    [100, 0],
+    [100, 100],
+    [0, 100],
+  ],
+  "slant-top": [
+    [0, 8],
+    [100, 0],
+    [100, 100],
+    [0, 100],
+  ],
+  "slant-bottom": [
+    [0, 0],
+    [100, 0],
+    [100, 92],
+    [0, 100],
+  ],
+} as const satisfies Record<string, ReadonlyArray<readonly [number, number]>>;
+
+export type PanelShape = keyof typeof PANEL_SHAPES;
+
+type PanelProps<T extends ElementType> = {
+  as?: T;
+  shape?: PanelShape;
+  /** Screentone fill behind the content. */
+  tone?: boolean;
+  className?: string;
+  innerClassName?: string;
+  children?: ReactNode;
+} & Omit<ComponentPropsWithoutRef<T>, "as" | "className" | "children">;
+
+/**
+ * A ruled manga panel. Content is clipped to the shape; the 3px ink border
+ * is an SVG polygon with non-scaling stroke, so it stays 3px at any size and
+ * can be drawn on with DrawSVG (data-panel-border).
+ */
+export function Panel<T extends ElementType = "div">({
+  as,
+  shape = "rect",
+  tone = false,
+  className,
+  innerClassName,
+  children,
+  ...rest
+}: PanelProps<T>) {
+  const Tag: ElementType = as ?? "div";
+  const points = PANEL_SHAPES[shape];
+  const clip = `polygon(${points.map(([x, y]) => `${x}% ${y}%`).join(", ")})`;
+
+  return (
+    <Tag className={cn("relative isolate", className)} {...rest}>
+      <div
+        data-panel-content
+        className={cn("relative h-full bg-bg", tone && "tone", innerClassName)}
+        style={{ clipPath: clip }}
+      >
+        {children}
+      </div>
+      <svg
+        data-panel-border
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+      >
+        <polygon
+          points={points.map(([x, y]) => `${x},${y}`).join(" ")}
+          fill="none"
+          stroke="currentColor"
+          style={{ strokeWidth: "var(--ink-w)" }}
+          strokeLinejoin="miter"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    </Tag>
+  );
+}

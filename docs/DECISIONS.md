@@ -15,3 +15,10 @@
 | 2026-10-04 | Extras added: grimoire preloader (original emblem, no clover), self-drawing magic circles, blade cursor with click slash, limit-break Konami egg (black flood + crimson cracks). | Owner picked all four. |
 | 2026-10-04 | Headings stay plain; theme wording only in subtitles. | Recruiter clarity; matches 01-DESIGN voice rule. |
 | 2026-10-04 | Phone not shown. | Owner. |
+| 2026-10-04 | Spec docs moved into `docs/`. Next 16 scaffold adds `AGENTS.md`; CLAUDE.md imports it. | Folder shape in CLAUDE.md; Next 16 agent rules. |
+| 2026-10-04 | Stack pinned from `pnpm view`: Next 16.3.8, React 19.2, Tailwind 4.3, GSAP 3.15 (all plugins free), Lenis 1.3.26, three 0.186, R3F 9.8, pnpm 12.9 via corepack. pnpm 12 needs build approval: `allowBuilds` for sharp and unrs-resolver in pnpm-workspace.yaml. | CLAUDE.md: check versions, don't pin from memory. |
+| 2026-10-04 | Added `--tone-ink` #5e5548 for muted text on paper. | `--tone` on `--washi` is about 2.8:1, fails AA; tone-ink is about 5.2:1. |
+| 2026-10-04 | Focus ring is crimson in print mode, ember (`--kiln`) in colour mode, via a per-mode `--ring`. | Crimson on sumi is about 2.8:1, under the 3:1 non-text minimum. |
+| 2026-10-04 | Colour roles (`--bg`, `--fg`, `--muted`, `--ring`) switch per section with `data-mode="print|colour"`; Tailwind tokens use `@theme inline` so the switch applies. | Two-mode design in 01-DESIGN. |
+| 2026-10-04 | Unknown content is `null` / empty in `src/content` with `TODO(phase N)` comments; components render nothing for missing items. | Ask-first protocol: never invent facts. |
+| 2026-10-04 | Temporary flame-mark `icon.svg` added so there is no favicon 404; final favicon in phase 9. | Clean console in phase 1. |
