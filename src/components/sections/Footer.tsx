@@ -1,10 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { ClashField, type ClashHandle } from "@/components/motion/ClashField";
+import { ImpactWord, type ImpactWordHandle } from "@/components/motion/ImpactWord";
+import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Grimoire } from "@/components/sections/contact/Grimoire";
 import { JaggedEdge } from "@/components/ui/JaggedEdge";
 import { Rune } from "@/components/ui/Rune";
-import { credits, profile } from "@/content";
+import { credits, profile, sfxCopy } from "@/content";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
 
@@ -26,6 +29,9 @@ const EMBERS = Array.from({ length: 16 }, (_, i) => ({
 export function Footer() {
   const ref = useRef<HTMLElement>(null);
   const [closed, setClosed] = useState(false);
+  const endScene = useRef<HTMLDivElement>(null);
+  const clash = useRef<ClashHandle>(null);
+  const word = useRef<ImpactWordHandle>(null);
 
   useMotion((ctx, el) => {
     if (ctx.reduced) return;
@@ -56,6 +62,11 @@ export function Footer() {
       start: "bottom bottom+=2",
       onEnter: () => {
         setClosed(true);
+        // the book slams shut: BAM, shockwave, shake
+        window.setTimeout(() => {
+          clash.current?.impact(1.1, 0.6);
+          word.current?.play(sfxCopy.hit, 68, 38);
+        }, 380);
         if (book) {
           gsap.fromTo(
             book,
@@ -124,16 +135,29 @@ export function Footer() {
       </div>
 
       {/* The end: the grimoire closes */}
-      <div className="relative px-4 pt-6 pb-4 text-center md:px-10">
-        <p className="font-display text-56 md:text-96">{credits.ending}</p>
-        <div data-end-book className="mx-auto mt-2 max-w-sm">
-          <Grimoire
-            open={!closed}
-            charge={closed ? 3 : 1}
-            turn={0}
-            cast={closed ? 1 : 0}
-            className="h-72"
-          />
+      <div className="relative overflow-hidden px-4 pt-10 pb-4 text-center md:px-10">
+        <ClashField
+          ref={clash}
+          intensity={0.75}
+          arcs={3}
+          className="absolute inset-0"
+          shakeTarget={endScene}
+        />
+        <div aria-hidden className="pointer-events-none absolute inset-0 text-washi/15">
+          <SpeedLines variant="radial" intensity={0.45} />
+        </div>
+        <div ref={endScene} className="relative [text-shadow:0_2px_16px_var(--sumi)]">
+          <ImpactWord ref={word} className="text-96" />
+          <p className="font-display text-56 md:text-96">{credits.ending}</p>
+          <div data-end-book className="mx-auto mt-2 max-w-sm">
+            <Grimoire
+              open={!closed}
+              charge={closed ? 3 : 1}
+              turn={0}
+              cast={closed ? 1 : 0}
+              className="h-72"
+            />
+          </div>
         </div>
       </div>
 

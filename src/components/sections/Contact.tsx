@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
-import { contactCopy, profile, sections } from "@/content";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { contactCopy, profile, sections, sfxCopy } from "@/content";
+import { ClashField, type ClashHandle } from "@/components/motion/ClashField";
+import { ImpactWord, type ImpactWordHandle } from "@/components/motion/ImpactWord";
 import { MagicCircle } from "@/components/motion/MagicCircle";
-import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Grimoire } from "./contact/Grimoire";
 import { buttonClass } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -45,6 +46,10 @@ export function Contact() {
   const [turn, setTurn] = useState(0);
   const [cast, setCast] = useState(0);
   const typed = useRef(0);
+  const scene = useRef<HTMLDivElement>(null);
+  const clash = useRef<ClashHandle>(null);
+  const word = useRef<ImpactWordHandle>(null);
+  const lastBurst = useRef(0);
   const charge =
     Number(!!values.name.trim()) +
     Number(EMAIL.test(values.email.trim())) +
@@ -65,6 +70,7 @@ export function Contact() {
     const split = heading ? SplitText.create(heading, { type: "chars" }) : null;
     gsap
       .timeline({ scrollTrigger: { trigger: el, start: "top 70%", once: true } })
+      .from(q("[data-letterbox]"), { scaleY: 0, duration: 0.5, ease: "snap" }, 0)
       .from(split?.chars ?? [], {
         yPercent: 80,
         scale: 1.6,
@@ -73,10 +79,14 @@ export function Contact() {
         stagger: 0.05,
         ease: "steps(4)",
       })
+      .call(() => {
+        clash.current?.impact(1);
+        word.current?.play(sfxCopy.slam, 32, 16);
+      })
       .from(
         q("[data-contact-rise]"),
         { y: 30, opacity: 0, duration: 0.6, stagger: 0.07, ease: "ink" },
-        0.3,
+        "-=0.1",
       );
     return () => split?.revert();
   }, ref);
@@ -126,6 +136,30 @@ export function Contact() {
       .to(line, { drawSVG: "100% 100%", opacity: 0, duration: 0.35, ease: "power2.out" });
   };
 
+  // Finishing move: a slash across the whole battlefield, the flame side wins.
+  const finisher = () => {
+    clash.current?.impact(1.2, 0.9);
+    word.current?.play(sfxCopy.strike, 62, 40);
+    if (prefersReducedMotion()) return;
+    const line = scene.current?.querySelector("[data-finisher]");
+    if (!line) return;
+    gsap
+      .timeline()
+      .fromTo(
+        line,
+        { drawSVG: "0% 0%", opacity: 1 },
+        { drawSVG: "0% 100%", duration: 0.18, ease: "power3.in" },
+      )
+      .to(line, { drawSVG: "100% 100%", opacity: 0, duration: 0.45, ease: "power2.out" });
+  };
+
+  // When the circle is fully charged, the clash surges.
+  useEffect(() => {
+    if (charge < 3) return;
+    clash.current?.impact(0.45, 0.3);
+    word.current?.play(sfxCopy.clash, 50, 30);
+  }, [charge]);
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (sending) return;
@@ -158,6 +192,7 @@ export function Contact() {
       burst();
       setCast((c) => c + 1);
       cut();
+      finisher();
       setSent(true);
     } catch {
       setFailed(true);
@@ -174,6 +209,9 @@ export function Contact() {
     if (Math.floor(total / 12) > typed.current) setTurn((t) => t + 1);
     typed.current = Math.floor(total / 12);
     if (tried) setErrors(validate(next));
+    // every keystroke throws sparks into the clash
+    lastBurst.current += 1;
+    if (lastBurst.current % 2 === 0) clash.current?.burst(6);
   };
 
   const fieldCls =
@@ -187,11 +225,47 @@ export function Contact() {
       aria-labelledby={`${sections.contact.id}-heading`}
       className="relative overflow-hidden px-4 py-24 md:px-10 md:py-32"
     >
-      <div aria-hidden className="pointer-events-none absolute inset-0 text-washi/10">
-        <SpeedLines variant="radial" intensity={0.3} />
-      </div>
+      {/* The battlefield: flame vs anti-magic, letterbox bars, the finishing slash */}
+      <ClashField
+        ref={clash}
+        intensity={0.85}
+        arcs={3}
+        className="absolute inset-0"
+        shakeTarget={scene}
+      />
+      <div
+        aria-hidden
+        data-letterbox
+        className="bg-black pointer-events-none absolute inset-x-0 top-0 z-10 h-[5svh] origin-top"
+      />
+      <div
+        aria-hidden
+        data-letterbox
+        className="bg-black pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[5svh] origin-bottom"
+      />
 
-      <div className="relative">
+      <div ref={scene} className="relative [text-shadow:0_2px_14px_var(--sumi)]">
+        <svg
+          aria-hidden
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          className="pointer-events-none absolute -inset-10 z-30 h-[calc(100%+5rem)] w-[calc(100%+5rem)] overflow-visible"
+        >
+          <line
+            data-finisher
+            x1="-5"
+            y1="95"
+            x2="105"
+            y2="5"
+            stroke="var(--washi)"
+            strokeWidth="6"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            opacity="0"
+            className="[filter:drop-shadow(0_0_10px_var(--kiln))_drop-shadow(0_0_24px_var(--agni))]"
+          />
+        </svg>
+        <ImpactWord ref={word} className="text-96" />
         <SectionHeading copy={sections.contact} />
 
         <div className="grid gap-14 lg:grid-cols-[1fr_1fr] lg:gap-16">
@@ -228,7 +302,7 @@ export function Contact() {
                 <li key={l.href} data-contact-rise>
                   <a
                     href={l.href}
-                    className="group/link relative flex items-center gap-4 overflow-hidden py-3 font-display text-24 break-all transition-colors hover:text-kiln md:text-36"
+                    className="group/link relative flex items-center gap-4 overflow-hidden py-3 font-display text-24 break-all transition-colors hover:text-kiln xl:text-36"
                     {...(l.href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
                   >
                     <span

@@ -192,3 +192,6 @@ export const resumeCopy = {
   live: "Live",
   code: "Code",
 };
+
+/** Sound-effect lettering for impacts (Latin romanisations of manga SFX). */
+export const sfxCopy = { strike: "ZAN!", slam: "DOON!", hit: "BAM!", clash: "GIN!" };
