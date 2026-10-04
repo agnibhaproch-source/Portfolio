@@ -128,10 +128,13 @@ export function Experience() {
 
                 <Panel
                   as="article"
+                  shape="torn-bottom"
+                  tape
+                  page={i + 9}
                   data-arc-card
                   data-mode="print"
                   className="max-w-3xl text-sumi"
-                  innerClassName="p-6 md:p-8"
+                  innerClassName="p-6 pb-10 md:p-8 md:pb-12"
                 >
                   <div className="relative">
                     <div

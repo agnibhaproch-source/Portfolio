@@ -33,6 +33,23 @@ export const PANEL_SHAPES = {
     [100, 92],
     [0, 100],
   ],
+  "torn-bottom": [
+    [0, 0],
+    [100, 0],
+    [100, 96],
+    [93, 99],
+    [86, 95.5],
+    [78, 99.5],
+    [70, 96],
+    [61, 100],
+    [52, 95],
+    [44, 98.5],
+    [35, 95.5],
+    [26, 99.5],
+    [17, 96],
+    [8, 99],
+    [0, 96],
+  ],
 } as const satisfies Record<string, ReadonlyArray<readonly [number, number]>>;
 
 export type PanelShape = keyof typeof PANEL_SHAPES;
@@ -56,6 +73,10 @@ type PanelProps = {
   children?: ReactNode;
   /** Rendered above the border, outside the clip (e.g. speech bubbles). */
   overlay?: ReactNode;
+  /** Manga page number printed small in the bottom corner. */
+  page?: number;
+  /** A strip of tape holding the panel to the page. */
+  tape?: boolean;
 } & Omit<ComponentPropsWithoutRef<"div">, "className" | "children">;
 
 /**
@@ -72,6 +93,8 @@ export function Panel({
   innerClassName,
   children,
   overlay,
+  page,
+  tape = false,
   ...rest
 }: PanelProps) {
   // All panel tags share div attributes; narrow for the JSX checker.
@@ -104,6 +127,20 @@ export function Panel({
           vectorEffect="non-scaling-stroke"
         />
       </svg>
+      {tape && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -top-3 left-1/2 z-10 h-6 w-24 -translate-x-1/2 -rotate-3 bg-[rgb(250_244_222/0.6)] shadow-[0_1px_2px_rgb(0_0_0/0.2)] [clip-path:polygon(3%_0,97%_0,100%_20%,97%_40%,100%_60%,97%_80%,100%_100%,3%_100%,0_80%,3%_60%,0_40%,3%_20%,0_0)]"
+        />
+      )}
+      {page !== undefined && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute right-3 bottom-2 z-10 font-display text-[10px] tracking-widest text-muted"
+        >
+          {page}
+        </span>
+      )}
       {overlay}
     </Tag>
   );

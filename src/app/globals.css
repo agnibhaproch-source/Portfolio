@@ -592,6 +592,57 @@ html[data-print] .hero canvas {
 }
 
 /* ------------------------------------------------------------------
+   Retro print: crimson ink misregistered behind display type
+   ------------------------------------------------------------------ */
+.misprint {
+  text-shadow: var(--mis-x, 0.045em) var(--mis-y, 0.04em) 0
+    color-mix(in srgb, var(--agni) 80%, transparent);
+}
+
+/* Paper fibres on print pages: faint long strands under the grain */
+[data-mode="print"] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.06' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.32 0 0 0 0 0.27 0 0 0 0.35 -0.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+
+/* Ink scrollbar, crimson selection, rune-ring keyboard focus */
+html {
+  scrollbar-color: var(--agni) var(--sumi);
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sumi);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--kiln), var(--agni));
+  border: 3px solid var(--sumi);
+  border-radius: 999px;
+}
+
+::selection,
+[data-mode="colour"] ::selection {
+  background-color: var(--agni);
+  color: var(--washi);
+}
+
+:focus-visible {
+  outline: 2px dashed var(--ring) !important;
+  outline-offset: 4px;
+  animation: rune-focus 1.2s ease-in-out infinite;
+}
+
+@keyframes rune-focus {
+  50% {
+    outline-offset: 7px;
+  }
+}
+
+/* ------------------------------------------------------------------
    Reduced motion: no smooth-scroll hijack, near-instant transitions
    ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {

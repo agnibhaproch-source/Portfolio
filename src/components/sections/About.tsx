@@ -6,6 +6,7 @@ import { aboutCopy, education, profile, sections } from "@/content";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Panel } from "@/components/ui/Panel";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { InkBlot } from "@/components/ui/InkBlot";
 import { Silhouette } from "@/components/ui/Silhouette";
 import { DUR, gsap, ScrollTrigger, SplitText, STAGGER } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
@@ -196,10 +197,20 @@ export function About() {
       <Rune index={1} className="absolute top-28 right-4 md:top-36 md:right-10" />
 
       <div data-about-stage className="relative grid gap-gutter md:grid-cols-2 lg:grid-cols-12">
+        <InkBlot
+          seed={3}
+          className="absolute -top-8 left-[31%] z-10 hidden size-16 opacity-80 lg:block"
+        />
+        <InkBlot
+          seed={8}
+          className="absolute right-[8%] -bottom-6 z-10 hidden size-10 opacity-70 lg:block"
+        />
         {/* 1: photo (silhouette until the owner's photo arrives) */}
         <Panel
           data-about-panel
           {...bubble(0)}
+          page={2}
+          tape
           tone
           className="min-h-72 md:min-h-[22rem] lg:col-span-4"
           innerClassName="overflow-hidden"
@@ -219,6 +230,7 @@ export function About() {
         <Panel
           data-about-panel
           {...bubble(1)}
+          page={3}
           className="md:min-h-[22rem] lg:col-span-8"
           innerClassName="flex flex-col justify-center gap-5 p-6 md:p-10"
         >
@@ -238,6 +250,7 @@ export function About() {
         <Panel
           data-about-panel
           {...bubble(2)}
+          page={4}
           className="md:min-h-[18rem] lg:col-span-3"
           innerClassName="flex flex-col justify-between gap-6 p-6"
         >
@@ -258,6 +271,7 @@ export function About() {
           <Panel
             data-about-panel
             {...bubble(3)}
+            page={5}
             shape="cut-right"
             fill={false}
             className="min-h-64 text-sumi md:order-last md:col-span-2 md:min-h-[18rem] lg:order-none lg:col-span-6"
@@ -274,6 +288,7 @@ export function About() {
         <Panel
           data-about-panel
           {...bubble(4)}
+          page={6}
           shape="cut-left"
           className="md:min-h-[18rem] lg:col-span-3"
           innerClassName="flex flex-col justify-between gap-6 p-6 pl-10 md:pl-12"

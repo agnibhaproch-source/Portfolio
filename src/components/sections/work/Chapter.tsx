@@ -116,7 +116,11 @@ export function Chapter({ project, index }: { project: Project; index: number })
           <p className="font-display text-14 text-muted">
             {chapterLabel(index)} <span aria-hidden>·</span> {workCopy.status[project.status]}
           </p>
-          <h3 id={headingId} data-title className="mt-2 text-[clamp(2.5rem,9vw,3.5rem)] leading-none lg:text-[clamp(3rem,5.2vw,6rem)]">
+          <h3
+            id={headingId}
+            data-title
+            className="mt-2 text-[clamp(2.5rem,9vw,3.5rem)] leading-none lg:text-[clamp(3rem,5.2vw,6rem)]"
+          >
             {project.name}
           </h3>
           <p data-pitch className="mt-3 max-w-prose text-18 lg:text-24">
