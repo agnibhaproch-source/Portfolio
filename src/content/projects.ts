@@ -1,4 +1,4 @@
-import type { Project } from "./types";
+import type { Project, SideQuest } from "./types";
 
 /*
  * Chapters of the grimoire, in order. Text drafted from each repo's README
@@ -88,5 +88,28 @@ export const projects: Project[] = [
     flagship: false,
     // No live build yet, so no screenshots: the chapter shows title art instead.
     media: [],
+  },
+];
+
+/*
+ * Smaller builds shown after the main chapters. UBuy's live site currently
+ * fails to load its products, so it links to the repo only until fixed.
+ */
+export const sideQuests: SideQuest[] = [
+  {
+    name: "nexus",
+    pitch:
+      "A full-stack reference app with zero runtime dependencies: JWT auth with roles, relational and document stores, RAG, a tool-using agent, WebSockets, payments and scheduled jobs, all on Node's standard library.",
+    stack: ["Node.js", "JavaScript", "WebSockets", "Docker"],
+    repoUrl: "https://github.com/agnibhaproch-source/nexus",
+    liveUrl: null,
+  },
+  {
+    name: "UBuy",
+    pitch:
+      "A storefront for curated collections, with category tabs, sorting, and price, brand, rating and colour filters.",
+    stack: ["HTML", "CSS", "JavaScript"],
+    repoUrl: "https://github.com/agnibhaproch-source/UBuy",
+    liveUrl: null,
   },
 ];

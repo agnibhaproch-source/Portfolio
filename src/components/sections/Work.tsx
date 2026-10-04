@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { profile, projects, sections, workCopy } from "@/content";
+import { profile, projects, sections, sideQuests, workCopy } from "@/content";
 import { MagicCircle } from "@/components/motion/MagicCircle";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Button } from "@/components/ui/Button";
@@ -149,6 +149,44 @@ export function Work() {
           {projects.map((p, i) => (
             <Chapter key={p.slug} project={p} index={i} />
           ))}
+
+          {sideQuests.length > 0 && (
+            <div className="work-page flex flex-col gap-5 overflow-y-auto border-[3px] border-washi p-6 md:p-8">
+              <div>
+                <h3 className="text-36">{workCopy.sideQuests}</h3>
+                <p className="mt-1 text-14 text-muted">{workCopy.sideQuestsLine}</p>
+              </div>
+              <ul className="space-y-4">
+                {sideQuests.map((q) => (
+                  <li key={q.name} data-quest className="border-l-[3px] border-kiln pl-4">
+                    <p className="font-display text-24">{q.name}</p>
+                    <p className="mt-1 text-14 md:text-18">{q.pitch}</p>
+                    <p className="mt-2 text-14 text-muted">{q.stack.join(", ")}</p>
+                    <div className="mt-2 flex flex-wrap gap-x-5">
+                      <a
+                        href={q.repoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ink-link text-14"
+                      >
+                        {workCopy.sourceCode}
+                      </a>
+                      {q.liveUrl && (
+                        <a
+                          href={q.liveUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="ink-link text-14"
+                        >
+                          {workCopy.liveSite}
+                        </a>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="work-page flex flex-col justify-center gap-6 border-[3px] border-dashed border-washi/50 p-8 md:p-10">
             <p className="font-display text-56">{workCopy.closingTitle}</p>

@@ -6,6 +6,7 @@ export const sections = {
   about: { id: "about", heading: "About", subtitle: "the origin" },
   skills: { id: "skills", heading: "Skills", subtitle: "spell list" },
   experience: { id: "experience", heading: "Experience", subtitle: "missions so far" },
+  stats: { id: "stats", heading: "Stats", subtitle: "the training log, updated daily" },
   work: { id: "work", heading: "Work", subtitle: "the grimoire, chapters so far" },
   achievements: { id: "achievements", heading: "Achievements", subtitle: "stars earned" },
   contact: { id: "contact", heading: "Contact", subtitle: "next chapter" },
@@ -79,6 +80,8 @@ export const workCopy = {
   liveSite: "Live site",
   sourceCode: "Source code",
   status: { live: "Live", "in progress": "In progress", archived: "Archived" },
+  sideQuests: "Side quests",
+  sideQuestsLine: "Smaller builds between chapters.",
   closingTitle: "More chapters",
   closingLine: "Everything else I am building lives on GitHub.",
   allWork: "All work on GitHub",
@@ -106,11 +109,12 @@ export const contactCopy = {
     message: "Write a message of at least 10 characters.",
   },
   errorSummary: "Fix the highlighted fields, then send again.",
-  successTitle: "Message ready",
+  sending: "Sending...",
+  successTitle: "Message sent",
   successBody:
-    "Your email app should have opened with the message filled in. Press send there and it reaches me. If nothing opened, email me at",
+    "Thanks, it is in my inbox. I will reply to the address you gave. You can also email me at",
+  failed: "That did not go through. Try again in a minute, or email me directly at",
   again: "Write another",
-  subject: "Hello from your portfolio",
 };
 
 export const notFoundCopy = {
@@ -118,4 +122,20 @@ export const notFoundCopy = {
   body: "This page is missing from the grimoire.",
   sfx: "SHIIN...",
   home: "Back to the first page",
+};
+
+export const statsCopy = {
+  leetcode: "LeetCode",
+  solved: "problems solved",
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
+  ranking: "global rank",
+  github: "GitHub",
+  contributions: "contributions in the last year",
+  activeDays: "active days",
+  repos: "public repos",
+  languages: "Most used languages",
+  profile: "View profile",
+  heatmapLabel: (n: number) => `${n} contributions in the last year, one dot per day`,
 };

@@ -25,12 +25,15 @@ export const profile: Profile = {
       label: "LinkedIn",
       href: "https://www.linkedin.com/in/agnibha-bhattacharya-50b72b382/",
     },
-    others: [], // TODO(phase 8): X, Instagram, LeetCode, others
+    others: [{ label: "LeetCode", href: "https://leetcode.com/u/8MuNcqZBRp/" }],
   },
   resume: null, // TODO: "/resume.pdf" once the owner sends it
   portrait: null, // TODO: public/me/portrait.jpg once the owner sends it
   pose: null, // TODO(phase 4): public/me/pose.jpg (optional)
 };
+
+/** Usernames for live stats (fetched on the server, refreshed daily). */
+export const handles = { github: "agnibhaproch-source", leetcode: "8MuNcqZBRp" };
 
 export const education: Education = {
   degree: "B.Tech CSE (Software Product Engineering)",

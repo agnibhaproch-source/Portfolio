@@ -63,7 +63,8 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 - LinkedIn: https://www.linkedin.com/in/agnibha-bhattacharya-50b72b382/
 - Email: agnibhapro.ch@gmail.com (shown publicly)
 - Phone: kept private, not shown on the site (owner decision)
-- X, Instagram, LeetCode, others: ASK
+- LeetCode: https://leetcode.com/u/8MuNcqZBRp/ (60 solved on 2026-10-04: 11 easy, 42 medium, 7 hard; no contests)
+- X, Instagram, others: none given
 - Resume PDF, drop at `public/resume.pdf`: not yet, owner will send later (button hidden until then)
 
 ## Assets
@@ -89,7 +90,7 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 
 ## Extra features chosen by owner (2026-10-04)
 
-- Info: live GitHub stats (contribution heatmap as screentone, repo count, top languages); more projects (UBuy, Hackathon-Mindmap-AI, CampusAi, others: ASK which and where); coding profiles (platforms and usernames: ASK)
-- Animation: spell-cast hover on skill cards (rune burst + radar axis highlight + projects using it); manga speech bubbles on About panels (lines: ASK); ink-splatter click with combo counter; phone tilt parallax on the hero
-- Features: hidden rune hunt (five original runes, unlocks a secret page); anime watch list from AniList, text only (username: ASK); real message delivery via Resend (account + API key: ASK)
-- Extras: print reading mode toggle; dev log / blog ("Training arc log", posts: ASK); interactive printable /resume page; Vercel Web Analytics
+- Info: live GitHub stats (contribution heatmap as screentone, repo count, top languages); more projects: UBuy and nexus as side quests (UBuy live site currently shows "Error loading collection.", so it is shown without live link or screenshot until fixed); coding profiles: LeetCode 8MuNcqZBRp
+- Animation: spell-cast hover on skill cards (rune burst + radar axis highlight + projects using it); manga speech bubbles on About panels (owner: "you select"; lines chosen by Claude); ink-splatter click with combo counter; phone tilt parallax on the hero
+- Features: hidden rune hunt (five original runes, unlocks a secret page); anime watch list: owner gave a Crunchyroll profile-management link, which is private with no public API; SKIPPED until owner sends titles or an AniList username; real message delivery via Resend: key in .env.local (send-only, git-ignored)
+- Extras: print reading mode toggle; dev log / blog ("Training arc log"): first post "My first year at Kalvium", bullets: ASK (post unpublished until given); interactive printable /resume page; Vercel Web Analytics

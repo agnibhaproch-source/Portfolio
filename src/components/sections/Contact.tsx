@@ -38,6 +38,8 @@ export function Contact() {
   const [errors, setErrors] = useState<Errors>({});
   const [tried, setTried] = useState(false);
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const links = [
     { label: profile.email, href: `mailto:${profile.email}` },
@@ -99,8 +101,10 @@ export function Contact() {
     );
   };
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (sending) return;
+    setFailed(false);
     setTried(true);
     const found = validate(values);
     setErrors(found);
@@ -116,13 +120,23 @@ export function Contact() {
       }
       return;
     }
-    const body = `${values.message.trim()}\n\n${values.name.trim()} (${values.email.trim()})`;
-    const href = `mailto:${profile.email}?subject=${encodeURIComponent(contactCopy.subject)}&body=${encodeURIComponent(body)}`;
-    const a = document.createElement("a");
-    a.href = href;
-    a.click();
-    burst();
-    setSent(true);
+    setSending(true);
+    try {
+      const trap =
+        formRef.current?.querySelector<HTMLInputElement>('[name="company"]')?.value ?? "";
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...values, company: trap }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      burst();
+      setSent(true);
+    } catch {
+      setFailed(true);
+    } finally {
+      setSending(false);
+    }
   };
 
   const update = (field: Field, value: string) => {
@@ -241,6 +255,22 @@ export function Contact() {
                     {contactCopy.errorSummary}
                   </p>
                 )}
+                {failed && (
+                  <p role="alert" className="text-18 text-kiln">
+                    {contactCopy.failed}{" "}
+                    <a href={`mailto:${profile.email}`} className="ink-link">
+                      {profile.email}
+                    </a>
+                    .
+                  </p>
+                )}
+                {/* Honeypot: hidden from people, filled by bots. */}
+                <div aria-hidden className="absolute -left-[9999px] h-0 overflow-hidden">
+                  <label>
+                    Company
+                    <input name="company" tabIndex={-1} autoComplete="off" />
+                  </label>
+                </div>
                 {(["name", "email", "message"] as Field[]).map((f) => (
                   <div key={f} className="group relative">
                     <label htmlFor={`contact-${f}`} className="text-14 text-muted">
@@ -281,12 +311,19 @@ export function Contact() {
                     )}
                   </div>
                 ))}
-                <button type="submit" className={buttonClass("primary", "group overflow-hidden")}>
+                <button
+                  type="submit"
+                  disabled={sending}
+                  aria-busy={sending}
+                  className={buttonClass("primary", "group overflow-hidden disabled:opacity-70")}
+                >
                   <span
                     aria-hidden
                     className="absolute inset-0 origin-left scale-x-0 bg-aura/40 transition-transform duration-700 ease-linear group-hover:scale-x-100 group-focus-visible:scale-x-100 group-active:scale-x-100"
                   />
-                  <span className="relative">{contactCopy.send}</span>
+                  <span className="relative">
+                    {sending ? contactCopy.sending : contactCopy.send}
+                  </span>
                 </button>
               </form>
             )}

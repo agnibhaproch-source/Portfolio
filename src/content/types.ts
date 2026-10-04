@@ -77,3 +77,11 @@ export type Project = {
 export type Achievement = { title: string; issuer: string; year: string; href: string | null };
 
 export type SectionCopy = { id: string; heading: string; subtitle: string };
+
+export type SideQuest = {
+  name: string;
+  pitch: string;
+  stack: string[];
+  repoUrl: string;
+  liveUrl: string | null;
+};
