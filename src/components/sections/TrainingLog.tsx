@@ -135,6 +135,14 @@ export function TrainingLog({
       className="px-4 py-24 md:px-10 md:py-32"
     >
       <SectionHeading copy={sections.stats} />
+      <p className="-mt-6 mb-10 text-14 text-muted md:-mt-8">
+        {statsCopy.asOf}{" "}
+        {new Date((github ?? leetcode)!.fetchedAt).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })}
+      </p>
 
       <div className="grid gap-gutter lg:grid-cols-[1fr_1.6fr]">
         {leetcode && (

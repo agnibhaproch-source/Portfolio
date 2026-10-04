@@ -13,44 +13,52 @@ export type GithubStats = {
   days: ContributionDay[];
   total: number;
   activeDays: number;
+  /** Same number as the profile's "Repositories" tab. */
   repos: number;
   languages: { name: string; count: number }[];
+  fetchedAt: string;
 };
 export type LeetcodeStats = {
   solved: number;
   easy: number;
   medium: number;
   hard: number;
+  /** LeetCode profile "Rank". */
   ranking: number | null;
+  fetchedAt: string;
 };
 
 export async function getGithubStats(): Promise<GithubStats | null> {
   try {
-    const [calRes, reposRes] = await Promise.all([
+    const api = { headers: { Accept: "application/vnd.github+json" }, next: { revalidate: DAY } };
+    const [calRes, userRes, reposRes] = await Promise.all([
       fetch(`https://github.com/users/${handles.github}/contributions`, {
         next: { revalidate: DAY },
       }),
-      fetch(`https://api.github.com/users/${handles.github}/repos?per_page=100`, {
-        headers: { Accept: "application/vnd.github+json" },
-        next: { revalidate: DAY },
-      }),
+      fetch(`https://api.github.com/users/${handles.github}`, api),
+      fetch(`https://api.github.com/users/${handles.github}/repos?per_page=100`, api),
     ]);
-    if (!calRes.ok || !reposRes.ok) return null;
+    if (!calRes.ok || !userRes.ok || !reposRes.ok) return null;
     const html = await calRes.text();
 
-    // Day cells carry data-date and data-level (0 to 4); tooltips carry counts.
+    // One cell per day: data-date and data-level (0 to 4), as on the profile graph.
     const days: ContributionDay[] = [];
     for (const m of html.matchAll(/data-date="(\d{4}-\d{2}-\d{2})"[^>]*?data-level="(\d)"/g)) {
       days.push({ date: m[1]!, level: Number(m[2]) });
     }
     days.sort((a, b) => a.date.localeCompare(b.date));
-    let total = 0;
-    for (const m of html.matchAll(/>(\d+) contributions? on /g)) total += Number(m[1]);
 
+    // GitHub's own headline, e.g. "235 contributions in the last year", exactly as the profile shows it.
+    const headline = html.replace(/\s+/g, " ").match(/([\d,]+) contributions? in the last year/);
+    if (!headline) return null;
+    const total = Number(headline[1]!.replace(/,/g, ""));
+
+    const user = (await userRes.json()) as { public_repos: number };
     const repos = (await reposRes.json()) as { fork: boolean; language: string | null }[];
-    const own = repos.filter((r) => !r.fork);
     const counts = new Map<string, number>();
-    for (const r of own) if (r.language) counts.set(r.language, (counts.get(r.language) ?? 0) + 1);
+    for (const r of repos) {
+      if (!r.fork && r.language) counts.set(r.language, (counts.get(r.language) ?? 0) + 1);
+    }
     const languages = [...counts]
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
@@ -60,8 +68,9 @@ export async function getGithubStats(): Promise<GithubStats | null> {
       days,
       total,
       activeDays: days.filter((d) => d.level > 0).length,
-      repos: own.length,
+      repos: user.public_repos,
       languages,
+      fetchedAt: new Date().toISOString(),
     };
   } catch {
     return null;
@@ -99,6 +108,7 @@ export async function getLeetcodeStats(): Promise<LeetcodeStats | null> {
       medium: by("Medium"),
       hard: by("Hard"),
       ranking: user?.profile?.ranking ?? null,
+      fetchedAt: new Date().toISOString(),
     };
   } catch {
     return null;

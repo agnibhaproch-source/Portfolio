@@ -50,6 +50,15 @@ export const aboutCopy = {
   studying: "Studying",
   classOf: "Class of",
   sfx: "DON!",
+  /** Speech bubbles on the five About panels, in panel order. Chosen by Claude at the owner's request. */
+  bubbles: [
+    "This is me. Probably debugging.",
+    "Demos are nice. Shipping is better.",
+    "Kolkata to Punjab, for a CS degree.",
+    "Every bug is just the next opponent.",
+    "CGPA 9.09. Not bad for zero talent.",
+  ],
+  tapHint: "Tap a panel",
 };
 
 export const skillsCopy = {
@@ -57,6 +66,7 @@ export const skillsCopy = {
   chartCaption: "Top six skills, self-rated out of 10",
   learning: "Currently learning",
   outOf: "out of 10",
+  usedIn: "Used in",
 };
 
 export const experienceCopy = {
@@ -138,4 +148,8 @@ export const statsCopy = {
   languages: "Most used languages",
   profile: "View profile",
   heatmapLabel: (n: number) => `${n} contributions in the last year, one dot per day`,
+  asOf: "Live from GitHub and LeetCode, as of",
 };
+
+export const heroTiltCopy = { enable: "Enable tilt" };
+export const comboCopy = { combo: "COMBO" };
