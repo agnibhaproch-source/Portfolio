@@ -9,7 +9,8 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { DUR, gsap } from "@/lib/gsap";
+import { usePathname, useRouter } from "next/navigation";
+import { DUR, gsap, ScrollTrigger } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 
 /*
@@ -29,6 +30,8 @@ type Slash = {
   uncover: () => Promise<void>;
   /** Cover then uncover, with an optional callback in between. */
   play: (between?: () => void | Promise<void>) => Promise<void>;
+  /** Route transition: cover, navigate, uncover once the new route is in. */
+  navigate: (href: string) => Promise<void>;
 };
 
 const SlashContext = createContext<Slash | null>(null);
@@ -113,7 +116,47 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
     [cover, uncover],
   );
 
-  const value = useMemo(() => ({ cover, uncover, play }), [cover, uncover, play]);
+  // Route transitions: uncover once the pathname actually changes.
+  const router = useRouter();
+  const pathname = usePathname();
+  const pending = useRef<string | null>(null);
+
+  const navigate = useCallback(
+    async (href: string) => {
+      const target = new URL(href, window.location.href);
+      const samePage = target.pathname === window.location.pathname;
+      await cover();
+      if (samePage) {
+        router.push(href);
+        await uncover();
+        return;
+      }
+      pending.current = target.pathname;
+      router.push(href);
+      // Failsafe: never leave the screen covered.
+      window.setTimeout(() => {
+        if (pending.current) {
+          pending.current = null;
+          void uncover();
+        }
+      }, 4000);
+    },
+    [cover, uncover, router],
+  );
+
+  useEffect(() => {
+    if (!pending.current || pending.current !== pathname) return;
+    pending.current = null;
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+      void uncover();
+    });
+  }, [pathname, uncover]);
+
+  const value = useMemo(
+    () => ({ cover, uncover, play, navigate }),
+    [cover, uncover, play, navigate],
+  );
 
   return (
     <SlashContext.Provider value={value}>

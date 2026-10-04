@@ -318,6 +318,83 @@ section[id] {
 }
 
 /* ------------------------------------------------------------------
+   Work: the grimoire. A vertical stack by default (touch, reduced motion,
+   no JS). On desktop, JS sets [data-horizontal] and pins it as a track.
+   ------------------------------------------------------------------ */
+.work-track {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.work-track:not([data-horizontal]) .work-intro {
+  display: none;
+}
+
+.work-track[data-horizontal] {
+  flex-direction: row;
+  align-items: center;
+  gap: 2.5rem;
+  width: max-content;
+  height: 100svh;
+  padding-inline: 2.5rem 6rem;
+}
+
+.work-track[data-horizontal] > * {
+  flex: none;
+  height: min(76svh, 720px);
+}
+
+.work-track[data-horizontal] .work-chapter {
+  width: min(1180px, 86vw);
+}
+
+.work-track[data-horizontal] .work-page {
+  width: min(560px, 42vw);
+}
+
+/* chapter cover: a title-card banner when stacked, a page that flips open on the track */
+.work-track[data-horizontal] .chapter-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  min-height: 0;
+  transform-origin: 0% 50%;
+  backface-visibility: hidden;
+}
+
+.work-track[data-horizontal] .chapter-body {
+  height: 100%;
+  margin-top: 0;
+}
+
+/* screenshots: a swipeable strip when stacked, a skewed collage on the track */
+.chapter-media {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.chapter-media > * {
+  flex: none;
+  width: 82%;
+  scroll-snap-align: center;
+}
+
+.work-track[data-horizontal] .chapter-media {
+  display: grid;
+  grid-template: "a a" 1.25fr "b c" 1fr / 1.5fr 1fr;
+  overflow: visible;
+}
+
+.work-track[data-horizontal] .chapter-media > * {
+  width: auto;
+}
+
+/* ------------------------------------------------------------------
    Reduced motion: no smooth-scroll hijack, near-instant transitions
    ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {

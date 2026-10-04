@@ -14,6 +14,8 @@ type Props = {
   /** Seconds to hold before cutting out. Omit to stay on screen. */
   hold?: number;
   onComplete?: () => void;
+  /** Heading level for the title (h1 when the card opens a page). */
+  level?: "h1" | "h2";
   className?: string;
 };
 
@@ -63,9 +65,11 @@ export function TitleCard({
   trigger = "scroll",
   hold,
   onComplete,
+  level = "h2",
   className,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const Heading = level;
 
   useMotion(
     (ctx, el) => {
@@ -94,12 +98,12 @@ export function TitleCard({
         <p data-tc-label className="font-display text-18 text-muted md:text-24">
           {label}
         </p>
-        <h2
+        <Heading
           data-tc-title
           className="mt-3 text-[clamp(2.25rem,15cqi,10rem)] leading-[0.92] break-words"
         >
           {title}
-        </h2>
+        </Heading>
         <div
           data-tc-line
           aria-hidden

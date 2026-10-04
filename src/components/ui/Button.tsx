@@ -18,6 +18,11 @@ const variants: Record<Variant, string> = {
     "bg-transparent text-fg shadow-[5px_5px_0_0_currentColor] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_currentColor] active:translate-x-1 active:translate-y-1 active:shadow-[1px_1px_0_0_currentColor]",
 };
 
+/** Button look for elements that are not this component (e.g. TransitionLink). */
+export function buttonClass(variant: Variant = "primary", className?: string) {
+  return cn(base, variants[variant], className);
+}
+
 type Common = { variant?: Variant; className?: string; children: ReactNode };
 
 type AsLink = Common & { href: string; download?: boolean | string } & Omit<

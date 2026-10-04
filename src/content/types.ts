@@ -71,7 +71,7 @@ export type Project = {
   repoUrl: string | null;
   status: "live" | "in progress" | "archived";
   flagship: boolean;
-  media: { src: string; alt: string; kind: "image" | "video" }[];
+  media: { src: string; alt: string; kind: "image" | "video"; width: number; height: number }[];
 };
 
 export type Achievement = { title: string; issuer: string; year: string; href: string | null };
