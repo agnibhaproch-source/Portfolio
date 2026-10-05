@@ -998,3 +998,42 @@ html[data-print] .foil-title {
 .work-track[data-horizontal] ~ .work-ribbon {
   display: block;
 }
+
+@keyframes radar-blip {
+  0%,
+  60% {
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes letter-drift {
+  from {
+    transform: translateY(0) rotate(var(--r, 0deg));
+    opacity: 0;
+  }
+  15% {
+    opacity: var(--o, 0.12);
+  }
+  85% {
+    opacity: var(--o, 0.12);
+  }
+  to {
+    transform: translateY(-120vh) rotate(calc(var(--r, 0deg) + 40deg));
+    opacity: 0;
+  }
+}
+@keyframes field-shake {
+  20%,
+  60% {
+    translate: -5px 0;
+  }
+  40%,
+  80% {
+    translate: 5px 0;
+  }
+}

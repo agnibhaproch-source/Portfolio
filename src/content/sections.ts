@@ -259,6 +259,18 @@ export const contactCopy = {
     "Thanks, it is in my inbox. I will reply to the address you gave. You can also email me at",
   failed: "That did not go through. Try again in a minute, or email me directly at",
   again: "Write another",
+  copied: "COPIED!",
+  copyEmail: "Copy email address",
+  copiedLive: "Email address copied",
+  mailApp: "Open in mail app",
+  meter: (n: number) => `${Math.min(n, 10)} / 10`,
+  meterDone: "Charged",
+  finalChapter: "Final chapter",
+  /** Speech bubble above the form. Written by Claude; the owner can change it. */
+  bubble: "Got a team that needs a builder? Let's talk.",
+  comic: ["Written", "Sealed", "In flight", "Delivered!"],
+  seal: "火",
+  findMe: "Find me on",
 };
 
 export const notFoundCopy = {
