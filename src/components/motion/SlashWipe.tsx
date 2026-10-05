@@ -15,14 +15,13 @@ import { DUR, gsap, ScrollTrigger } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 
 /*
- * "Dimension slash": the site's full-screen transition (replaces the brush
- * InkWipe, see DECISIONS.md). A blade line cuts the screen on a diagonal,
- * two ink halves slam shut along it, then slide apart to uncover.
+ * "Dimension slash": the site's full-screen transition. A blade cuts
+ * straight across the middle of the screen and the cut tears open into a
+ * purple-black void; the next page comes out as the tear closes again.
  */
 
-// Cut runs from (0, 82) to (100, 18) in a 100x100 box.
-const HALF_A = "polygon(0% 0%, 100% 0%, 100% 18%, 0% 82%)";
-const HALF_B = "polygon(0% 82%, 100% 18%, 100% 100%, 0% 100%)";
+const SHUT = "inset(50% 0% 50% 0%)";
+const OPEN = "inset(0% 0% 0% 0%)";
 
 type Slash = {
   /** Resolves once the screen is fully covered. */
@@ -64,21 +63,23 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
         gsap.set(el, { autoAlpha: 1 });
 
         if (prefersReducedMotion()) {
-          gsap.set(q("[data-half]"), { xPercent: 0, opacity: 0 });
-          gsap.to(q("[data-half]"), { opacity: 1, duration: DUR.micro, onComplete: resolve });
+          gsap.set(q("[data-void]"), { clipPath: OPEN, opacity: 0 });
+          gsap.to(q("[data-void]"), { opacity: 1, duration: DUR.micro, onComplete: resolve });
           return;
         }
 
         sound.play("slash");
         gsap
           .timeline({ onComplete: () => resolve() })
-          .set(q("[data-half]"), { opacity: 1 })
-          .set(q("[data-half='a']"), { xPercent: 105 })
-          .set(q("[data-half='b']"), { xPercent: -105 })
+          .set(q("[data-void]"), { clipPath: SHUT, opacity: 1 })
+          .set(q("[data-edge]"), { top: "50%", opacity: 0 })
           .set(q("[data-blade]"), { opacity: 1, drawSVG: "0% 0%" })
-          .to(q("[data-blade]"), { drawSVG: "0% 100%", duration: 0.18, ease: "power2.in" })
-          .to(q("[data-half]"), { xPercent: 0, duration: 0.42, ease: "snap" }, "-=0.04")
-          .to(q("[data-blade]"), { opacity: 0, duration: 0.12 }, "-=0.1");
+          .to(q("[data-blade]"), { drawSVG: "0% 100%", duration: 0.16, ease: "power2.in" })
+          .set(q("[data-edge]"), { opacity: 1 })
+          .to(q("[data-void]"), { clipPath: OPEN, duration: 0.45, ease: "snap" }, "+=0.02")
+          .to(q("[data-edge='top']"), { top: "0%", duration: 0.45, ease: "snap" }, "<")
+          .to(q("[data-edge='bottom']"), { top: "100%", duration: 0.45, ease: "snap" }, "<")
+          .to(q("[data-blade]"), { opacity: 0, duration: 0.12 }, "<");
       }),
     [],
   );
@@ -95,16 +96,16 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
         };
 
         if (prefersReducedMotion()) {
-          gsap.to(q("[data-half]"), { opacity: 0, duration: DUR.micro, onComplete: done });
+          gsap.to(q("[data-void]"), { opacity: 0, duration: DUR.micro, onComplete: done });
           return;
         }
 
         gsap
           .timeline({ onComplete: done })
-          .set(q("[data-blade]"), { opacity: 1, drawSVG: "0% 100%" })
-          .to(q("[data-blade]"), { opacity: 0, duration: 0.25 })
-          .to(q("[data-half='a']"), { xPercent: -105, duration: 0.5, ease: "ink" }, 0.05)
-          .to(q("[data-half='b']"), { xPercent: 105, duration: 0.5, ease: "ink" }, 0.05);
+          .to(q("[data-void]"), { clipPath: SHUT, duration: 0.5, ease: "ink" })
+          .to(q("[data-edge]"), { top: "50%", duration: 0.5, ease: "ink" }, 0)
+          .to(q("[data-edge]"), { opacity: 0, scaleX: 0.2, duration: 0.18 }, 0.45)
+          .set(q("[data-edge]"), { scaleX: 1 });
       }),
     [],
   );
@@ -168,30 +169,39 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
         aria-hidden
         className="pointer-events-none invisible fixed inset-0 z-[150] opacity-0"
       >
-        <div data-half="a" className="absolute inset-0 bg-sumi" style={{ clipPath: HALF_A }} />
-        <div data-half="b" className="absolute inset-0 bg-sumi" style={{ clipPath: HALF_B }} />
+        <div
+          data-void
+          className="absolute inset-0 overflow-hidden bg-[radial-gradient(ellipse_at_50%_50%,var(--void-haze),var(--void)_62%)]"
+          style={{ clipPath: SHUT }}
+        >
+          <div className="absolute -inset-1/4 animate-[void-drift_7s_ease-in-out_infinite] bg-[radial-gradient(circle_at_30%_40%,rgb(120_60_160/0.35),transparent_40%),radial-gradient(circle_at_70%_65%,rgb(194_39_45/0.18),transparent_38%)] blur-2xl" />
+          <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_22px,rgb(160_110_210/0.07)_22px_23px)]" />
+        </div>
+        <div
+          data-edge="top"
+          className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 bg-[linear-gradient(90deg,transparent,#a070e0_15%,var(--washi)_50%,#a070e0_85%,transparent)] opacity-0 shadow-[0_0_18px_#7a3fc0]"
+        />
+        <div
+          data-edge="bottom"
+          className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 bg-[linear-gradient(90deg,transparent,var(--agni)_15%,var(--washi)_50%,var(--agni)_85%,transparent)] opacity-0 shadow-[0_0_18px_var(--agni)]"
+        />
         <svg
           className="absolute inset-0 h-full w-full"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
         >
-          <defs>
-            <linearGradient id="blade" x1="0" y1="1" x2="1" y2="0">
-              <stop offset="0" stopColor="var(--agni)" />
-              <stop offset="1" stopColor="var(--kiln)" />
-            </linearGradient>
-          </defs>
           <line
             data-blade
             x1="-2"
-            y1="83.3"
+            y1="50"
             x2="102"
-            y2="16.7"
-            stroke="url(#blade)"
-            strokeWidth="4"
+            y2="50"
+            stroke="var(--washi)"
+            strokeWidth="3"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
             opacity="0"
+            className="[filter:drop-shadow(0_0_6px_#a070e0)]"
           />
         </svg>
       </div>

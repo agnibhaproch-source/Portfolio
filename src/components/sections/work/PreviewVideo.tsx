@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { workCopy } from "@/content";
-import { MOTION_QUERIES } from "@/lib/motion";
+import { MOTION_QUERIES, SUMMON_MS } from "@/lib/motion";
 
 /**
  * Plays a silent loop over a chapter's screenshots while the pointer is over
@@ -13,10 +13,13 @@ export function PreviewVideo({
   src,
   poster,
   label,
+  delay = SUMMON_MS,
 }: {
   src: string;
   poster: string;
   label: string;
+  /** Wait this long (ms) after hover before showing: the grimoire summons it first. */
+  delay?: number;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -25,12 +28,18 @@ export function PreviewVideo({
     const host = wrap.current?.parentElement;
     const v = video.current;
     if (!host || !v || !window.matchMedia(MOTION_QUERIES.desktop).matches) return;
+    let timer = 0;
     const show = () => {
       if (!v.src) v.src = src;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(reveal, delay);
+    };
+    const reveal = () => {
       wrap.current?.setAttribute("data-on", "");
       void v.play().catch(() => {});
     };
     const hide = () => {
+      window.clearTimeout(timer);
       wrap.current?.removeAttribute("data-on");
       v.pause();
     };
@@ -39,8 +48,9 @@ export function PreviewVideo({
     return () => {
       host.removeEventListener("pointerenter", show);
       host.removeEventListener("pointerleave", hide);
+      window.clearTimeout(timer);
     };
-  }, [src]);
+  }, [src, delay]);
 
   return (
     <div

@@ -5,6 +5,8 @@ import { profile } from "@/content";
 import { SlashWipeProvider } from "@/components/motion/SlashWipe";
 import { VelocityFx } from "@/components/motion/VelocityFx";
 import { LimitBreak } from "@/components/motion/LimitBreak";
+import { ImpactFrame } from "@/components/motion/ImpactFrame";
+import { SpellCast } from "@/components/ui/SpellCast";
 import { AntiMagicLayer } from "@/components/ui/AntiMagicLayer";
 import { Cursor } from "@/components/ui/Cursor";
 import { Nav } from "@/components/ui/Nav";
@@ -78,6 +80,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Toast />
             <VelocityFx />
             <LimitBreak />
+            <SpellCast />
+            <ImpactFrame />
             <Cursor />
           </SlashWipeProvider>
         </SmoothScroll>

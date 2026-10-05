@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Duel } from "@/components/motion/Duel";
 import { MangaBackdrop } from "@/components/motion/MangaBackdrop";
 import { ImpactWord, type ImpactWordHandle } from "@/components/motion/ImpactWord";
 import { SpeedLines } from "@/components/motion/SpeedLines";
@@ -22,7 +23,7 @@ const EMBERS = Array.from({ length: 16 }, (_, i) => ({
 }));
 
 /**
- * Credits roll under an anti-magic energy horizon, embers rising behind.
+ * A duel, then the credits roll under an anti-magic energy horizon, embers rising behind.
  * At the very end the grimoire slams shut. Static list without JS or under
  * reduced motion.
  */
@@ -139,6 +140,9 @@ export function Footer() {
           />
         ))}
       </div>
+
+      {/* Two fighters clash before the credits roll */}
+      <Duel />
 
       <h2 className="sr-only">{credits.heading}</h2>
       <div

@@ -79,7 +79,13 @@ export type Project = {
 
 export type Achievement = { title: string; issuer: string; year: string; href: string | null };
 
-export type SectionCopy = { id: string; heading: string; subtitle: string };
+export type SectionCopy = {
+  id: string;
+  heading: string;
+  subtitle: string;
+  /** Decorative incantation chanted before the heading is cast. */
+  chant?: string;
+};
 
 export type SideQuest = {
   name: string;

@@ -43,3 +43,6 @@ export function triggerFor(el: Element, trigger: Trigger, start = "top 85%") {
 export function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia(MOTION_QUERIES.reduced).matches;
 }
+
+/** Work chapter hover: when the summoned card appears, in ms. */
+export const SUMMON_MS = 780;

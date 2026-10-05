@@ -3,13 +3,33 @@ import type { SectionCopy } from "./types";
 
 /** Plain headings for recruiters; the theme lives in the subtitle line. */
 export const sections = {
-  about: { id: "about", heading: "About", subtitle: "the origin" },
-  skills: { id: "skills", heading: "Skills", subtitle: "spell list" },
-  experience: { id: "experience", heading: "Experience", subtitle: "missions so far" },
-  stats: { id: "stats", heading: "Stats", subtitle: "the training log, updated daily" },
-  work: { id: "work", heading: "Work", subtitle: "the grimoire, chapters so far" },
-  achievements: { id: "achievements", heading: "Achievements", subtitle: "stars earned" },
-  contact: { id: "contact", heading: "Contact", subtitle: "next chapter" },
+  about: { id: "about", heading: "About", subtitle: "the origin", chant: "我が起源を記せ" },
+  skills: { id: "skills", heading: "Skills", subtitle: "spell list", chant: "呪文よ、並べ" },
+  experience: {
+    id: "experience",
+    heading: "Experience",
+    subtitle: "missions so far",
+    chant: "任務の頁を開け",
+  },
+  stats: {
+    id: "stats",
+    heading: "Stats",
+    subtitle: "the training log, updated daily",
+    chant: "修行の記録よ、示せ",
+  },
+  work: {
+    id: "work",
+    heading: "Work",
+    subtitle: "the grimoire, chapters so far",
+    chant: "魔導書よ、章を開け",
+  },
+  achievements: {
+    id: "achievements",
+    heading: "Achievements",
+    subtitle: "stars earned",
+    chant: "星よ、輝け",
+  },
+  contact: { id: "contact", heading: "Contact", subtitle: "next chapter", chant: "次の章を呼べ" },
 } satisfies Record<string, SectionCopy>;
 
 export const nav = [sections.about, sections.skills, sections.work, sections.contact];
@@ -87,6 +107,7 @@ export const experienceCopy = {
 export const transitionCopy = {
   /** Revealed on the night side of the paper burn, just before Skills. */
   burnLine: "The grimoire opens",
+  summonWord: "GOGOGO",
 };
 
 export const workCopy = {
@@ -206,6 +227,14 @@ export const resumeCopy = {
 
 /** Sound-effect lettering for impacts (Latin romanisations of manga SFX). */
 export const sfxCopy = { strike: "ZAN!", slam: "DOON!", hit: "BAM!", clash: "GIN!" };
+
+/** Hold-to-cast spell names, by charge. Original names. */
+export const spellCopy = {
+  small: "Ember Spark",
+  mid: "Flame Burst",
+  max: "Inferno Grimoire",
+  consoleHint: "Hold the mouse anywhere (or long-press on a phone) to charge a spell.",
+};
 
 export const limitBreakCopy = {
   word: "LIMIT BREAK!",

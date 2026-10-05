@@ -7,6 +7,7 @@ import { gsap } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { sound } from "@/lib/sound";
 import { haptic } from "@/lib/haptics";
+import { impactFrame } from "@/lib/impact";
 
 const CODE = [
   "ArrowUp",
@@ -73,6 +74,7 @@ export function LimitBreak() {
       gsap
         .timeline({ onComplete: done })
         .set(el, { autoAlpha: 1 })
+        .call(() => impactFrame(1.5), [], 0.3)
         .fromTo(
           q("[data-lb-flood]"),
           { clipPath: "inset(0% 100% 0% 0%)" },

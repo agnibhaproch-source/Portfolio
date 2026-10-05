@@ -5,6 +5,7 @@ import { Magnetic } from "@/components/motion/Magnetic";
 import { buttonClass } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
 import { TransitionLink } from "@/components/ui/TransitionLink";
+import { GrimoireSummon } from "./GrimoireSummon";
 import { PreviewVideo } from "./PreviewVideo";
 import { cn } from "@/lib/utils";
 
@@ -85,6 +86,7 @@ export function Chapter({ project, index }: { project: Project; index: number })
       >
         <div className="chapter-media relative min-h-0">
           {project.preview && <PreviewVideo {...project.preview} />}
+          <GrimoireSummon />
           {project.media.length > 0 ? (
             project.media.slice(0, 3).map((m, i) => (
               <figure

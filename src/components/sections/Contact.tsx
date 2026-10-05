@@ -15,6 +15,8 @@ import { prefersReducedMotion } from "@/lib/motion";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
+import { impactFrame } from "@/lib/impact";
+import { useSlash } from "@/components/motion/SlashWipe";
 
 type Field = "name" | "email" | "message";
 type Errors = Partial<Record<Field, string>>;
@@ -39,6 +41,7 @@ const RAYS = 14;
  */
 export function Contact() {
   const ref = useRef<HTMLElement>(null);
+  const slash = useSlash();
   const formRef = useRef<HTMLFormElement>(null);
   const [values, setValues] = useState<Record<Field, string>>({ name: "", email: "", message: "" });
   const [errors, setErrors] = useState<Errors>({});
@@ -206,13 +209,21 @@ export function Contact() {
         body: JSON.stringify({ ...values, company: trap }),
       });
       if (!res.ok) throw new Error(String(res.status));
+      // The send button fires, the panel is cut, then the dimension slash
+      // tears the screen open and the sealed message comes out of it.
       burst();
       setCast((c) => c + 1);
       cut();
-      window.setTimeout(() => sound.play("stamp"), 450);
       haptic("send");
-      finisher();
-      setSent(true);
+      window.setTimeout(() => {
+        void slash
+          .play(() => setSent(true))
+          .then(() => {
+            sound.play("stamp");
+            finisher();
+            impactFrame(1);
+          });
+      }, 260);
     } catch {
       setFailed(true);
     } finally {
