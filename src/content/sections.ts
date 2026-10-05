@@ -55,6 +55,23 @@ export const heroCopy = {
   coverLabel: "Grimoire",
 };
 
+/** The opening ceremony on the home page. */
+export const introCopy = {
+  loading: "Gathering mana",
+  ready: "The grimoire is ready",
+  tap: "Tap to open the grimoire",
+  skip: "Skip intro",
+  escHint: "Esc",
+  sound: "Sound",
+  /** Narration: the owner's own lines. */
+  lines: [
+    "Born with zero talent,",
+    "coding with pure grit.",
+    profile.bigLine ?? "Every project is a training arc.",
+  ],
+  dialog: "Opening",
+};
+
 export const navCopy = {
   printOff: "Print",
   printLabel: "Read in black-and-white print mode",

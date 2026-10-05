@@ -240,13 +240,13 @@
 
 @media (prefers-reduced-motion: no-preference) {
   html[data-preload] .preloader {
-    display: flex;
-    animation: failsafe-hide 0.2s 2.6s forwards;
+    display: block;
   }
 
-  /* the emblem stays undrawn until the timeline takes over */
-  html[data-preload] .preloader:not([data-started]) [data-stroke] {
-    opacity: 0;
+  /* The gate waits for a tap once the script is running; if the script never
+     starts, the overlay removes itself so the page is never locked. */
+  html[data-preload] .preloader:not([data-started]) {
+    animation: failsafe-hide 0.2s 4s forwards;
   }
 
   html[data-js] .hero:not([data-revealed]) :is([data-hero-late], [data-sign-ink], [data-seal]) {
