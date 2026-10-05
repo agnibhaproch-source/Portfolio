@@ -7,9 +7,10 @@ import { gsap } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { runes, toasts, useRunes } from "@/lib/runes";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 
 /** Five original rune glyphs, one per hiding spot. */
-const GLYPHS = [
+export const GLYPHS = [
   "M12 2 L12 22 M5 8 L12 2 L19 8 M7 16 L17 16",
   "M4 4 L20 20 M20 4 L4 20 M12 2 L12 6 M12 18 L12 22",
   "M12 3 L21 19 L3 19 Z M12 9 L12 15",
@@ -31,6 +32,7 @@ export function Rune({ index, className }: { index: number; className?: string }
     if (n === null) return;
     const total = runeCopy.total;
     sound.play("chime");
+    haptic("rune");
     toasts.show(
       n >= total
         ? { text: runeCopy.allFound, link: { href: runeCopy.secretPath, label: runeCopy.open } }

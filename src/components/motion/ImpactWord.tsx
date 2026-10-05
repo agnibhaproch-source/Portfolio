@@ -5,6 +5,7 @@ import { sound } from "@/lib/sound";
 import { gsap } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 
 export type ImpactWordHandle = {
   /** Slam a sound-effect word in at (x%, y%) of the parent. */
@@ -27,6 +28,7 @@ export function ImpactWord({
       if (!node || prefersReducedMotion()) return;
       node.textContent = text;
       sound.play("impact");
+      haptic("impact");
       gsap.killTweensOf(node);
       gsap
         .timeline()

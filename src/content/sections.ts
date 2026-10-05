@@ -21,6 +21,8 @@ export const heroCopy = {
   downloadResume: "Download resume",
   viewResume: "View resume",
   antiMagicHint: "Shows the name in Japanese and switches the page to anti-magic mode",
+  /** Hero strip label for the visitor's local time of day. */
+  timeOfDay: { night: "Night", dawn: "Dawn", day: "Midday", dusk: "Dusk" },
 };
 
 export const navCopy = {
@@ -111,6 +113,11 @@ export const workCopy = {
   links: "Links",
   nextChapter: "Next chapter",
   backToGrimoire: "Back to the grimoire",
+  step: "Step",
+  storySub: "how this chapter went",
+  stackSub: "the spells behind it",
+  gallerySub: "panels from the build",
+  openChapter: "Open the next chapter",
 };
 
 export const contactCopy = {

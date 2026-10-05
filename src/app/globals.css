@@ -654,6 +654,37 @@ html[data-limit] {
 }
 
 /* ------------------------------------------------------------------
+   Time-of-day hero: the sky follows the visitor's local hour
+   (html[data-tod] is set before paint by the head script)
+   ------------------------------------------------------------------ */
+.hero {
+  --sky-glow: var(--twilight);
+  --sky-base: var(--sumi);
+}
+
+html[data-tod="dawn"] .hero {
+  --sky-glow: #5c2a1a;
+}
+
+html[data-tod="day"] .hero {
+  --sky-glow: #3d3128;
+  --sky-base: #261e1b;
+}
+
+html[data-tod="dusk"] .hero {
+  --sky-glow: #3d1f45;
+}
+
+html[data-tod="day"] .hero .tod-tone {
+  opacity: 0.1;
+}
+
+html[data-print] .hero {
+  --sky-glow: var(--twilight);
+  --sky-base: var(--sumi);
+}
+
+/* ------------------------------------------------------------------
    Reduced motion: no smooth-scroll hijack, near-instant transitions
    ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {

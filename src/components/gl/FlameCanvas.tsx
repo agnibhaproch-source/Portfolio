@@ -7,21 +7,30 @@ import { fragment, vertex } from "./flame.glsl";
 
 const MAX_DPR = 1.5;
 
+/** Flame colours (deep, core, hot) for the visitor's local time of day. */
+const PALETTES = {
+  night: ["#b8232f", "#e2622b", "#f4c99a"],
+  dawn: ["#c2451f", "#f08a3a", "#ffd9a0"],
+  day: ["#a83a28", "#d9763a", "#f2d6b0"],
+  dusk: ["#8f1f4a", "#d4503a", "#f2b38a"],
+} as const;
+
 function FlamePlane({ pointer }: { pointer: React.RefObject<{ x: number; y: number }> }) {
   const mat = useRef<ShaderMaterial>(null);
   const size = useThree((s) => s.size);
 
-  const uniforms = useMemo(
-    () => ({
+  const uniforms = useMemo(() => {
+    const tod = (document.documentElement.dataset.tod ?? "night") as keyof typeof PALETTES;
+    const p = PALETTES[tod] ?? PALETTES.night;
+    return {
       uTime: { value: 17.3 },
       uRes: { value: [1, 1] },
       uPointer: { value: [0, 0] },
-      uDeep: { value: new Color("#b8232f") },
-      uCore: { value: new Color("#e2622b") },
-      uHot: { value: new Color("#f4c99a") },
-    }),
-    [],
-  );
+      uDeep: { value: new Color(p[0]) },
+      uCore: { value: new Color(p[1]) },
+      uHot: { value: new Color(p[2]) },
+    };
+  }, []);
 
   useFrame((_, delta) => {
     const m = mat.current;

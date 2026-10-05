@@ -6,6 +6,7 @@ import { SpeedLines } from "@/components/motion/SpeedLines";
 import { gsap } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { sound } from "@/lib/sound";
+import { haptic } from "@/lib/haptics";
 
 const CODE = [
   "ArrowUp",
@@ -55,6 +56,7 @@ export function LimitBreak() {
       const html = document.documentElement;
       const q = gsap.utils.selector(el);
       sound.play("impact");
+      haptic("limit");
       html.setAttribute("data-limit", "");
       const done = () => {
         html.removeAttribute("data-limit");

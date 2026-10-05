@@ -14,6 +14,7 @@ import { gsap, SplitText } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 
 type Field = "name" | "email" | "message";
 type Errors = Partial<Record<Field, string>>;
@@ -209,6 +210,7 @@ export function Contact() {
       setCast((c) => c + 1);
       cut();
       window.setTimeout(() => sound.play("stamp"), 450);
+      haptic("send");
       finisher();
       setSent(true);
     } catch {

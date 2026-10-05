@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { Rune } from "@/components/ui/Rune";
 import { heroCopy, heroTiltCopy, profile, sections } from "@/content";
 import { Flame } from "@/components/gl/Flame";
@@ -37,6 +37,12 @@ export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const [interactive, setInteractive] = useState(false);
   const [tiltAsk, setTiltAsk] = useState(false);
+  // Set on <html> before paint by the head script; nothing on the server.
+  const tod = useSyncExternalStore(
+    () => () => {},
+    () => (document.documentElement.dataset.tod ?? null) as keyof typeof heroCopy.timeOfDay | null,
+    () => null,
+  );
   const tiltRequest = useRef<(() => Promise<void>) | null>(null);
   const { tagline, resume, role, name } = profile;
 
@@ -224,7 +230,11 @@ export function Hero() {
     >
       <div
         aria-hidden
-        className="absolute inset-0 -z-20 bg-[radial-gradient(120%_90%_at_75%_100%,var(--twilight),var(--sumi)_70%)]"
+        className="absolute inset-0 -z-20 bg-[radial-gradient(120%_90%_at_75%_100%,var(--sky-glow),var(--sky-base)_70%)] transition-[background] duration-700"
+      />
+      <div
+        aria-hidden
+        className="tod-tone pointer-events-none absolute inset-0 -z-20 tone opacity-0 [--tone-dot:var(--washi)]"
       />
       <div aria-hidden data-hero-paper className="hero-paper absolute inset-0 -z-10 bg-washi">
         <div className="absolute inset-x-0 bottom-0 h-1/3 rotate-180 tone-fade [--tone-dot:var(--sumi)]" />
@@ -291,7 +301,10 @@ export function Hero() {
       </div>
 
       <div data-hero-late className="mt-8 flex items-center gap-4 text-14 text-muted">
-        <span>{heroCopy.chapterLabel}</span>
+        <span>
+          {heroCopy.chapterLabel}
+          {tod && ` · ${heroCopy.timeOfDay[tod]}`}
+        </span>
         <Rune index={0} className="-my-2" />
         <span aria-hidden className="h-px flex-1 bg-current" />
         {tiltAsk && (
