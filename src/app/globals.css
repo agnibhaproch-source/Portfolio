@@ -830,3 +830,34 @@ html[data-casting] * {
 html[data-calm] .calm-hide {
   display: none;
 }
+
+/* ---------- Ink splash reveal: a panel appears through a spreading ink blot ---------- */
+.ink-reveal {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M99.4 50.0 L85.7 58.8 L86.4 69.1 L76.6 73.6 L70.5 79.7 L68.1 97.7 L53.9 82.0 L45.6 85.9 L36.7 85.1 L27.6 82.5 L16.2 79.9 L20.2 65.6 L19.8 57.4 L10.3 50.0 L12.8 40.8 L10.6 29.3 L18.7 22.3 L26.4 15.8 L36.6 14.6 L45.5 12.9 L55.5 4.4 L60.7 21.8 L70.6 20.1 L73.0 29.6 L78.6 35.0 L95.5 38.8 Z'/%3E%3Ccircle cx='14' cy='18' r='4'/%3E%3Ccircle cx='86' cy='22' r='3'/%3E%3Ccircle cx='90' cy='78' r='5'/%3E%3Ccircle cx='12' cy='84' r='3.5'/%3E%3Ccircle cx='50' cy='6' r='2.5'/%3E%3Ccircle cx='52' cy='95' r='3'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M99.4 50.0 L85.7 58.8 L86.4 69.1 L76.6 73.6 L70.5 79.7 L68.1 97.7 L53.9 82.0 L45.6 85.9 L36.7 85.1 L27.6 82.5 L16.2 79.9 L20.2 65.6 L19.8 57.4 L10.3 50.0 L12.8 40.8 L10.6 29.3 L18.7 22.3 L26.4 15.8 L36.6 14.6 L45.5 12.9 L55.5 4.4 L60.7 21.8 L70.6 20.1 L73.0 29.6 L78.6 35.0 L95.5 38.8 Z'/%3E%3Ccircle cx='14' cy='18' r='4'/%3E%3Ccircle cx='86' cy='22' r='3'/%3E%3Ccircle cx='90' cy='78' r='5'/%3E%3Ccircle cx='12' cy='84' r='3.5'/%3E%3Ccircle cx='50' cy='6' r='2.5'/%3E%3Ccircle cx='52' cy='95' r='3'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: var(--ink-at, 50% 50%);
+  mask-position: var(--ink-at, 50% 50%);
+  -webkit-mask-size: var(--ink, 0%);
+  mask-size: var(--ink, 0%);
+}
+
+@keyframes gauge-run {
+  to {
+    background-position: 28px 0;
+  }
+}
+@keyframes gauge-sweep {
+  from {
+    left: -35%;
+  }
+  to {
+    left: 105%;
+  }
+}
+@keyframes star-twinkle {
+  50% {
+    opacity: 0.45;
+  }
+}

@@ -44,3 +44,21 @@ export function projectsUsing(group: SkillGroup) {
     .filter((p) => p.stack.some((entry) => group.items.some((item) => mentions(entry, item))))
     .map((p) => p.name);
 }
+
+/** Every skill named in the groups, in order, without repeats. */
+export const allSkills = [...new Set(skillGroups.flatMap((g) => g.items))];
+
+/** Projects and side quests that use one skill. */
+export function projectsUsingSkill(skill: string) {
+  const all = [...projects.map((p) => ({ name: p.name, stack: p.stack })), ...sideQuests];
+  return all.filter((p) => p.stack.some((entry) => mentions(entry, skill))).map((p) => p.name);
+}
+
+/** Every project and side quest with the group skills its stack uses. */
+export function projectSkillLinks() {
+  const all = [...projects.map((p) => ({ name: p.name, stack: p.stack })), ...sideQuests];
+  return all.map((p) => ({
+    name: p.name,
+    skills: allSkills.filter((s) => p.stack.some((entry) => mentions(entry, s))),
+  }));
+}

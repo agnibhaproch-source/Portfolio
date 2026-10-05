@@ -143,6 +143,31 @@ export const skillsCopy = {
   learning: "Currently learning",
   outOf: "out of 10",
   usedIn: "Used in",
+  /** Shout as the chart finishes charging. */
+  powerWord: "HAAA!",
+  lv: "Lv.",
+  chartStyle: "Chart style",
+  radar: "Radar",
+  bars: "Bars",
+  vs: "VS",
+  vsHint: "Hover two skills to compare them",
+  compare: (name: string) => `Compare ${name}`,
+  notInProject: "Not in a project yet",
+  chain: "CHAIN",
+  comboWord: "COMBO SPELL!",
+  comboHint: "Click three skills in a row to chain a combo",
+  inTraining: "In training",
+  tree: { title: "Skill tree", sub: "how the grimoire branches" },
+  dummy: {
+    title: "Training dummy",
+    hint: "Pick a skill to strike. The damage is the real rating.",
+    strike: (name: string, rating: number) => `Strike with ${name} (rating ${rating})`,
+  },
+  constellation: {
+    title: "Skill constellation",
+    sub: "which skills power which projects",
+    tableCaption: "Skills used in each project",
+  },
 };
 
 export const experienceCopy = {
