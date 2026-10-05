@@ -223,6 +223,18 @@ export const workCopy = {
   stackSub: "the spells behind it",
   gallerySub: "panels from the build",
   openChapter: "Open the next chapter",
+  contents: "Contents",
+  contentsSub: "Jump to a chapter",
+  contentsIntro: "Grimoire",
+  ribbonLabel: "Chapter bookmarks",
+  ribbon: (n: number, total: number) => `Chapter ${n} / ${total}`,
+  jumpTo: (name: string) => `Jump to ${name}`,
+  seal: { live: "LIVE", "in progress": "IN PROGRESS", archived: "ARCHIVED" },
+  comingSoon: "Next chapter coming soon",
+  sideQuestStamp: "SIDE QUEST",
+  reward: "Reward",
+  toBeContinued: "To be continued",
+  complete: "COMPLETE!",
 };
 
 export const contactCopy = {

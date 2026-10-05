@@ -30,8 +30,11 @@ type Slash = {
   uncover: () => Promise<void>;
   /** Cover then uncover, with an optional callback in between. */
   play: (between?: () => void | Promise<void>) => Promise<void>;
-  /** Route transition: cover, navigate, uncover once the new route is in. */
-  navigate: (href: string) => Promise<void>;
+  /**
+   * Route transition: cover, navigate, uncover once the new route is in.
+   * `page` turns a paper page over the screen instead of the dimension slash.
+   */
+  navigate: (href: string, opts?: { variant?: "slash" | "page"; label?: string }) => Promise<void>;
 };
 
 const SlashContext = createContext<Slash | null>(null);
@@ -110,6 +113,72 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  // Page turn: a paper page hinged on the left swings over the screen, then on and away.
+  const turnIn = useCallback(
+    (label?: string) =>
+      new Promise<void>((resolve) => {
+        const el = root.current;
+        const page = el?.querySelector<HTMLElement>("[data-turn]");
+        if (!el || !page) return resolve();
+        const q = gsap.utils.selector(el);
+        gsap.killTweensOf([page, ...q("[data-turn] *")]);
+        const title = page.querySelector("[data-turn-label]");
+        if (title) title.textContent = label ?? "";
+        gsap.set(el, { autoAlpha: 1 });
+        if (prefersReducedMotion()) {
+          gsap.fromTo(
+            page,
+            { autoAlpha: 0, rotationY: 0 },
+            { autoAlpha: 1, duration: DUR.micro, onComplete: resolve },
+          );
+          return;
+        }
+        sound.play("page");
+        gsap
+          .timeline({ onComplete: () => resolve() })
+          .set(page, { autoAlpha: 1 })
+          .fromTo(
+            page,
+            { rotationY: -118 },
+            { rotationY: 0, duration: 0.6, ease: "power2.inOut", transformPerspective: 1400 },
+          )
+          .fromTo(
+            q("[data-turn-shade]"),
+            { opacity: 0.9 },
+            { opacity: 0, duration: 0.6, ease: "power1.in" },
+            0,
+          );
+      }),
+    [],
+  );
+  const turnOut = useCallback(
+    () =>
+      new Promise<void>((resolve) => {
+        const el = root.current;
+        const page = el?.querySelector<HTMLElement>("[data-turn]");
+        if (!el || !page) return resolve();
+        const done = () => {
+          gsap.set(page, { autoAlpha: 0, rotationY: 0 });
+          gsap.set(el, { autoAlpha: 0 });
+          resolve();
+        };
+        if (prefersReducedMotion()) {
+          gsap.to(page, { autoAlpha: 0, duration: DUR.micro, onComplete: done });
+          return;
+        }
+        gsap
+          .timeline({ onComplete: done })
+          .to(page, {
+            rotationY: 118,
+            duration: 0.65,
+            ease: "power2.in",
+            transformPerspective: 1400,
+          })
+          .to(gsap.utils.selector(el)("[data-turn-shade]"), { opacity: 0.8, duration: 0.65 }, 0);
+      }),
+    [],
+  );
+
   const play = useCallback(
     async (between?: () => void | Promise<void>) => {
       await cover();
@@ -124,14 +193,18 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const pending = useRef<string | null>(null);
 
+  const outRef = useRef<() => Promise<void>>(uncover);
   const navigate = useCallback(
-    async (href: string) => {
+    async (href: string, opts?: { variant?: "slash" | "page"; label?: string }) => {
       const target = new URL(href, window.location.href);
       const samePage = target.pathname === window.location.pathname;
-      await cover();
+      const page = opts?.variant === "page";
+      outRef.current = page ? turnOut : uncover;
+      if (page) await turnIn(opts?.label);
+      else await cover();
       if (samePage) {
         router.push(href);
-        await uncover();
+        await outRef.current();
         return;
       }
       pending.current = target.pathname;
@@ -140,11 +213,11 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
       window.setTimeout(() => {
         if (pending.current) {
           pending.current = null;
-          void uncover();
+          void outRef.current();
         }
       }, 4000);
     },
-    [cover, uncover, router],
+    [cover, uncover, turnIn, turnOut, router],
   );
 
   useEffect(() => {
@@ -152,9 +225,9 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
     pending.current = null;
     requestAnimationFrame(() => {
       ScrollTrigger.refresh();
-      void uncover();
+      void outRef.current();
     });
-  }, [pathname, uncover]);
+  }, [pathname]);
 
   const value = useMemo(
     () => ({ cover, uncover, play, navigate }),
@@ -185,6 +258,21 @@ export function SlashWipeProvider({ children }: { children: ReactNode }) {
           data-edge="bottom"
           className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 bg-[linear-gradient(90deg,transparent,var(--agni)_15%,var(--washi)_50%,var(--agni)_85%,transparent)] opacity-0 shadow-[0_0_18px_var(--agni)]"
         />
+        <div
+          data-turn
+          className="invisible absolute inset-0 origin-left bg-[#ebdcb9] text-[#1d1614] opacity-0 shadow-[0_0_60px_rgb(0_0_0/0.6)] [backface-visibility:hidden]"
+        >
+          <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_31px,rgb(29_22_20/0.06)_31px_32px)]" />
+          <div className="absolute inset-y-0 left-0 w-10 bg-[linear-gradient(90deg,rgb(0_0_0/0.25),transparent)]" />
+          <p
+            data-turn-label
+            className="absolute inset-0 grid place-items-center px-6 text-center font-display text-[clamp(3rem,10vw,8rem)] leading-none"
+          />
+          <div
+            data-turn-shade
+            className="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0/0.55),transparent_70%)]"
+          />
+        </div>
         <svg
           className="absolute inset-0 h-full w-full"
           viewBox="0 0 100 100"

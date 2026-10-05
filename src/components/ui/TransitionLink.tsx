@@ -4,13 +4,18 @@ import Link from "next/link";
 import type { ComponentPropsWithoutRef } from "react";
 import { useSlash } from "@/components/motion/SlashWipe";
 
-type Props = Omit<ComponentPropsWithoutRef<typeof Link>, "href"> & { href: string };
+type Props = Omit<ComponentPropsWithoutRef<typeof Link>, "href"> & {
+  href: string;
+  /** "page" turns a paper page over the screen (shows `turnLabel` on it). */
+  transition?: "slash" | "page";
+  turnLabel?: string;
+};
 
 /**
  * Internal link that plays the dimension-slash transition: cover, change
  * route, uncover. Modified clicks (new tab etc.) behave normally.
  */
-export function TransitionLink({ href, onClick, ...rest }: Props) {
+export function TransitionLink({ href, onClick, transition = "slash", turnLabel, ...rest }: Props) {
   const slash = useSlash();
   return (
     <Link
@@ -27,7 +32,7 @@ export function TransitionLink({ href, onClick, ...rest }: Props) {
         )
           return;
         e.preventDefault();
-        void slash.navigate(href);
+        void slash.navigate(href, { variant: transition, label: turnLabel });
       }}
       {...rest}
     />
