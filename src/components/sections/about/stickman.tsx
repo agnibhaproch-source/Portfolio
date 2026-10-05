@@ -8,7 +8,7 @@
 // head, neck, hip, elbowF, handF, elbowB, handB, kneeF, footF, kneeB, footB, sword
 export type Pose = number[];
 
-const P = (pts: [number, number][], sword: number): Pose => [...pts.flat(), sword];
+export const P = (pts: [number, number][], sword: number): Pose => [...pts.flat(), sword];
 
 export const POSES = {
   idle: P(
@@ -242,7 +242,7 @@ export function Stickman({
   ref,
 }: {
   rig: Rig;
-  blade?: "broad" | "katana";
+  blade?: "broad" | "katana" | "none";
   className?: string;
   ref?: React.Ref<SVGGElement>;
 }) {
@@ -261,19 +261,21 @@ export function Stickman({
         <line key={k} data-bone x1={px(a)} y1={py(a)} x2={px(b)} y2={py(b)} strokeWidth="6" />
       ))}
       <circle data-head cx={px(0)} cy={py(0) - 2} r="12" fill="currentColor" stroke="none" />
-      <g data-blade transform={`translate(${px(4)} ${py(4)}) rotate(${facing * pose[22]!})`}>
-        <line x1="0" y1="8" x2="0" y2="-2" strokeWidth="5" />
-        <line x1="-8" y1="-3" x2="8" y2="-3" strokeWidth="4" />
-        {blade === "broad" ? (
-          <path d="M-6 -5 L6 -5 L7 -54 L0 -66 L-7 -56 Z" fill="currentColor" strokeWidth="1.5" />
-        ) : (
-          <path
-            d="M-1.5 -5 L1.5 -5 C3 -30 2 -52 -3 -72 C-1 -52 -2 -30 -1.5 -5 Z"
-            fill="currentColor"
-            strokeWidth="1.5"
-          />
-        )}
-      </g>
+      {blade !== "none" && (
+        <g data-blade transform={`translate(${px(4)} ${py(4)}) rotate(${facing * pose[22]!})`}>
+          <line x1="0" y1="8" x2="0" y2="-2" strokeWidth="5" />
+          <line x1="-8" y1="-3" x2="8" y2="-3" strokeWidth="4" />
+          {blade === "broad" ? (
+            <path d="M-6 -5 L6 -5 L7 -54 L0 -66 L-7 -56 Z" fill="currentColor" strokeWidth="1.5" />
+          ) : (
+            <path
+              d="M-1.5 -5 L1.5 -5 C3 -30 2 -52 -3 -72 C-1 -52 -2 -30 -1.5 -5 Z"
+              fill="currentColor"
+              strokeWidth="1.5"
+            />
+          )}
+        </g>
+      )}
     </g>
   );
 }

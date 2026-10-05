@@ -1037,3 +1037,28 @@ html[data-print] .foil-title {
     translate: 5px 0;
   }
 }
+
+@keyframes tech-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes glitch {
+  50% {
+    transform: translateX(2px) skewX(-6deg);
+  }
+}
+@keyframes rewind-lines {
+  to {
+    background-position: 0 84px;
+  }
+}
+.rewind-fx {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+html[data-rewind] .rewind-fx {
+  visibility: visible;
+  opacity: 1;
+}
