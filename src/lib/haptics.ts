@@ -17,6 +17,8 @@ const PATTERNS = {
 export function haptic(kind: keyof typeof PATTERNS) {
   if (typeof navigator === "undefined" || !("vibrate" in navigator)) return;
   if (prefersReducedMotion() || !window.matchMedia("(pointer: coarse)").matches) return;
+  // Browsers block vibration until the visitor has interacted with the page.
+  if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
   try {
     navigator.vibrate([...PATTERNS[kind]]);
   } catch {}

@@ -9,6 +9,7 @@ import { MagicCircle } from "@/components/motion/MagicCircle";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { onIntroDone } from "@/lib/intro";
 import { prefersReducedMotion } from "@/lib/motion";
+import { calmMode, useCalm } from "@/lib/calm";
 import { printMode, usePrintMode } from "@/lib/print-mode";
 import { useLenis } from "@/lib/smooth-scroll";
 import { useMotion } from "@/lib/use-motion";
@@ -31,6 +32,7 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const print = usePrintMode();
   const soundOn = useSoundOn();
+  const calm = useCalm();
   useEffect(() => sound.restore(), []);
 
   const href = (id: string) => (onHome ? `#${id}` : `/#${id}`);
@@ -161,6 +163,60 @@ export function Nav() {
     );
   };
 
+  const toggleButtons = (
+    <>
+      <button
+        type="button"
+        aria-pressed={calm}
+        aria-label={navCopy.calmLabel}
+        onClick={() => calmMode.toggle()}
+        className={cn(
+          "border-2 border-current px-2.5 py-0.5 font-display text-14 transition-[color,background-color] duration-200 [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)]",
+          calm && "bg-fg text-bg",
+        )}
+      >
+        {navCopy.calm}
+      </button>
+      <button
+        type="button"
+        aria-pressed={print}
+        aria-label={navCopy.printLabel}
+        onClick={() => printMode.toggle()}
+        className={cn(
+          "border-2 border-current px-2.5 py-0.5 font-display text-14 transition-[color,background-color,box-shadow] duration-200 [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)] hover:shadow-[inset_0_0_0_30px_rgb(201_162_74/0.25)]",
+          print && "bg-fg text-bg",
+        )}
+      >
+        {navCopy.printOff}
+      </button>
+      <button
+        type="button"
+        aria-pressed={soundOn}
+        aria-label={navCopy.soundLabel}
+        onClick={() => sound.toggle()}
+        className={cn(
+          "flex items-center gap-1.5 border-2 border-current px-2.5 py-0.5 font-display text-14 transition-[color,background-color] duration-200 [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)]",
+          soundOn && "bg-fg text-bg",
+        )}
+      >
+        <svg aria-hidden viewBox="0 0 16 16" className="size-3.5">
+          <path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor" />
+          {soundOn ? (
+            <path
+              d="M11 5c1.5 1.5 1.5 4.5 0 6M13 3c3 3 3 7 0 10"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
+          ) : (
+            <path d="M11 6l4 4M15 6l-4 4" stroke="currentColor" strokeWidth="1.5" />
+          )}
+        </svg>
+        {navCopy.sound}
+      </button>
+    </>
+  );
+
   return (
     <>
       <header
@@ -287,50 +343,21 @@ export function Nav() {
           </ul>
 
           <div data-nav-item className="flex items-center gap-4">
-            <button
-              type="button"
-              aria-pressed={print}
-              aria-label={navCopy.printLabel}
-              onClick={() => printMode.toggle()}
-              className={cn(
-                "border-2 border-current px-2.5 py-0.5 font-display text-14 transition-[color,background-color,box-shadow] duration-200 [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)] hover:shadow-[inset_0_0_0_30px_rgb(201_162_74/0.25)]",
-                print && "bg-fg text-bg",
-              )}
+            <Link
+              href="/quick"
+              aria-label={navCopy.quickLabel}
+              className="border-2 border-current bg-agni px-2.5 py-0.5 font-display text-14 text-washi [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)]"
             >
-              {navCopy.printOff}
-            </button>
-            <button
-              type="button"
-              aria-pressed={soundOn}
-              aria-label={navCopy.soundLabel}
-              onClick={() => sound.toggle()}
-              className={cn(
-                "flex items-center gap-1.5 border-2 border-current px-2.5 py-0.5 font-display text-14 transition-[color,background-color] duration-200 [clip-path:polygon(6px_0,100%_0,100%_calc(100%-6px),calc(100%-6px)_100%,0_100%,0_6px)]",
-                soundOn && "bg-fg text-bg",
-              )}
-            >
-              <svg aria-hidden viewBox="0 0 16 16" className="size-3.5">
-                <path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor" />
-                {soundOn ? (
-                  <path
-                    d="M11 5c1.5 1.5 1.5 4.5 0 6M13 3c3 3 3 7 0 10"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                ) : (
-                  <path d="M11 6l4 4M15 6l-4 4" stroke="currentColor" strokeWidth="1.5" />
-                )}
-              </svg>
-              {navCopy.sound}
-            </button>
+              {navCopy.quick}
+            </Link>
+            <div className="hidden items-center gap-4 md:flex">{toggleButtons}</div>
             <button
               ref={menuButton}
               type="button"
               aria-expanded={open}
               aria-controls="site-menu"
               onClick={() => toggle(!open)}
-              className="font-display text-18 md:hidden"
+              className="-my-2 min-h-11 min-w-11 px-1 font-display text-18 md:hidden"
             >
               {open ? navCopy.closeMenu : navCopy.menuLabel}
             </button>
@@ -378,6 +405,10 @@ export function Nav() {
             </li>
           ))}
         </ul>
+        <div className="relative mt-6">
+          <p className="mb-2 text-14 text-muted">{navCopy.settings}</p>
+          <div className="flex flex-wrap items-center gap-3">{toggleButtons}</div>
+        </div>
       </div>
     </>
   );

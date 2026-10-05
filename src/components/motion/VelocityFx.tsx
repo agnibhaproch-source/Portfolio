@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { gsap } from "@/lib/gsap";
+import { isCalm } from "@/lib/calm";
 import { prefersReducedMotion } from "@/lib/motion";
 
 /**
@@ -23,7 +24,7 @@ export function VelocityFx() {
     const tick = (_t: number, delta: number) => {
       const dt = Math.max(delta, 1) / 1000;
       const y = window.scrollY;
-      const v = Math.min(Math.abs(y - last) / dt / 8000, 1);
+      const v = isCalm() ? 0 : Math.min(Math.abs(y - last) / dt / 8000, 1);
       last = y;
       vel += (v - vel) * Math.min(dt * 8, 1);
       const rounded = Math.round(vel * 50) / 50;
@@ -47,7 +48,7 @@ export function VelocityFx() {
   }, []);
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-30 text-tone/40">
+    <div aria-hidden className="calm-hide pointer-events-none fixed inset-0 z-30 text-tone/40">
       <SpeedLines variant="parallel" followScroll />
       {/* Black-flame distortion for the heading aura (only painted in black form) */}
       <svg width="0" height="0" className="absolute">

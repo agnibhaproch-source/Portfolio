@@ -79,7 +79,7 @@ export function ProgressLine() {
             href={`#${c.id}`}
             data-tick={c.id}
             aria-label={progressCopy.jump(c.heading)}
-            className="group/tick pointer-events-auto absolute top-0 hidden h-4 w-5 -translate-x-1/2"
+            className="group/tick pointer-events-auto absolute top-0 hidden h-6 w-6 -translate-x-1/2"
           >
             <span className="absolute top-0 left-1/2 h-[7px] w-[2px] -translate-x-1/2 bg-washi transition-[height,background-color] duration-200 group-hover/tick:h-3 group-hover/tick:bg-kiln" />
             <span

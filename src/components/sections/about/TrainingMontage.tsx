@@ -6,6 +6,7 @@ import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Panel } from "@/components/ui/Panel";
 import { gsap } from "@/lib/gsap";
 import { impactFrame } from "@/lib/impact";
+import { useCalm } from "@/lib/calm";
 import { useMotion } from "@/lib/use-motion";
 import { drawRig, makeRig, POSES, Stickman, type Pose } from "./stickman";
 
@@ -32,57 +33,63 @@ function swing(phase: number): Pose {
 export function TrainingMontage({ className }: { className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useMotion((ctx, el) => {
-    if (ctx.reduced) return;
-    const q = gsap.utils.selector(el);
-    const hero = q("[data-hero]")[0] as unknown as SVGGElement | undefined;
-    const ghosts = q("[data-ghost]") as unknown as SVGGElement[];
-    const count = q("[data-count]")[0];
-    const done = q("[data-done]")[0];
-    const lines = q("[data-lines]")[0];
-    const rig = makeRig("idle", X, 1);
-    const ghostRigs = ghosts.map(() => makeRig("idle", X, 1));
-    let finished = false;
-    gsap.set(done ?? {}, { opacity: 0, scale: 2 });
+  const calm = useCalm();
 
-    const render = (p: number) => {
-      const e = gsap.parseEase("power2.in")(p);
-      const phase = (e * SWINGS) % 1;
-      rig.pose = swing(phase);
-      drawRig(hero ?? null, rig);
-      ghostRigs.forEach((g, i) => {
-        g.pose = swing((phase - 0.06 * (i + 1) + 1) % 1);
-        drawRig(ghosts[i] ?? null, g);
-      });
-      const reps = Math.round(e * 1000);
-      if (count) count.textContent = String(reps);
-      if (lines) lines.style.opacity = String(Math.min(e * 1.4, 1));
-      if (reps >= 1000 && !finished) {
-        finished = true;
-        impactFrame(0.8);
-        gsap.to(done ?? {}, {
-          opacity: 1,
-          scale: 1,
-          rotation: -8,
-          duration: 0.2,
-          ease: "steps(3)",
+  useMotion(
+    (ctx, el) => {
+      if (ctx.reduced || calm) return;
+      const q = gsap.utils.selector(el);
+      const hero = q("[data-hero]")[0] as unknown as SVGGElement | undefined;
+      const ghosts = q("[data-ghost]") as unknown as SVGGElement[];
+      const count = q("[data-count]")[0];
+      const done = q("[data-done]")[0];
+      const lines = q("[data-lines]")[0];
+      const rig = makeRig("idle", X, 1);
+      const ghostRigs = ghosts.map(() => makeRig("idle", X, 1));
+      let finished = false;
+      gsap.set(done ?? {}, { opacity: 0, scale: 2 });
+
+      const render = (p: number) => {
+        const e = gsap.parseEase("power2.in")(p);
+        const phase = (e * SWINGS) % 1;
+        rig.pose = swing(phase);
+        drawRig(hero ?? null, rig);
+        ghostRigs.forEach((g, i) => {
+          g.pose = swing((phase - 0.06 * (i + 1) + 1) % 1);
+          drawRig(ghosts[i] ?? null, g);
         });
-      } else if (reps < 1000 && finished) {
-        finished = false;
-        gsap.to(done ?? {}, { opacity: 0, scale: 2, duration: 0.2 });
-      }
-    };
-    render(0);
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: el,
-        start: "top 85%",
-        end: "bottom 20%",
-        scrub: 0.3,
-        onUpdate: (st) => render(st.progress),
-      },
-    });
-  }, ref);
+        const reps = Math.round(e * 1000);
+        if (count) count.textContent = String(reps);
+        if (lines) lines.style.opacity = String(Math.min(e * 1.4, 1));
+        if (reps >= 1000 && !finished) {
+          finished = true;
+          impactFrame(0.8);
+          gsap.to(done ?? {}, {
+            opacity: 1,
+            scale: 1,
+            rotation: -8,
+            duration: 0.2,
+            ease: "steps(3)",
+          });
+        } else if (reps < 1000 && finished) {
+          finished = false;
+          gsap.to(done ?? {}, { opacity: 0, scale: 2, duration: 0.2 });
+        }
+      };
+      render(0);
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: "top 85%",
+          end: "bottom 20%",
+          scrub: 0.3,
+          onUpdate: (st) => render(st.progress),
+        },
+      });
+    },
+    ref,
+    [calm],
+  );
 
   return (
     <div ref={ref} className={className}>

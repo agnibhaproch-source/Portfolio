@@ -221,10 +221,10 @@ export function StickFight({ className }: { className?: string }) {
     >
       <button
         type="button"
-        aria-label={copy.next}
         onPointerEnter={(e) => e.pointerType === "mouse" && play.current()}
         onClick={() => play.current()}
         data-no-cast
+        data-stickfight
         className="relative block h-full min-h-72 w-full cursor-pointer text-left md:min-h-80"
       >
         <div
@@ -284,6 +284,7 @@ export function StickFight({ className }: { className?: string }) {
             })}
           </g>
         </svg>
+        <span className="sr-only">{copy.next}</span>
         <span
           ref={word}
           aria-hidden
@@ -295,9 +296,7 @@ export function StickFight({ className }: { className?: string }) {
         >
           {caption}
         </span>
-        <span className="absolute right-4 bottom-3 text-14 text-washi/80">
-          {copy.hint}
-        </span>
+        <span className="absolute right-4 bottom-3 text-14 text-washi/80">{copy.hint}</span>
       </button>
     </Panel>
   );

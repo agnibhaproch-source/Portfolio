@@ -9,6 +9,7 @@ import { gsap, SplitText } from "@/lib/gsap";
 import { haptic } from "@/lib/haptics";
 import { impactFrame } from "@/lib/impact";
 import { sound } from "@/lib/sound";
+import { useCalm } from "@/lib/calm";
 import { useMotion } from "@/lib/use-motion";
 
 /*
@@ -107,174 +108,187 @@ export function BurnTransition() {
   const ref = useRef<HTMLDivElement>(null);
   const smoke = useRef<SummonSmokeHandle>(null);
 
-  useMotion((ctx, el) => {
-    const q = gsap.utils.selector(el);
-    if (ctx.reduced) {
-      // Static: fully burnt, the grimoire reveal shown as a still frame.
-      gsap.set(q("[data-burn-paper], [data-tendrils], [data-summoning]"), { autoAlpha: 0 });
-      return;
-    }
+  const calm = useCalm();
 
-    const slam = () => {
-      if (tl.scrollTrigger?.direction !== 1) return;
-      sound.play("impact");
-      haptic("impact");
-      impactFrame(1.4);
-    };
-    const fumes = { v: 0 };
-    const setFumes = () => smoke.current?.setAmount(fumes.v);
+  useMotion(
+    (ctx, el) => {
+      const q = gsap.utils.selector(el);
+      if (ctx.reduced || calm) {
+        // Static: fully burnt, the grimoire reveal shown as a still frame.
+        gsap.set(q("[data-burn-paper], [data-tendrils], [data-summoning]"), { autoAlpha: 0 });
+        return;
+      }
 
-    gsap.set(q("[data-summoning]"), { autoAlpha: 1 });
-    const chars = SplitText.create(q("[data-burn-line]"), { type: "words,chars" }).chars;
+      const slam = () => {
+        if (tl.scrollTrigger?.direction !== 1) return;
+        sound.play("impact");
+        haptic("impact");
+        impactFrame(1.4);
+      };
+      const fumes = { v: 0 };
+      const setFumes = () => smoke.current?.setAmount(fumes.v);
 
-    // One scrubbed timeline: burn (0 to 0.55), grimoire reveal (to 1), summoning (to 1.9).
-    const tl = gsap
-      .timeline({
-        scrollTrigger: { trigger: el, start: "top 55%", end: "bottom bottom", scrub: 0.4 },
-      })
-      .fromTo(
-        q("[data-burn-paper]"),
-        { yPercent: 0 },
-        { yPercent: -100, ease: "none", duration: 0.55 },
-        0,
-      )
-      // the rim glow lags the paper a little so the edge looks alive
-      .fromTo(q("[data-burn-rim]"), { y: 0 }, { y: 24, ease: "sine.inOut", duration: 0.55 }, 0)
-      .fromTo(
-        q("[data-tendril]"),
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: "power2.out",
-          duration: 0.35,
-          stagger: 0.015,
-          transformOrigin: "50% 100%",
-        },
-        0.03,
-      )
-      .to(
-        q("[data-tendrils]"),
-        { yPercent: -30, opacity: 0, ease: "power1.in", duration: 0.15 },
-        0.4,
-      )
-      // the grimoire reveal underneath
-      .fromTo(
-        q("[data-burn-glow]"),
-        { opacity: 0, scale: 0.6 },
-        { opacity: 1, scale: 1, duration: 0.3 },
-        0.3,
-      )
-      .from(q("[data-ring]"), { drawSVG: "0%", duration: 0.25, stagger: 0.04, ease: "none" }, 0.3)
-      .from(
-        q("[data-runes] > *"),
-        { opacity: 0, scale: 0, transformOrigin: "50% 50%", duration: 0.1, stagger: 0.005 },
-        0.45,
-      )
-      .from(q("[data-star]"), { drawSVG: "0%", duration: 0.25, ease: "steps(14)" }, 0.5)
-      .from(q("[data-core]"), { drawSVG: "50% 50%", duration: 0.1 }, 0.7)
-      .from(
-        chars,
-        { yPercent: 120, scale: 1.5, opacity: 0, duration: 0.12, stagger: 0.008, ease: "steps(4)" },
-        0.68,
-      )
-      .from(q("[data-burn-underline]"), { scaleX: 0, duration: 0.1, ease: "ink" }, 0.86)
-      // the summoning
-      .to(q("[data-burn-title]"), { y: -60, opacity: 0, duration: 0.12, ease: "power1.in" }, 1.02)
-      .to(q("[data-circle] > div"), { color: "#c2272d", duration: 0.12 }, 1.04)
-      .fromTo(
-        q("[data-circle]"),
-        { rotationX: 0, scale: 1 },
-        { rotationX: 62, scale: 1.25, yPercent: 26, duration: 0.25, ease: "power2.inOut" },
-        1.06,
-      )
-      .to(q("[data-burn-glow]"), { opacity: 0, duration: 0.1 }, 1.06)
-      .fromTo(
-        q("[data-void]"),
-        { scale: 0, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" },
-        1.14,
-      )
-      .fromTo(q("[data-dark]"), { opacity: 0 }, { opacity: 1, duration: 0.2 }, 1.08)
-      .fromTo(
-        fumes,
-        { v: 0 },
-        { v: 0.55, duration: 0.26, ease: "power1.in", onUpdate: setFumes },
-        1.14,
-      )
-      // the greatsword rises hilt-first out of the void...
-      .fromTo(
-        q("[data-sword]"),
-        { yPercent: 100, rotation: -4 },
-        { yPercent: 2, rotation: 2, duration: 0.3, ease: "power2.out" },
-        1.22,
-      )
-      .fromTo(q("[data-veins]"), { strokeOpacity: 0 }, { strokeOpacity: 0.9, duration: 0.1 }, 1.4)
-      .fromTo(
-        q("[data-summon-word]"),
-        { scale: 2.2, opacity: 0, rotation: -16 },
-        { scale: 1, opacity: 1, rotation: -8, duration: 0.05, ease: "steps(3)" },
-        1.3,
-      )
-      .to(q("[data-summon-word]"), { opacity: 0, duration: 0.06 }, 1.56)
-      // ...hangs in the smoke...
-      .to(
-        q("[data-sword]"),
-        { yPercent: -3, rotation: 0, duration: 0.08, ease: "sine.inOut" },
-        1.52,
-      )
-      .to(fumes, { v: 0.8, duration: 0.1, onUpdate: setFumes }, 1.5)
-      // ...and slams back down into the circle
-      .to(q("[data-sword]"), { yPercent: 34, duration: 0.05, ease: "power4.in" }, 1.6)
-      .call(slam, [], 1.65)
-      .fromTo(
-        q("[data-stage]"),
-        { x: 0, y: 0 },
-        { keyframes: { x: [14, -12, 9, -5, 0], y: [-8, 6, -4, 2, 0] }, duration: 0.08 },
-        1.65,
-      )
-      .fromTo(
-        q("[data-shock]"),
-        { scale: 0.2, opacity: 1 },
-        { scale: 5, opacity: 0, duration: 0.14, ease: "power2.out" },
-        1.65,
-      )
-      .fromTo(
-        q("[data-crack]"),
-        { drawSVG: "0%" },
-        { drawSVG: "100%", duration: 0.08, stagger: 0.004 },
-        1.65,
-      )
-      .fromTo(
-        q("[data-debris]"),
-        { x: 0, y: 0, rotation: 0, opacity: 1 },
-        {
-          x: (i: number) => DEBRIS[i]![0],
-          y: (i: number) => DEBRIS[i]![1],
-          rotation: (i: number) => DEBRIS[i]![2],
-          opacity: 0,
-          duration: 0.18,
-          ease: "power2.out",
-        },
-        1.65,
-      )
-      .fromTo(q("[data-summon-bolts]"), { opacity: 0 }, { opacity: 1, duration: 0.02 }, 1.65)
-      .fromTo(
-        q("[data-slam-word]"),
-        { scale: 2.6, opacity: 0, rotation: -20 },
-        { scale: 1, opacity: 1, rotation: -8, duration: 0.05, ease: "steps(3)" },
-        1.66,
-      )
-      .to(fumes, { v: 1, duration: 0.04, onUpdate: setFumes }, 1.65)
-      .to(fumes, { v: 0.65, duration: 0.15, onUpdate: setFumes }, 1.72)
-      .to({}, { duration: 0.12 }, 1.8);
-  }, ref);
+      gsap.set(q("[data-summoning]"), { autoAlpha: 1 });
+      const chars = SplitText.create(q("[data-burn-line]"), { type: "words,chars" }).chars;
+
+      // One scrubbed timeline: burn (0 to 0.55), grimoire reveal (to 1), summoning (to 1.9).
+      const tl = gsap
+        .timeline({
+          scrollTrigger: { trigger: el, start: "top 55%", end: "bottom bottom", scrub: 0.4 },
+        })
+        .fromTo(
+          q("[data-burn-paper]"),
+          { yPercent: 0 },
+          { yPercent: -100, ease: "none", duration: 0.55 },
+          0,
+        )
+        // the rim glow lags the paper a little so the edge looks alive
+        .fromTo(q("[data-burn-rim]"), { y: 0 }, { y: 24, ease: "sine.inOut", duration: 0.55 }, 0)
+        .fromTo(
+          q("[data-tendril]"),
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: "power2.out",
+            duration: 0.35,
+            stagger: 0.015,
+            transformOrigin: "50% 100%",
+          },
+          0.03,
+        )
+        .to(
+          q("[data-tendrils]"),
+          { yPercent: -30, opacity: 0, ease: "power1.in", duration: 0.15 },
+          0.4,
+        )
+        // the grimoire reveal underneath
+        .fromTo(
+          q("[data-burn-glow]"),
+          { opacity: 0, scale: 0.6 },
+          { opacity: 1, scale: 1, duration: 0.3 },
+          0.3,
+        )
+        .from(q("[data-ring]"), { drawSVG: "0%", duration: 0.25, stagger: 0.04, ease: "none" }, 0.3)
+        .from(
+          q("[data-runes] > *"),
+          { opacity: 0, scale: 0, transformOrigin: "50% 50%", duration: 0.1, stagger: 0.005 },
+          0.45,
+        )
+        .from(q("[data-star]"), { drawSVG: "0%", duration: 0.25, ease: "steps(14)" }, 0.5)
+        .from(q("[data-core]"), { drawSVG: "50% 50%", duration: 0.1 }, 0.7)
+        .from(
+          chars,
+          {
+            yPercent: 120,
+            scale: 1.5,
+            opacity: 0,
+            duration: 0.12,
+            stagger: 0.008,
+            ease: "steps(4)",
+          },
+          0.68,
+        )
+        .from(q("[data-burn-underline]"), { scaleX: 0, duration: 0.1, ease: "ink" }, 0.86)
+        // the summoning
+        .to(q("[data-burn-title]"), { y: -60, opacity: 0, duration: 0.12, ease: "power1.in" }, 1.02)
+        .to(q("[data-circle] > div"), { color: "#c2272d", duration: 0.12 }, 1.04)
+        .fromTo(
+          q("[data-circle]"),
+          { rotationX: 0, scale: 1 },
+          { rotationX: 62, scale: 1.25, yPercent: 26, duration: 0.25, ease: "power2.inOut" },
+          1.06,
+        )
+        .to(q("[data-burn-glow]"), { opacity: 0, duration: 0.1 }, 1.06)
+        .fromTo(
+          q("[data-void]"),
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" },
+          1.14,
+        )
+        .fromTo(q("[data-dark]"), { opacity: 0 }, { opacity: 1, duration: 0.2 }, 1.08)
+        .fromTo(
+          fumes,
+          { v: 0 },
+          { v: 0.55, duration: 0.26, ease: "power1.in", onUpdate: setFumes },
+          1.14,
+        )
+        // the greatsword rises hilt-first out of the void...
+        .fromTo(
+          q("[data-sword]"),
+          { yPercent: 100, rotation: -4 },
+          { yPercent: 2, rotation: 2, duration: 0.3, ease: "power2.out" },
+          1.22,
+        )
+        .fromTo(q("[data-veins]"), { strokeOpacity: 0 }, { strokeOpacity: 0.9, duration: 0.1 }, 1.4)
+        .fromTo(
+          q("[data-summon-word]"),
+          { scale: 2.2, opacity: 0, rotation: -16 },
+          { scale: 1, opacity: 1, rotation: -8, duration: 0.05, ease: "steps(3)" },
+          1.3,
+        )
+        .to(q("[data-summon-word]"), { opacity: 0, duration: 0.06 }, 1.56)
+        // ...hangs in the smoke...
+        .to(
+          q("[data-sword]"),
+          { yPercent: -3, rotation: 0, duration: 0.08, ease: "sine.inOut" },
+          1.52,
+        )
+        .to(fumes, { v: 0.8, duration: 0.1, onUpdate: setFumes }, 1.5)
+        // ...and slams back down into the circle
+        .to(q("[data-sword]"), { yPercent: 34, duration: 0.05, ease: "power4.in" }, 1.6)
+        .call(slam, [], 1.65)
+        .fromTo(
+          q("[data-stage]"),
+          { x: 0, y: 0 },
+          { keyframes: { x: [14, -12, 9, -5, 0], y: [-8, 6, -4, 2, 0] }, duration: 0.08 },
+          1.65,
+        )
+        .fromTo(
+          q("[data-shock]"),
+          { scale: 0.2, opacity: 1 },
+          { scale: 5, opacity: 0, duration: 0.14, ease: "power2.out" },
+          1.65,
+        )
+        .fromTo(
+          q("[data-crack]"),
+          { drawSVG: "0%" },
+          { drawSVG: "100%", duration: 0.08, stagger: 0.004 },
+          1.65,
+        )
+        .fromTo(
+          q("[data-debris]"),
+          { x: 0, y: 0, rotation: 0, opacity: 1 },
+          {
+            x: (i: number) => DEBRIS[i]![0],
+            y: (i: number) => DEBRIS[i]![1],
+            rotation: (i: number) => DEBRIS[i]![2],
+            opacity: 0,
+            duration: 0.18,
+            ease: "power2.out",
+          },
+          1.65,
+        )
+        .fromTo(q("[data-summon-bolts]"), { opacity: 0 }, { opacity: 1, duration: 0.02 }, 1.65)
+        .fromTo(
+          q("[data-slam-word]"),
+          { scale: 2.6, opacity: 0, rotation: -20 },
+          { scale: 1, opacity: 1, rotation: -8, duration: 0.05, ease: "steps(3)" },
+          1.66,
+        )
+        .to(fumes, { v: 1, duration: 0.04, onUpdate: setFumes }, 1.65)
+        .to(fumes, { v: 0.65, duration: 0.15, onUpdate: setFumes }, 1.72)
+        .to({}, { duration: 0.12 }, 1.8);
+    },
+    ref,
+    [calm],
+  );
 
   return (
     <div
       ref={ref}
       aria-hidden
       data-mode="colour"
-      className="relative h-[360svh] motion-reduce:h-svh"
+      className="relative h-[360svh] motion-reduce:h-svh [html[data-calm]_&]:h-svh"
     >
       <div
         data-stage

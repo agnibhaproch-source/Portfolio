@@ -67,6 +67,7 @@
   --font-display: var(--font-dela), "Hiragino Kaku Gothic StdN", system-ui, sans-serif;
   --font-body: var(--font-zen), "Hiragino Sans", system-ui, sans-serif;
   --font-sfx: var(--font-rampart), var(--font-dela), sans-serif;
+  --font-brush: var(--font-kaushan), cursive;
 
   /* Type scale (desktop): 14, 18, 24, 36, 56, 96, 160 */
   --text-14: 0.875rem;
@@ -237,35 +238,35 @@
   display: none;
 }
 
-.hero-paper,
-.hero-print {
-  visibility: hidden;
-}
-
 @media (prefers-reduced-motion: no-preference) {
   html[data-preload] .preloader {
     display: flex;
     animation: failsafe-hide 0.2s 2.6s forwards;
   }
 
-  /* art stays hidden until the timeline takes over, so it never flashes drawn */
-  html[data-preload] .preloader:not([data-started]) :is([data-fade], [data-frame]) {
+  /* the emblem stays undrawn until the timeline takes over */
+  html[data-preload] .preloader:not([data-started]) [data-stroke] {
     opacity: 0;
   }
 
-  html[data-js] .hero:not([data-revealed]) :is(.hero-paper, .hero-print) {
-    visibility: visible;
-    animation: failsafe-hide 0.2s 7s forwards;
-  }
-
-  html[data-js] .hero:not([data-revealed]) :is([data-hero-late], [data-name-latin] [data-ch]) {
+  html[data-js] .hero:not([data-revealed]) :is([data-hero-late], [data-sign-ink], [data-seal]) {
     opacity: 0;
     animation: failsafe-show 0.2s 7s forwards;
   }
 
-  /* ink on paper, paper on night: the text flips exactly at the cut */
-  html[data-js] .hero:not([data-revealed]) [data-hero-copy] {
-    mix-blend-mode: difference;
+  /* Under the closed cover these are painted at 0.001 rather than 0, so the
+     browser counts the page's main text as shown at first paint. */
+  html[data-preload]
+    .hero:not([data-revealed])
+    :is([data-hero-late], [data-sign-ink], [data-seal]) {
+    opacity: 0.001;
+  }
+
+  /* The name is already painted under the closed cover (so it counts as the
+     page's main content straight away); without the cover it waits for the forge. */
+  html[data-js]:not([data-preload]) .hero:not([data-revealed]) [data-name-latin] [data-ch] {
+    opacity: 0;
+    animation: failsafe-show 0.2s 7s forwards;
   }
 }
 
@@ -807,4 +808,25 @@ html[data-casting] * {
   .breakout:hover > [data-breakout-crack] polygon[data-shard="3"] {
     translate: -10px 2px;
   }
+}
+
+@keyframes page-drift {
+  50% {
+    translate: 0 -14px;
+    rotate: 3deg;
+  }
+}
+
+/* Heat-reactive name letters: the hero writes --hx/--hy/--heat per letter.
+   Uses the individual translate property so GSAP transforms still compose. */
+[data-name-latin] [data-ch] {
+  translate: var(--hx, 0px) var(--hy, 0px);
+  text-shadow:
+    0 0 calc(var(--heat, 0) * 14px) rgb(255 150 70 / calc(var(--heat, 0) * 0.9)),
+    0 0 calc(var(--heat, 0) * 34px) rgb(194 39 45 / calc(var(--heat, 0) * 0.7));
+}
+
+/* Calm mode: heavy overlays off (components also check html[data-calm]). */
+html[data-calm] .calm-hide {
+  display: none;
 }

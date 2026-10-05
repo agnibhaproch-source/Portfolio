@@ -7,6 +7,7 @@ import { SpeedLines } from "@/components/motion/SpeedLines";
 import { SwordFigure, swingProxy } from "@/components/motion/SwordFigure";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { impactFrame } from "@/lib/impact";
+import { useCalm } from "@/lib/calm";
 import { useMotion } from "@/lib/use-motion";
 
 /** Spark streaks flying from the clash point, in a 200x200 box. */
@@ -28,75 +29,85 @@ export function Duel() {
   const ref = useRef<HTMLDivElement>(null);
   const word = useRef<ImpactWordHandle>(null);
 
-  useMotion((ctx, el) => {
-    if (ctx.reduced) return;
-    const q = gsap.utils.selector(el);
-    const left = swingProxy(q("[data-duel='left']")[0] ?? null, -80);
-    const right = swingProxy(q("[data-duel='right']")[0] ?? null, -80);
-    const clash = () => {
-      word.current?.play(sfxCopy.clash, 50, 26);
-      impactFrame(1.2);
-      gsap.fromTo(
-        el,
-        { x: 8, y: -5 },
-        { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1.2, 0.25)" },
-      );
-    };
-    const tl = gsap
-      .timeline({ paused: true })
-      .fromTo(q("[data-duel='left']"), { x: "-55vw" }, { x: 0, duration: 0.55, ease: "power3.in" })
-      .fromTo(
-        q("[data-duel='right']"),
-        { x: "55vw" },
-        { x: 0, duration: 0.55, ease: "power3.in" },
-        0,
-      )
-      .fromTo(q("[data-lines]"), { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0)
-      .fromTo(
-        left.proxy,
-        { a: -80 },
-        { a: 40, duration: 0.18, ease: "power3.in", onUpdate: left.apply },
-        0.38,
-      )
-      .fromTo(
-        right.proxy,
-        { a: -80 },
-        { a: 40, duration: 0.18, ease: "power3.in", onUpdate: right.apply },
-        0.38,
-      )
-      .call(clash, [], 0.56)
-      .fromTo(
-        q("[data-spark]"),
-        { drawSVG: "0% 0%", opacity: 1 },
-        { drawSVG: "0% 100%", duration: 0.16, ease: "power2.out" },
-        0.56,
-      )
-      .fromTo(
-        q("[data-flash]"),
-        { scale: 0.2, opacity: 1 },
-        { scale: 2.4, opacity: 0, duration: 0.5, ease: "power2.out" },
-        0.56,
-      )
-      .to(q("[data-spark]"), { drawSVG: "100% 100%", opacity: 0, duration: 0.4 }, 1.25)
-      .to(
-        q("[data-duel='left']"),
-        { x: "-9vw", rotation: -3, duration: 0.45, ease: "power2.out" },
-        1.3,
-      )
-      .to(
-        q("[data-duel='right']"),
-        { x: "9vw", rotation: 3, duration: 0.45, ease: "power2.out" },
-        1.3,
-      )
-      .to(q("[data-lines]"), { opacity: 0, duration: 0.4 }, 1.3);
-    tl.progress(0);
-    ScrollTrigger.create({
-      trigger: el,
-      start: "top 70%",
-      onEnter: () => tl.restart(),
-      onLeaveBack: () => tl.pause(0),
-    });
-  }, ref);
+  const calm = useCalm();
+
+  useMotion(
+    (ctx, el) => {
+      if (ctx.reduced || calm) return;
+      const q = gsap.utils.selector(el);
+      const left = swingProxy(q("[data-duel='left']")[0] ?? null, -80);
+      const right = swingProxy(q("[data-duel='right']")[0] ?? null, -80);
+      const clash = () => {
+        word.current?.play(sfxCopy.clash, 50, 26);
+        impactFrame(1.2);
+        gsap.fromTo(
+          el,
+          { x: 8, y: -5 },
+          { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1.2, 0.25)" },
+        );
+      };
+      const tl = gsap
+        .timeline({ paused: true })
+        .fromTo(
+          q("[data-duel='left']"),
+          { x: "-55vw" },
+          { x: 0, duration: 0.55, ease: "power3.in" },
+        )
+        .fromTo(
+          q("[data-duel='right']"),
+          { x: "55vw" },
+          { x: 0, duration: 0.55, ease: "power3.in" },
+          0,
+        )
+        .fromTo(q("[data-lines]"), { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0)
+        .fromTo(
+          left.proxy,
+          { a: -80 },
+          { a: 40, duration: 0.18, ease: "power3.in", onUpdate: left.apply },
+          0.38,
+        )
+        .fromTo(
+          right.proxy,
+          { a: -80 },
+          { a: 40, duration: 0.18, ease: "power3.in", onUpdate: right.apply },
+          0.38,
+        )
+        .call(clash, [], 0.56)
+        .fromTo(
+          q("[data-spark]"),
+          { drawSVG: "0% 0%", opacity: 1 },
+          { drawSVG: "0% 100%", duration: 0.16, ease: "power2.out" },
+          0.56,
+        )
+        .fromTo(
+          q("[data-flash]"),
+          { scale: 0.2, opacity: 1 },
+          { scale: 2.4, opacity: 0, duration: 0.5, ease: "power2.out" },
+          0.56,
+        )
+        .to(q("[data-spark]"), { drawSVG: "100% 100%", opacity: 0, duration: 0.4 }, 1.25)
+        .to(
+          q("[data-duel='left']"),
+          { x: "-9vw", rotation: -3, duration: 0.45, ease: "power2.out" },
+          1.3,
+        )
+        .to(
+          q("[data-duel='right']"),
+          { x: "9vw", rotation: 3, duration: 0.45, ease: "power2.out" },
+          1.3,
+        )
+        .to(q("[data-lines]"), { opacity: 0, duration: 0.4 }, 1.3);
+      tl.progress(0);
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 70%",
+        onEnter: () => tl.restart(),
+        onLeaveBack: () => tl.pause(0),
+      });
+    },
+    ref,
+    [calm],
+  );
 
   return (
     <div ref={ref} aria-hidden className="relative h-[40svh] overflow-hidden md:h-[52svh]">

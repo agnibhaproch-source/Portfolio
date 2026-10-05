@@ -5,6 +5,7 @@ import { sound } from "@/lib/sound";
 import type { SectionCopy } from "@/content";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { useCalm } from "@/lib/calm";
 import { useMotion } from "@/lib/use-motion";
 
 /**
@@ -15,61 +16,72 @@ import { useMotion } from "@/lib/use-motion";
 export function Eyecatch({ items }: { items: SectionCopy[] }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useMotion((ctx, el) => {
-    if (ctx.reduced) return;
-    const q = gsap.utils.selector(el);
-    const title = q("[data-ec-title]")[0] as HTMLElement;
-    const sub = q("[data-ec-sub]")[0] as HTMLElement;
-    let tl: gsap.core.Timeline | null = null;
+  const calm = useCalm();
 
-    const play = (it: SectionCopy) => {
-      title.textContent = it.heading;
-      sound.play("slash");
-      sub.textContent = it.subtitle;
-      tl?.kill();
-      tl = gsap
-        .timeline()
-        .set(el, { autoAlpha: 1 })
-        .fromTo(
-          q("[data-ec-band]"),
-          { clipPath: "inset(50% 0% 50% 0%)" },
-          { clipPath: "inset(0% 0% 0% 0%)", duration: 0.25, ease: "snap" },
-        )
-        .fromTo(
-          title,
-          { scale: 1.6, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.3, ease: "steps(4)" },
-          0.08,
-        )
-        .fromTo(q("[data-ec-line]"), { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "ink" }, 0.18)
-        .fromTo(sub, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 0.25)
-        .to(
-          q("[data-ec-band]"),
-          {
-            clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
-            duration: 0.3,
-            ease: "snap",
+  useMotion(
+    (ctx, el) => {
+      if (ctx.reduced || calm) return;
+      const q = gsap.utils.selector(el);
+      const title = q("[data-ec-title]")[0] as HTMLElement;
+      const sub = q("[data-ec-sub]")[0] as HTMLElement;
+      let tl: gsap.core.Timeline | null = null;
+
+      const play = (it: SectionCopy) => {
+        title.textContent = it.heading;
+        sound.play("slash");
+        sub.textContent = it.subtitle;
+        tl?.kill();
+        tl = gsap
+          .timeline()
+          .set(el, { autoAlpha: 1 })
+          .fromTo(
+            q("[data-ec-band]"),
+            { clipPath: "inset(50% 0% 50% 0%)" },
+            { clipPath: "inset(0% 0% 0% 0%)", duration: 0.25, ease: "snap" },
+          )
+          .fromTo(
+            title,
+            { scale: 1.6, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.3, ease: "steps(4)" },
+            0.08,
+          )
+          .fromTo(
+            q("[data-ec-line]"),
+            { scaleX: 0 },
+            { scaleX: 1, duration: 0.4, ease: "ink" },
+            0.18,
+          )
+          .fromTo(sub, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 0.25)
+          .to(
+            q("[data-ec-band]"),
+            {
+              clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
+              duration: 0.3,
+              ease: "snap",
+            },
+            "+=0.5",
+          )
+          .set(el, { autoAlpha: 0 })
+          .set(q("[data-ec-band]"), { clearProps: "clipPath" });
+      };
+
+      items.forEach((it) => {
+        const target = document.getElementById(it.id);
+        if (!target) return;
+        ScrollTrigger.create({
+          trigger: target,
+          start: "top 62%",
+          once: true,
+          onEnter: (self) => {
+            if (Math.abs(self.getVelocity()) < 2500) play(it);
           },
-          "+=0.5",
-        )
-        .set(el, { autoAlpha: 0 })
-        .set(q("[data-ec-band]"), { clearProps: "clipPath" });
-    };
-
-    items.forEach((it) => {
-      const target = document.getElementById(it.id);
-      if (!target) return;
-      ScrollTrigger.create({
-        trigger: target,
-        start: "top 62%",
-        once: true,
-        onEnter: (self) => {
-          if (Math.abs(self.getVelocity()) < 2500) play(it);
-        },
+        });
       });
-    });
-    return () => tl?.kill();
-  }, ref);
+      return () => tl?.kill();
+    },
+    ref,
+    [calm],
+  );
 
   return (
     <div

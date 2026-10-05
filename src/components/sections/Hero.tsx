@@ -13,6 +13,13 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { onIntroDone } from "@/lib/intro";
 import { useMotion } from "@/lib/use-motion";
 import { HeroName } from "./hero/HeroName";
+import { FloatingPages } from "./hero/FloatingPages";
+import { HeroStatus } from "./hero/HeroStatus";
+import { RoleRotator } from "./hero/RoleRotator";
+import { Signature } from "./hero/Signature";
+import { ImpactWord, type ImpactWordHandle } from "@/components/motion/ImpactWord";
+import { SpeedLines } from "@/components/motion/SpeedLines";
+import { impactFrame } from "@/lib/impact";
 
 // The reveal plays once per page load; client-side returns show the final state.
 let played = false;
@@ -24,13 +31,6 @@ const flameBox = {
   left: `-${FLAME_INSET.side}%`,
   right: `-${FLAME_INSET.side}%`,
   bottom: `-${FLAME_INSET.bottom}%`,
-};
-// The print-state panel inside that flame area, so it lines up with the real one.
-const printPanel = {
-  top: `${(FLAME_INSET.top / (100 + FLAME_INSET.top + FLAME_INSET.bottom)) * 100}%`,
-  left: `${(FLAME_INSET.side / (100 + FLAME_INSET.side * 2)) * 100}%`,
-  width: `${(100 / (100 + FLAME_INSET.side * 2)) * 100}%`,
-  height: `${(100 / (100 + FLAME_INSET.top + FLAME_INSET.bottom)) * 100}%`,
 };
 
 export function Hero() {
@@ -44,7 +44,8 @@ export function Hero() {
     () => null,
   );
   const tiltRequest = useRef<(() => Promise<void>) | null>(null);
-  const { tagline, resume, role, name } = profile;
+  const dropWord = useRef<ImpactWordHandle>(null);
+  const { tagline, resume } = profile;
 
   useMotion((ctx, el) => {
     const q = gsap.utils.selector(el);
@@ -69,6 +70,7 @@ export function Hero() {
         y: gsap.quickTo(node, "y", { duration: 0.9, ease: "power3" }),
         d: Number((node as HTMLElement).dataset.depth),
       }));
+      const names = q("[data-name-latin] [data-ch]") as HTMLElement[];
       const apply = (px: number, py: number) => {
         if (!el.hasAttribute("data-revealed")) return;
         layers.forEach((l) => {
@@ -77,17 +79,47 @@ export function Hero() {
         });
       };
       if (ctx.desktop) {
-        const onMove = (e: PointerEvent) =>
+        // Heat: letters near the pointer lean away and glow, like hot metal.
+        let raf = 0;
+        let px = 0;
+        let py = 0;
+        const heat = () => {
+          raf = 0;
+          const live = el.hasAttribute("data-revealed") && el.getBoundingClientRect().bottom > 0;
+          names.forEach((c) => {
+            const r = c.getBoundingClientRect();
+            const dx = r.left + r.width / 2 - px;
+            const dy = r.top + r.height / 2 - py;
+            const d = Math.hypot(dx, dy) || 1;
+            const k = live ? Math.max(0, 1 - d / 380) : 0;
+            c.style.setProperty("--hx", `${((dx / d) * k * 12).toFixed(1)}px`);
+            c.style.setProperty("--hy", `${((dy / d) * k * 9).toFixed(1)}px`);
+            c.style.setProperty("--heat", (k ** 1.4).toFixed(2));
+          });
+        };
+        const onMove = (e: PointerEvent) => {
           apply(e.clientX / window.innerWidth - 0.5, e.clientY / window.innerHeight - 0.5);
+          px = e.clientX;
+          py = e.clientY;
+          if (!raf) raf = requestAnimationFrame(heat);
+        };
         window.addEventListener("pointermove", onMove, { passive: true });
-        return () => window.removeEventListener("pointermove", onMove);
+        return () => {
+          cancelAnimationFrame(raf);
+          window.removeEventListener("pointermove", onMove);
+        };
       }
       const clamp = gsap.utils.clamp(-0.5, 0.5);
       let heard = false;
       const onTilt = (e: DeviceOrientationEvent) => {
         if (e.gamma == null || e.beta == null) return;
         heard = true;
-        apply(clamp(e.gamma / 60), clamp((e.beta - 45) / 60));
+        const gx = clamp(e.gamma / 60);
+        apply(gx, clamp((e.beta - 45) / 60));
+        // the name's letters sway gently with the tilt
+        names.forEach((c, i) =>
+          c.style.setProperty("--hx", `${(gx * 8 * (1 + (i % 3) * 0.35)).toFixed(1)}px`),
+        );
       };
       // Listen straight away (Android sends events freely). If nothing arrives and the
       // browser gates motion behind a permission (iOS), offer a button to ask.
@@ -148,63 +180,136 @@ export function Hero() {
         .fromTo(q("[data-crack]"), { opacity: 1 }, { opacity: 0, duration: 0.2, ...off }, 0.8);
     }
 
+    // Loose pages drift up at their own speeds as the hero scrolls away.
+    if (!ctx.reduced) {
+      q("[data-page-speed]").forEach((p) =>
+        gsap.to(p, {
+          yPercent: -Number((p as HTMLElement).dataset.pageSpeed) * 6,
+          ease: "none",
+          scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: true },
+        }),
+      );
+    }
+
     if (ctx.reduced || played) {
       played = true;
       reveal();
       return parallax();
     }
 
-    const paper = el.querySelector<HTMLElement>("[data-hero-paper]");
-    const printArt = el.querySelector<HTMLElement>("[data-hero-print]");
-    const blade = el.querySelector<SVGLineElement>("[data-hero-blade] line");
-    if (!paper || !printArt || !blade) return;
     const chars = q("[data-name-latin] [data-ch]");
     const late = q("[data-hero-late]");
+    const nameBox = q("[data-depth='10']")[0];
+    const washi = getComputedStyle(el).getPropertyValue("--washi").trim() || "#ebdcb9";
 
-    // Diagonal cut sweeping left to right: edge runs from (s+15, 0) to (s-15, 100).
-    const cut = { s: -30 };
-    let heroBox: DOMRect;
-    let artBox: DOMRect;
-    const edgeAt = (yRatio: number) => ((cut.s + 15 - 30 * yRatio) / 100) * heroBox.width;
-    const drawCut = () => {
-      paper.style.clipPath = `polygon(${cut.s + 15}% 0%, 100% 0%, 100% 100%, ${cut.s - 15}% 100%)`;
-      const y0 = (artBox.top - heroBox.top) / heroBox.height;
-      const y1 = (artBox.bottom - heroBox.top) / heroBox.height;
-      const lx = (px: number) => ((px - (artBox.left - heroBox.left)) / artBox.width) * 100;
-      printArt.style.clipPath = `polygon(${lx(edgeAt(y0))}% 0%, 100% 0%, 100% 100%, ${lx(edgeAt(y1))}% 100%)`;
-      blade.setAttribute("x1", String(cut.s + 15));
-      blade.setAttribute("x2", String(cut.s - 15));
+    // Title drop: focus lines snap in, the columns rumble; the sound word and
+    // impact frame only on the first visit of the session.
+    const titleDrop = () => {
+      let seen = false;
+      try {
+        seen = !!sessionStorage.getItem("agni:titledrop");
+        sessionStorage.setItem("agni:titledrop", "1");
+      } catch {}
+      gsap.fromTo(
+        q("[data-drop-lines]"),
+        { opacity: 0 },
+        { opacity: 1, duration: 0.08, yoyo: true, repeat: 1, repeatDelay: 0.4 },
+      );
+      gsap
+        .timeline()
+        .to(q("[data-hero-shake] > *"), {
+          x: seen ? 2 : 6,
+          y: seen ? -2 : -4,
+          duration: 0.04,
+          repeat: 7,
+          yoyo: true,
+          ease: "steps(1)",
+        })
+        .set(q("[data-hero-shake] > *"), { clearProps: "x,y" });
+      if (!seen) {
+        dropWord.current?.play(heroCopy.titleDrop, 62, 16);
+        impactFrame(0.9);
+      }
     };
 
+    // Name forged in fire: letters ignite out of heat shimmer as embers fly,
+    // land with the title drop, then cool into ink.
+    const ignite = 0.3 + chars.length * 0.045;
     const tl = gsap.timeline({ paused: true, onComplete: reveal });
-    tl.fromTo(
-      chars,
-      { opacity: 0, scale: 1.8, yPercent: -20 },
-      { opacity: 1, scale: 1, yPercent: 0, duration: 0.26, stagger: 0.04, ease: "steps(4)" },
-    )
-      // 2px camera shake as the last character lands. Shake the columns, not
-      // their parent: a transformed ancestor would isolate the text's blend.
-      .to(q("[data-hero-shake] > *"), {
-        x: 2,
-        y: -2,
-        duration: 0.04,
-        repeat: 5,
-        yoyo: true,
-        ease: "steps(1)",
-      })
-      .set(q("[data-hero-shake] > *"), { clearProps: "transform" })
-      .call(() => {
-        heroBox = el.getBoundingClientRect();
-        artBox = printArt.getBoundingClientRect();
-      })
-      .set(blade, { opacity: 1 })
-      .to(cut, { s: 130, duration: 0.8, ease: "snap", onUpdate: drawCut })
-      .to(blade, { opacity: 0, duration: 0.2 }, "-=0.15")
+    tl.set(nameBox ?? {}, { filter: "url(#hero-heat)" })
+      .fromTo(
+        chars,
+        {
+          // 0.001, not 0: the letters were already painted under the cover, and
+          // Chrome would count a reveal from exactly 0 as a brand-new (late) paint.
+          opacity: 0.001,
+          filter: "blur(8px)",
+          color: "#ffb36b",
+          textShadow: "0 0 24px #e2622b, 0 0 60px #c2272d",
+          yPercent: 12,
+          scale: 1.15,
+        },
+        {
+          opacity: 1,
+          filter: "blur(0px)",
+          yPercent: 0,
+          scale: 1,
+          duration: 0.3,
+          stagger: 0.045,
+          ease: "power2.out",
+        },
+      )
+      .fromTo(
+        q("[data-ember]"),
+        { x: 0, y: 0, opacity: 1 },
+        {
+          x: (i: number) => (((i * 37) % 9) - 4) * 12,
+          y: (i: number) => -90 - ((i * 53) % 7) * 22,
+          opacity: 0,
+          duration: 0.9,
+          stagger: 0.05,
+          ease: "power1.out",
+        },
+        0.05,
+      )
+      .call(titleDrop, [], ignite)
+      .to(
+        chars,
+        {
+          color: washi,
+          textShadow: "0 0 0px rgba(226,98,43,0), 0 0 0px rgba(194,39,45,0)",
+          duration: 0.9,
+          stagger: 0.03,
+          ease: "power1.out",
+          clearProps: "color,textShadow,filter",
+        },
+        ignite + 0.1,
+      )
+      .set(nameBox ?? {}, { clearProps: "filter" }, ignite + 0.5)
+      // the brush signature paints on and the seal stamps
+      .fromTo(
+        q("[data-sign-ink]"),
+        { opacity: 1, clipPath: "inset(-30% 100% -30% 0%)" },
+        {
+          clipPath: "inset(-30% -30% -30% 0%)",
+          duration: 0.5,
+          ease: "steps(9)",
+          clearProps: "clipPath",
+        },
+        ignite + 0.15,
+      )
+      .from(q("[data-sign-stroke]"), { drawSVG: "0%", duration: 0.35, ease: "ink" }, ignite + 0.5)
+      .fromTo(
+        q("[data-seal]"),
+        { opacity: 0.001, scale: 2.2, rotation: -25 },
+        { opacity: 1, scale: 1, rotation: -6, duration: 0.22, ease: "steps(3)" },
+        ignite + 0.75,
+      )
       .fromTo(
         late,
-        { opacity: 0, y: 18 },
+        { opacity: 0.001, y: 18 },
         { opacity: 1, y: 0, duration: 0.6, stagger: 0.07, ease: "ink" },
-        "-=0.35",
+        ignite + 0.35,
       );
 
     const stop = onIntroDone(() => {
@@ -236,26 +341,49 @@ export function Hero() {
         aria-hidden
         className="tod-tone pointer-events-none absolute inset-0 -z-20 tone opacity-0 [--tone-dot:var(--washi)]"
       />
-      <div aria-hidden data-hero-paper className="hero-paper absolute inset-0 -z-10 bg-washi">
-        <div className="absolute inset-x-0 bottom-0 h-1/3 rotate-180 tone-fade [--tone-dot:var(--sumi)]" />
+      <FloatingPages />
+      <div
+        aria-hidden
+        data-drop-lines
+        className="pointer-events-none absolute inset-0 z-[1] text-washi/25 opacity-0"
+      >
+        <SpeedLines variant="radial" intensity={1} />
       </div>
+      <svg aria-hidden width="0" height="0" className="absolute">
+        <filter id="hero-heat">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.06" numOctaves="2" seed="7">
+            <animate
+              attributeName="baseFrequency"
+              dur="0.7s"
+              values="0.012 0.06;0.016 0.09;0.012 0.06"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" scale="7" />
+        </filter>
+      </svg>
 
       <div data-hero-shake className="grid flex-1 items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
         <div data-hero-copy className="relative">
-          <div data-depth="10">
-            <HeroName enabled={interactive} />
+          <div data-hero-late>
+            <HeroStatus className="mb-6" />
           </div>
-          <p
-            data-hero-late
-            lang="ja"
-            aria-hidden
-            className="mt-4 font-display text-36 text-aura md:text-56"
-          >
-            {name.aliasJa}
-          </p>
-          <p data-hero-late className="mt-6 text-24">
-            {role}
-          </p>
+          <div data-depth="10" className="relative">
+            <HeroName enabled={interactive} />
+            {Array.from({ length: 12 }, (_, i) => (
+              <i
+                key={i}
+                aria-hidden
+                data-ember
+                className="pointer-events-none absolute h-3 w-[3px] rounded-full bg-kiln opacity-0 shadow-[0_0_8px_var(--agni)]"
+                style={{ left: `${6 + ((i * 41) % 88)}%`, top: `${30 + ((i * 23) % 50)}%` }}
+              />
+            ))}
+          </div>
+          <Signature className="mt-4" />
+          <div data-hero-late>
+            <RoleRotator className="mt-6 text-18 md:text-24" />
+          </div>
           {tagline && (
             <p data-hero-late className="mt-2 max-w-prose text-18 text-muted">
               {tagline}
@@ -284,18 +412,6 @@ export function Hero() {
             <Panel shape="cut-left" fill={false} className="h-full text-washi">
               <Silhouette className="absolute inset-x-0 bottom-0 mx-auto h-[85%] text-sumi [filter:drop-shadow(-3px_-2px_0_var(--agni))_drop-shadow(0_0_14px_rgb(226_98_43/0.45))]" />
             </Panel>
-          </div>
-          <div
-            aria-hidden
-            data-hero-print
-            className="hero-print absolute bg-washi text-sumi"
-            style={flameBox}
-          >
-            <div className="absolute" style={printPanel}>
-              <Panel shape="cut-left" tone className="h-full">
-                <Silhouette className="absolute inset-x-0 bottom-0 mx-auto h-[85%] text-sumi" />
-              </Panel>
-            </div>
           </div>
         </div>
       </div>
@@ -374,24 +490,7 @@ export function Hero() {
         />
       </svg>
 
-      <svg
-        aria-hidden
-        data-hero-blade
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-      >
-        <line
-          x1="-15"
-          y1="0"
-          x2="-45"
-          y2="100"
-          stroke="var(--kiln)"
-          strokeWidth="3"
-          vectorEffect="non-scaling-stroke"
-          opacity="0"
-        />
-      </svg>
+      <ImpactWord ref={dropWord} canvas className="text-96" />
     </section>
   );
 }

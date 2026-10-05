@@ -43,6 +43,16 @@ export const heroCopy = {
   antiMagicHint: "Shows the name in Japanese and switches the page to anti-magic mode",
   /** Hero strip label for the visitor's local time of day. */
   timeOfDay: { night: "Night", dawn: "Dawn", day: "Midday", dusk: "Dusk" },
+  /** Real roles the role line brush-swipes through. */
+  roles: [profile.role, "Open-source contributor (GSSoC 2026)", "B.Tech CSE student", "Anime fan"],
+  rolesLabel: "Roles",
+  /** Brush signature under the name, with a hanko seal (火 = fire, what "Agni" means). */
+  signature: profile.name.alias,
+  seal: "火",
+  status: profile.availability,
+  clock: { city: "Kolkata", timeZone: "Asia/Kolkata", label: "Local time in Kolkata" },
+  titleDrop: "DOON!",
+  coverLabel: "Grimoire",
 };
 
 export const navCopy = {
@@ -50,6 +60,11 @@ export const navCopy = {
   printLabel: "Read in black-and-white print mode",
   sound: "Sound",
   soundLabel: "Sound effects",
+  calm: "Calm",
+  calmLabel: "Calm mode: turn off the heavy animations",
+  quick: "60s",
+  quickLabel: "The 60-second version: everything on one page",
+  settings: "Reading options",
   home: "Home",
   openMenu: "Open menu",
   closeMenu: "Close menu",
@@ -220,6 +235,25 @@ export const statsCopy = {
   profile: "View profile",
   heatmapLabel: (n: number) => `${n} contributions in the last year, one dot per day`,
   asOf: "Live from GitHub and LeetCode, as of",
+};
+
+/** The 60-second version: a calm one-page summary for recruiters. */
+export const quickCopy = {
+  title: "The 60-second version",
+  intro: "Everything that matters on one page, no scroll scenes.",
+  glance: "At a glance",
+  cgpa: "first-year CGPA",
+  prs: "GSSoC pull requests",
+  skills: "Top skills",
+  outOf: "/10",
+  learning: "Learning",
+  projects: "Projects",
+  caseStudy: "Case study",
+  experience: "Experience and education",
+  contact: "Get in touch",
+  email: "Email me",
+  resume: "Resume",
+  full: "See the full experience",
 };
 
 export const heroTiltCopy = { enable: "Enable tilt" };

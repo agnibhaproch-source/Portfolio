@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { spellCopy } from "@/content";
 import { GLYPHS } from "@/components/ui/Rune";
 import { gsap } from "@/lib/gsap";
+import { isCalm } from "@/lib/calm";
 import { haptic } from "@/lib/haptics";
 import { impactFrame } from "@/lib/impact";
 import { prefersReducedMotion } from "@/lib/motion";
@@ -184,7 +185,7 @@ export function SpellCast() {
     };
 
     const onDown = (e: PointerEvent) => {
-      if (!e.isPrimary || e.button !== 0) return;
+      if (!e.isPrimary || e.button !== 0 || isCalm()) return;
       if ((e.target as Element | null)?.closest?.(SKIP)) return;
       sx = x = e.clientX;
       sy = y = e.clientY;

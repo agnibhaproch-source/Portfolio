@@ -1,18 +1,91 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { profile } from "@/content";
+import { heroCopy, profile } from "@/content";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { markIntroDone, PRELOADED_KEY } from "@/lib/intro";
 import { useLenis } from "@/lib/smooth-scroll";
+import { sound } from "@/lib/sound";
 import { FLAME_INNER, FLAME_OUTER } from "./flame-paths";
 
+/** Cracks spreading from the seam, in a 100x100 box. */
+const CRACKS = [
+  "50,50 46,44 47,38 42,31 44,24",
+  "50,50 55,45 53,39 58,33 57,26",
+  "50,50 45,56 47,62 41,69",
+  "50,50 54,57 52,63 57,70 56,76",
+  "50,50 43,50 37,48 31,51",
+  "50,50 57,50 63,52 69,49",
+];
+
+/** The cover emblem: a ruled ring, rune ticks and the flame, centred on (100, 100). */
+function Emblem() {
+  return (
+    <svg viewBox="0 0 200 200" className="h-full w-full" fill="none" stroke="currentColor">
+      <circle data-stroke cx="100" cy="100" r="92" strokeWidth="2.5" />
+      <circle data-stroke cx="100" cy="100" r="80" strokeWidth="1" strokeDasharray="3 6" />
+      <circle data-stroke cx="100" cy="100" r="58" strokeWidth="1.5" />
+      {Array.from({ length: 12 }, (_, i) => {
+        const a = (i / 12) * Math.PI * 2;
+        const p = (r: number) =>
+          `${(100 + Math.cos(a) * r).toFixed(1)} ${(100 + Math.sin(a) * r).toFixed(1)}`;
+        return <path key={i} data-stroke d={`M${p(62)} L${p(78)}`} strokeWidth="1.5" />;
+      })}
+      <g transform="translate(64.8 62) scale(2.2)">
+        <path data-fill d={FLAME_OUTER} fill="var(--agni)" stroke="none" opacity="0" />
+        <path data-fill d={FLAME_INNER} fill="var(--kiln)" stroke="none" opacity="0" />
+        <path data-stroke d={FLAME_OUTER} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+        <path data-stroke d={FLAME_INNER} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+      </g>
+    </svg>
+  );
+}
+
+/** One board of the cover. Both carry the whole emblem, clipped at the seam. */
+function Board({ side }: { side: "l" | "r" }) {
+  const left = side === "l";
+  return (
+    <div
+      data-board={side}
+      className={`absolute inset-y-0 w-1/2 overflow-hidden bg-[linear-gradient(160deg,#2c1a20,#140e0d_70%)] [backface-visibility:hidden] ${left ? "left-0 origin-left" : "right-0 origin-right"}`}
+    >
+      <div className="absolute inset-0 tone opacity-10 [--tone-dot:var(--washi)]" />
+      {/* tooled border and corner fittings */}
+      <div
+        className={`absolute inset-y-4 border-[3px] border-aura/60 ${left ? "right-0 left-4 border-r-0" : "right-4 left-0 border-l-0"}`}
+      />
+      <div
+        className={`absolute inset-y-7 border border-aura/30 ${left ? "right-0 left-7 border-r-0" : "right-7 left-0 border-l-0"}`}
+      />
+      {["top-3", "bottom-3"].map((v) => (
+        <span
+          key={v}
+          className={`absolute ${v} ${left ? "left-3" : "right-3"} size-8 rotate-45 border-[3px] border-aura bg-[#140e0d]`}
+        />
+      ))}
+      {/* spine bands on the outer edge */}
+      <div
+        className={`absolute inset-y-0 w-3 bg-[repeating-linear-gradient(0deg,rgb(201_162_74/0.5)_0_6px,transparent_6px_40px)] ${left ? "left-0" : "right-0"}`}
+      />
+      <div
+        className={`absolute top-1/2 size-[min(64vw,56svh)] -translate-y-1/2 text-aura ${left ? "right-0 translate-x-1/2" : "left-0 -translate-x-1/2"}`}
+      >
+        <Emblem />
+      </div>
+      <div
+        className={`absolute inset-y-0 w-6 ${left ? "right-0 bg-[linear-gradient(90deg,transparent,rgb(0_0_0/0.6))]" : "left-0 bg-[linear-gradient(-90deg,transparent,rgb(0_0_0/0.6))]"}`}
+      />
+    </div>
+  );
+}
+
 /**
- * "Cold open": a pencil panel line draws, an original grimoire inks its cover
- * and flame emblem while a counter runs 000 to 100, the cover bursts open,
- * the panel slams out to full screen and cuts to the hero. Under 2.5s, once
- * per session, never under reduced motion. Hidden by CSS unless the head
- * script set html[data-preload]; a CSS failsafe hides it after 2.5s anyway.
+ * Cold open: the screen is the closed cover of an original grimoire. Its
+ * emblem inks itself while a counter runs to 100, light leaks through the
+ * seam, cracks split out, the clasp snaps and the two boards swing open onto
+ * the hero. Under 2.5s, once per session, never under reduced or calm mode.
+ * Hidden by CSS unless the head script set html[data-preload]; a CSS
+ * failsafe hides it after 2.6s anyway.
  */
 export function Preloader() {
   const root = useRef<HTMLDivElement>(null);
@@ -20,8 +93,6 @@ export function Preloader() {
   const lenisRef = useRef(lenis);
   const active = useRef(false);
 
-  // Lenis mounts after this component; keep the live instance in a ref and
-  // hold scroll while the preloader is on screen.
   useEffect(() => {
     lenisRef.current = lenis;
     if (active.current) lenis?.stop();
@@ -39,31 +110,12 @@ export function Preloader() {
       lenisRef.current?.stop();
 
       const q = gsap.utils.selector(el);
-      const frame = q("[data-frame]")[0] as SVGRectElement | undefined;
-      const book = q("[data-book]")[0] as HTMLElement | undefined;
       const digits = q("[data-digit]") as HTMLElement[];
-      if (!frame || !book) return;
-
-      // Fit the pencil panel around the book, in the 0-100 viewBox space.
-      const r = book.getBoundingClientRect();
-      const pad = 28;
-      const vw = window.innerWidth / 100;
-      const vh = window.innerHeight / 100;
-      gsap.set(frame, {
-        attr: {
-          x: (r.left - pad) / vw,
-          y: (r.top - pad) / vh,
-          width: (r.width + pad * 2) / vw,
-          height: (r.height + pad * 2 + 120) / vh,
-        },
-      });
-
       const count = { v: 0 };
       const paint = () => {
         const s = String(Math.round(count.v)).padStart(3, "0");
         digits.forEach((d, i) => (d.textContent = s[i] ?? "0"));
       };
-
       const finish = () => {
         try {
           sessionStorage.setItem(PRELOADED_KEY, "1");
@@ -76,34 +128,49 @@ export function Preloader() {
       el.setAttribute("data-started", "");
       gsap
         .timeline({ onComplete: finish })
-        .from(frame, { drawSVG: "0%", duration: 0.55, ease: "ink" })
-        .fromTo(
-          q("[data-cover]"),
-          { clipPath: "inset(100% 0% 0% 0%)" },
-          { clipPath: "inset(0% 0% 0% 0%)", duration: 0.45, ease: "snap" },
-          0.1,
-        )
         .from(
           q("[data-stroke]"),
-          { drawSVG: "0%", duration: 0.5, stagger: 0.12, ease: "steps(10)" },
-          0.35,
+          { drawSVG: "0%", duration: 0.55, stagger: 0.03, ease: "steps(10)" },
+          0.05,
         )
-        .to(q("[data-fill]"), { opacity: 1, duration: 0.2, ease: "steps(3)" }, 1.0)
-        .to(count, { v: 100, duration: 1.5, ease: "power1.inOut", onUpdate: paint }, 0)
-        .to(q("[data-cover]"), { rotationY: -165, duration: 0.45, ease: "snap" }, 1.55)
+        .to(q("[data-fill]"), { opacity: 1, duration: 0.2, ease: "steps(3)" }, 0.85)
+        .to(count, { v: 100, duration: 1.35, ease: "power1.inOut", onUpdate: paint }, 0)
+        .fromTo(
+          q("[data-seam]"),
+          { scaleY: 0, opacity: 0 },
+          { scaleY: 1, opacity: 1, duration: 0.3, ease: "power2.in" },
+          1.05,
+        )
+        .fromTo(
+          q("[data-crack]"),
+          { drawSVG: "0%" },
+          { drawSVG: "100%", duration: 0.18, stagger: 0.02, ease: "none" },
+          1.3,
+        )
         .to(
-          q("[data-page]"),
-          { rotationY: -150, duration: 0.4, stagger: 0.06, ease: "power2.in" },
-          1.62,
+          q("[data-board]"),
+          { x: 3, duration: 0.04, repeat: 5, yoyo: true, ease: "steps(1)" },
+          1.3,
         )
-        .to(q("[data-fade]"), { opacity: 0, scale: 0.96, duration: 0.2 }, 1.95)
+        .call(() => sound.play("impact"), [], 1.5)
         .to(
-          frame,
-          { attr: { x: -1, y: -1, width: 102, height: 102 }, duration: 0.28, ease: "snap" },
-          1.95,
+          q("[data-clasp='l']"),
+          { x: -30, y: 60, rotation: -40, opacity: 0, duration: 0.35, ease: "power2.in" },
+          1.5,
         )
-        .add(markIntroDone, 2.12)
-        .to(el, { autoAlpha: 0, duration: 0.18 }, 2.12);
+        .to(
+          q("[data-clasp='r']"),
+          { x: 30, y: 70, rotation: 35, opacity: 0, duration: 0.35, ease: "power2.in" },
+          1.5,
+        )
+        .to(q("[data-count]"), { opacity: 0, duration: 0.15 }, 1.5)
+        .to(q("[data-crack], [data-seam]"), { opacity: 0, duration: 0.15 }, 1.6)
+        .fromTo(q("[data-burst]"), { opacity: 0 }, { opacity: 1, duration: 0.12 }, 1.58)
+        .to(q("[data-board='l']"), { rotationY: -105, duration: 0.6, ease: "power3.in" }, 1.58)
+        .to(q("[data-board='r']"), { rotationY: 105, duration: 0.6, ease: "power3.in" }, 1.58)
+        .to(q("[data-burst]"), { opacity: 0, duration: 0.4 }, 1.75)
+        .add(markIntroDone, 1.85)
+        .to(el, { autoAlpha: 0, duration: 0.15 }, 2.15);
     },
     { scope: root },
   );
@@ -112,85 +179,64 @@ export function Preloader() {
     <div
       ref={root}
       aria-hidden
-      data-mode="print"
-      className="preloader fixed inset-0 z-[180] flex-col items-center justify-center bg-washi text-sumi"
+      data-mode="colour"
+      className="preloader fixed inset-0 z-[180] [perspective:1800px]"
     >
+      <div
+        data-burst
+        className="absolute inset-0 bg-[radial-gradient(circle,rgb(255_170_90/0.75),rgb(226_98_43/0.25)_35%,transparent_70%)] opacity-0"
+      />
+      <Board side="l" />
+      <Board side="r" />
+
+      <div
+        data-seam
+        className="absolute inset-y-0 left-1/2 w-[3px] -translate-x-1/2 bg-[#ffd9a8] opacity-0 shadow-[0_0_18px_6px_rgb(226_98_43/0.8)]"
+      />
       <svg
-        className="pointer-events-none absolute inset-0 h-full w-full"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
+        className="pointer-events-none absolute inset-0 h-full w-full"
       >
-        <rect
-          data-frame
-          x="30"
-          y="20"
-          width="40"
-          height="60"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          vectorEffect="non-scaling-stroke"
-        />
+        {CRACKS.map((pts) => (
+          <polyline
+            key={pts}
+            data-crack
+            points={pts}
+            fill="none"
+            stroke="#ffb36b"
+            strokeWidth="2"
+            vectorEffect="non-scaling-stroke"
+            className="[filter:drop-shadow(0_0_4px_var(--agni))]"
+          />
+        ))}
       </svg>
 
-      <div data-fade className="flex flex-col items-center">
-        <div data-book className="relative aspect-[3/4] w-[min(46vw,200px)] [perspective:1200px]">
-          {[3, 2, 1].map((i) => (
-            <div
-              key={i}
-              data-page
-              className="absolute inset-0 origin-left border-[3px] border-sumi bg-washi"
-              style={{ translate: `${i * 4}px ${i * 3}px` }}
-            />
-          ))}
-          <div
-            data-cover
-            className="absolute inset-0 origin-left border-[3px] border-sumi bg-washi [backface-visibility:hidden]"
-          >
-            <div className="absolute inset-y-0 left-0 w-4 border-r-[3px] border-sumi hatch" />
-            <div className="absolute inset-3 left-7 border border-sumi" />
-            <svg viewBox="0 0 100 100" className="absolute inset-0 m-auto w-3/5 translate-x-2">
-              <circle
-                data-stroke
-                cx="50"
-                cy="50"
-                r="44"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-              <g transform="translate(14.8 12) scale(2.2)">
-                <path data-fill d={FLAME_OUTER} fill="var(--agni)" opacity="0" />
-                <path data-fill d={FLAME_INNER} fill="var(--kiln)" opacity="0" />
-                <path
-                  data-stroke
-                  d={FLAME_OUTER}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                />
-                <path
-                  data-stroke
-                  d={FLAME_INNER}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                />
-              </g>
-            </svg>
-          </div>
-        </div>
+      {/* the clasp across the seam, which snaps in two */}
+      <div className="absolute bottom-[16%] left-1/2 flex -translate-x-1/2">
+        <span
+          data-clasp="l"
+          className="block h-10 w-12 rounded-l-md border-[3px] border-r-0 border-aura bg-[#2a1d14]"
+        />
+        <span
+          data-clasp="r"
+          className="block h-10 w-12 rounded-r-md border-[3px] border-l-0 border-aura bg-[#2a1d14]"
+        >
+          <span className="mt-2.5 -ml-2 block size-3 rotate-45 border-2 border-aura bg-agni" />
+        </span>
+      </div>
 
-        <p className="mt-10 font-display text-56 leading-none">
+      <div data-count className="absolute inset-x-0 bottom-[6%] text-center text-washi">
+        <p className="font-display text-36 leading-none">
           {[0, 1, 2].map((i) => (
             <span key={i} data-digit className="inline-block w-[0.72em] text-center">
               0
             </span>
           ))}
         </p>
-        {profile.tagline && <p className="mt-3 px-4 text-center text-14">{profile.tagline}</p>}
+        <p className="mt-2 text-14 text-[var(--tone-light)]">
+          {profile.tagline ?? heroCopy.coverLabel}
+        </p>
       </div>
     </div>
   );

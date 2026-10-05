@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Grimoire } from "@/components/sections/contact/Grimoire";
 import { gsap } from "@/lib/gsap";
+import { isCalm } from "@/lib/calm";
 import { MOTION_QUERIES, SUMMON_MS } from "@/lib/motion";
 
 /**
@@ -31,6 +32,7 @@ export function GrimoireSummon() {
 
     const enter = () => {
       clear();
+      if (isCalm()) return;
       gsap.killTweensOf([el, ...q("*")]);
       gsap.fromTo(
         el,

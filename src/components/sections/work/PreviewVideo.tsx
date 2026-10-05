@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { workCopy } from "@/content";
+import { isCalm } from "@/lib/calm";
 import { MOTION_QUERIES, SUMMON_MS } from "@/lib/motion";
 
 /**
@@ -32,7 +33,7 @@ export function PreviewVideo({
     const show = () => {
       if (!v.src) v.src = src;
       window.clearTimeout(timer);
-      timer = window.setTimeout(reveal, delay);
+      timer = window.setTimeout(reveal, isCalm() ? 0 : delay);
     };
     const reveal = () => {
       wrap.current?.setAttribute("data-on", "");

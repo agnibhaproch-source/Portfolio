@@ -1,5 +1,6 @@
 "use client";
 
+import { isCalm } from "./calm";
 import { prefersReducedMotion } from "./motion";
 
 export const IMPACT_EVENT = "agni:impact";
@@ -10,6 +11,6 @@ export const IMPACT_EVENT = "agni:impact";
  * motion.
  */
 export function impactFrame(strength = 1) {
-  if (typeof window === "undefined" || prefersReducedMotion()) return;
+  if (typeof window === "undefined" || prefersReducedMotion() || isCalm()) return;
   window.dispatchEvent(new CustomEvent(IMPACT_EVENT, { detail: strength }));
 }

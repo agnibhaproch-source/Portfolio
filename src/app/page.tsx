@@ -1,16 +1,20 @@
-import { Eyecatch } from "@/components/motion/Eyecatch";
-import { SwordsmanDivider } from "@/components/motion/SwordsmanDivider";
-import { BrushDivider, RipDivider, ShatterDivider } from "@/components/motion/PageTransitions";
-import { About } from "@/components/sections/About";
-import { Achievements } from "@/components/sections/Achievements";
-import { BurnTransition } from "@/components/sections/BurnTransition";
-import { Contact } from "@/components/sections/Contact";
-import { Experience } from "@/components/sections/Experience";
-import { Footer } from "@/components/sections/Footer";
+import {
+  About,
+  Achievements,
+  BrushDivider,
+  BurnTransition,
+  Contact,
+  Experience,
+  Eyecatch,
+  Footer,
+  RipDivider,
+  ShatterDivider,
+  Skills,
+  SwordsmanDivider,
+  TrainingLog,
+  Work,
+} from "@/components/sections/lazy";
 import { Hero } from "@/components/sections/Hero";
-import { Skills } from "@/components/sections/Skills";
-import { TrainingLog } from "@/components/sections/TrainingLog";
-import { Work } from "@/components/sections/Work";
 import { sections } from "@/content";
 import { getGithubStats, getLeetcodeStats } from "@/lib/stats";
 

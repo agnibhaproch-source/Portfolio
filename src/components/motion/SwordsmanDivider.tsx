@@ -7,6 +7,7 @@ import { gsap } from "@/lib/gsap";
 import { haptic } from "@/lib/haptics";
 import { impactFrame } from "@/lib/impact";
 import { sound } from "@/lib/sound";
+import { useCalm } from "@/lib/calm";
 import { useMotion } from "@/lib/use-motion";
 
 // The cut runs from (0, 64) up to (100, 36) in a 100x100 box.
@@ -33,56 +34,71 @@ const BOLTS = [3, 17, 29].map((seed) => {
 export function SwordsmanDivider({ label }: { label: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useMotion((ctx, el) => {
-    if (ctx.reduced) return;
-    const q = gsap.utils.selector(el);
-    const { proxy, apply } = swingProxy(el, -80);
-    const fire = () => {
-      if (tl.scrollTrigger?.direction !== 1) return;
-      sound.play("slash");
-      haptic("impact");
-      impactFrame(1.1);
-    };
-    const tl = gsap
-      .timeline({
-        defaults: { ease: "none" },
-        scrollTrigger: { trigger: el, start: "top 75%", end: "bottom 15%", scrub: 0.4 },
-      })
-      .fromTo(q("[data-fighter]"), { x: "-45vw" }, { x: "30vw", duration: 0.34, ease: "power1.in" })
-      .fromTo(q("[data-lines]"), { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.06)
-      .fromTo(proxy, { a: -80 }, { a: 115, duration: 0.1, ease: "power3.in", onUpdate: apply }, 0.3)
-      .fromTo(
-        q("[data-arc]"),
-        { drawSVG: "0%", opacity: 1 },
-        { drawSVG: "100%", duration: 0.1 },
-        0.3,
-      )
-      .fromTo(q("[data-cut]"), { drawSVG: "0%" }, { drawSVG: "100%", duration: 0.05 }, 0.4)
-      .call(fire, [], 0.42)
-      .to(q("[data-arc]"), { opacity: 0, duration: 0.08 }, 0.44)
-      .fromTo(q("[data-bolts]"), { opacity: 0 }, { opacity: 1, duration: 0.01 }, 0.42)
-      .fromTo(
-        q("[data-page]"),
-        { filter: "grayscale(0)" },
-        { filter: "grayscale(1)", duration: 0.08 },
-        0.42,
-      )
-      .fromTo(
-        q("[data-half='a']"),
-        { xPercent: 0, yPercent: 0, rotation: 0 },
-        { xPercent: -3, yPercent: -9, rotation: -2.5, duration: 0.3, ease: "power2.out" },
-        0.44,
-      )
-      .fromTo(
-        q("[data-half='b']"),
-        { xPercent: 0, yPercent: 0, rotation: 0 },
-        { xPercent: 3, yPercent: 9, rotation: 2.5, duration: 0.3, ease: "power2.out" },
-        0.44,
-      )
-      .to(q("[data-fighter]"), { x: "115vw", duration: 0.3, ease: "power2.in" }, 0.6)
-      .to(q("[data-lines]"), { opacity: 0, duration: 0.15 }, 0.75)
-      .to(q("[data-bolts]"), { opacity: 0, duration: 0.1 }, 0.9);
-  }, ref);
+  const calm = useCalm();
+
+  useMotion(
+    (ctx, el) => {
+      if (ctx.reduced || calm) return;
+      const q = gsap.utils.selector(el);
+      const { proxy, apply } = swingProxy(el, -80);
+      const fire = () => {
+        if (tl.scrollTrigger?.direction !== 1) return;
+        sound.play("slash");
+        haptic("impact");
+        impactFrame(1.1);
+      };
+      const tl = gsap
+        .timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: { trigger: el, start: "top 75%", end: "bottom 15%", scrub: 0.4 },
+        })
+        .fromTo(
+          q("[data-fighter]"),
+          { x: "-45vw" },
+          { x: "30vw", duration: 0.34, ease: "power1.in" },
+        )
+        .fromTo(q("[data-lines]"), { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.06)
+        .fromTo(
+          proxy,
+          { a: -80 },
+          { a: 115, duration: 0.1, ease: "power3.in", onUpdate: apply },
+          0.3,
+        )
+        .fromTo(
+          q("[data-arc]"),
+          { drawSVG: "0%", opacity: 1 },
+          { drawSVG: "100%", duration: 0.1 },
+          0.3,
+        )
+        .fromTo(q("[data-cut]"), { drawSVG: "0%" }, { drawSVG: "100%", duration: 0.05 }, 0.4)
+        .call(fire, [], 0.42)
+        .to(q("[data-arc]"), { opacity: 0, duration: 0.08 }, 0.44)
+        .fromTo(q("[data-bolts]"), { opacity: 0 }, { opacity: 1, duration: 0.01 }, 0.42)
+        .fromTo(
+          q("[data-page]"),
+          { filter: "grayscale(0)" },
+          { filter: "grayscale(1)", duration: 0.08 },
+          0.42,
+        )
+        .fromTo(
+          q("[data-half='a']"),
+          { xPercent: 0, yPercent: 0, rotation: 0 },
+          { xPercent: -3, yPercent: -9, rotation: -2.5, duration: 0.3, ease: "power2.out" },
+          0.44,
+        )
+        .fromTo(
+          q("[data-half='b']"),
+          { xPercent: 0, yPercent: 0, rotation: 0 },
+          { xPercent: 3, yPercent: 9, rotation: 2.5, duration: 0.3, ease: "power2.out" },
+          0.44,
+        )
+        .to(q("[data-fighter]"), { x: "115vw", duration: 0.3, ease: "power2.in" }, 0.6)
+        .to(q("[data-lines]"), { opacity: 0, duration: 0.15 }, 0.75)
+        .to(q("[data-bolts]"), { opacity: 0, duration: 0.1 }, 0.9);
+    },
+    ref,
+    [calm],
+  );
 
   const half = (which: "a" | "b") => (
     <div
