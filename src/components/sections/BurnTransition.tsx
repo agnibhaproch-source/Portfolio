@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef } from "react";
-import { Devil } from "@/components/motion/Devil";
+import { SummonSmoke, type SummonSmokeHandle } from "@/components/gl/SummonSmoke";
+import { Greatsword } from "@/components/motion/Greatsword";
 import { MagicCircle } from "@/components/motion/MagicCircle";
-import { transitionCopy } from "@/content";
+import { sfxCopy, transitionCopy } from "@/content";
 import { gsap, SplitText } from "@/lib/gsap";
 import { haptic } from "@/lib/haptics";
 import { impactFrame } from "@/lib/impact";
@@ -16,9 +17,10 @@ import { useMotion } from "@/lib/use-motion";
  * of it. Scrubbed both ways; only transforms animate. Shapes come from a
  * seeded generator so server and client render the same paths.
  *
- * Then the summoning: the circle turns crimson, its core opens into an
- * anti-magic void, shadow wisps burst outward and an original devil rises
- * out of the circle, wings unfurling, eyes igniting.
+ * Then the summoning: the circle turns crimson and tips flat, its core opens
+ * into an anti-magic void, black smoke pours out (WebGL shader) and an
+ * original greatsword rises hilt-first, hangs, then slams back down into
+ * the circle: impact frame, shockwave, cracks across the screen, debris.
  */
 
 function seeded(seed: number) {
@@ -78,34 +80,32 @@ function tendril(seed: number) {
 
 const TENDRILS = Array.from({ length: 9 }, (_, i) => tendril(i * 31 + 5));
 
-/** Anti-magic shadow wisp curling outward from the void (800, 640) of a 1600x1000 box. */
-function wisp(i: number, count: number) {
-  const rand = seeded(i * 17 + 3);
-  const a = (i / count) * Math.PI * 2 + (rand() - 0.5) * 0.3;
-  const len = 300 + rand() * 340;
-  const curl = (rand() - 0.5) * 1.1;
-  const steps = 18;
-  const left: string[] = [];
-  const right: string[] = [];
-  for (let k = 0; k <= steps; k++) {
-    const t = k / steps;
-    const ang = a + curl * t * t;
-    const r = 40 + t * len;
-    const cx = 800 + Math.cos(ang) * r;
-    const cy = 640 + Math.sin(ang) * r * 0.55 - t * t * 140;
-    const w = (1 - t) ** 1.1 * (46 + rand() * 6) + Math.sin(t * 9 + i) * 3;
-    const nx = -Math.sin(ang) * w;
-    const ny = Math.cos(ang) * w * 0.55;
-    left.push(`${(cx + nx).toFixed(1)} ${(cy + ny).toFixed(1)}`);
-    right.unshift(`${(cx - nx).toFixed(1)} ${(cy - ny).toFixed(1)}`);
+/** Cracks splitting out from the impact point (50, 64) of a 100x100 box. */
+const CRACKS = Array.from({ length: 9 }, (_, i) => {
+  const rand = seeded(i * 13 + 2);
+  const a = (i / 9) * Math.PI * 2 + (rand() - 0.5) * 0.4;
+  let x = 50;
+  let y = 64;
+  const pts = [`${x},${y}`];
+  const len = 30 + rand() * 40;
+  for (let r = 0; r < len; r += 3 + rand() * 4) {
+    const wob = (rand() - 0.5) * 0.9;
+    x += Math.cos(a + wob) * 5;
+    y += Math.sin(a + wob) * 5 * (Math.abs(Math.sin(a)) > 0.5 ? 0.9 : 0.4);
+    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
   }
-  return `M${left.join(" L")} L${right.join(" L")} Z`;
-}
+  return pts.join(" ");
+});
 
-const WISPS = Array.from({ length: 14 }, (_, i) => wisp(i, 14));
+/** Debris flung up by the slam: [x, y, rotation] targets in px. */
+const DEBRIS = Array.from({ length: 10 }, (_, i) => {
+  const rand = seeded(i * 7 + 40);
+  return [(rand() - 0.5) * 900, -120 - rand() * 320, (rand() - 0.5) * 540] as const;
+});
 
 export function BurnTransition() {
   const ref = useRef<HTMLDivElement>(null);
+  const smoke = useRef<SummonSmokeHandle>(null);
 
   useMotion((ctx, el) => {
     const q = gsap.utils.selector(el);
@@ -115,12 +115,14 @@ export function BurnTransition() {
       return;
     }
 
-    const summon = () => {
+    const slam = () => {
       if (tl.scrollTrigger?.direction !== 1) return;
       sound.play("impact");
       haptic("impact");
-      impactFrame(1.2);
+      impactFrame(1.4);
     };
+    const fumes = { v: 0 };
+    const setFumes = () => smoke.current?.setAmount(fumes.v);
 
     gsap.set(q("[data-summoning]"), { autoAlpha: 1 });
     const chars = SplitText.create(q("[data-burn-line]"), { type: "words,chars" }).chars;
@@ -192,55 +194,78 @@ export function BurnTransition() {
         { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" },
         1.14,
       )
-      .call(summon, [], 1.24)
+      .fromTo(q("[data-dark]"), { opacity: 0 }, { opacity: 1, duration: 0.2 }, 1.08)
       .fromTo(
-        q("[data-wisp]"),
-        { scale: 0 },
-        { scale: 1, duration: 0.25, stagger: 0.01, ease: "power3.out", svgOrigin: "800 640" },
-        1.24,
+        fumes,
+        { v: 0 },
+        { v: 0.55, duration: 0.26, ease: "power1.in", onUpdate: setFumes },
+        1.14,
       )
+      // the greatsword rises hilt-first out of the void...
       .fromTo(
-        q("[data-devil]"),
-        { yPercent: 55, scale: 0.7, clipPath: "inset(0% 0% 100% 0%)" },
-        {
-          yPercent: 0,
-          scale: 1,
-          clipPath: "inset(0% 0% 0% 0%)",
-          duration: 0.32,
-          ease: "power2.out",
-        },
-        1.26,
+        q("[data-sword]"),
+        { yPercent: 100, rotation: -4 },
+        { yPercent: 2, rotation: 2, duration: 0.3, ease: "power2.out" },
+        1.22,
       )
-      .fromTo(
-        q("[data-wing='l']"),
-        { rotation: 55, scaleX: 0.2 },
-        { rotation: 0, scaleX: 1, duration: 0.2, ease: "back.out(1.6)" },
-        1.46,
-      )
-      .fromTo(
-        q("[data-wing='r']"),
-        { rotation: -55, scaleX: 0.2 },
-        { rotation: 0, scaleX: 1, duration: 0.2, ease: "back.out(1.6)" },
-        1.46,
-      )
-      .fromTo(
-        q("[data-eyes]"),
-        { opacity: 0 },
-        { opacity: 1, duration: 0.03, ease: "steps(2)" },
-        1.62,
-      )
-      .fromTo(q("[data-summon-bolts]"), { opacity: 0 }, { opacity: 1, duration: 0.02 }, 1.62)
+      .fromTo(q("[data-veins]"), { strokeOpacity: 0 }, { strokeOpacity: 0.9, duration: 0.1 }, 1.4)
       .fromTo(
         q("[data-summon-word]"),
-        { scale: 2.4, opacity: 0, rotation: -18 },
-        { scale: 1, opacity: 1, rotation: -8, duration: 0.06, ease: "steps(3)" },
-        1.64,
+        { scale: 2.2, opacity: 0, rotation: -16 },
+        { scale: 1, opacity: 1, rotation: -8, duration: 0.05, ease: "steps(3)" },
+        1.3,
       )
+      .to(q("[data-summon-word]"), { opacity: 0, duration: 0.06 }, 1.56)
+      // ...hangs in the smoke...
       .to(
-        q("[data-wisps]"),
-        { rotation: 8, duration: 0.3, ease: "none", transformOrigin: "50% 50%" },
-        1.5,
+        q("[data-sword]"),
+        { yPercent: -3, rotation: 0, duration: 0.08, ease: "sine.inOut" },
+        1.52,
       )
+      .to(fumes, { v: 0.8, duration: 0.1, onUpdate: setFumes }, 1.5)
+      // ...and slams back down into the circle
+      .to(q("[data-sword]"), { yPercent: 34, duration: 0.05, ease: "power4.in" }, 1.6)
+      .call(slam, [], 1.65)
+      .fromTo(
+        q("[data-stage]"),
+        { x: 0, y: 0 },
+        { keyframes: { x: [14, -12, 9, -5, 0], y: [-8, 6, -4, 2, 0] }, duration: 0.08 },
+        1.65,
+      )
+      .fromTo(
+        q("[data-shock]"),
+        { scale: 0.2, opacity: 1 },
+        { scale: 5, opacity: 0, duration: 0.14, ease: "power2.out" },
+        1.65,
+      )
+      .fromTo(
+        q("[data-crack]"),
+        { drawSVG: "0%" },
+        { drawSVG: "100%", duration: 0.08, stagger: 0.004 },
+        1.65,
+      )
+      .fromTo(
+        q("[data-debris]"),
+        { x: 0, y: 0, rotation: 0, opacity: 1 },
+        {
+          x: (i: number) => DEBRIS[i]![0],
+          y: (i: number) => DEBRIS[i]![1],
+          rotation: (i: number) => DEBRIS[i]![2],
+          opacity: 0,
+          duration: 0.18,
+          ease: "power2.out",
+        },
+        1.65,
+      )
+      .fromTo(q("[data-summon-bolts]"), { opacity: 0 }, { opacity: 1, duration: 0.02 }, 1.65)
+      .fromTo(
+        q("[data-slam-word]"),
+        { scale: 2.6, opacity: 0, rotation: -20 },
+        { scale: 1, opacity: 1, rotation: -8, duration: 0.05, ease: "steps(3)" },
+        1.66,
+      )
+      .to(fumes, { v: 1, duration: 0.04, onUpdate: setFumes }, 1.65)
+      .to(fumes, { v: 0.65, duration: 0.15, onUpdate: setFumes }, 1.72)
       .to({}, { duration: 0.12 }, 1.8);
   }, ref);
 
@@ -251,7 +276,10 @@ export function BurnTransition() {
       data-mode="colour"
       className="relative h-[360svh] motion-reduce:h-svh"
     >
-      <div className="sticky top-0 h-svh overflow-hidden bg-[linear-gradient(to_bottom,var(--twilight),var(--sumi)_60%)]">
+      <div
+        data-stage
+        className="sticky top-0 h-svh overflow-hidden bg-[linear-gradient(to_bottom,var(--twilight),var(--sumi)_60%)]"
+      >
         {/* Revealed as the paper burns away: an original magic circle and a title line */}
         <div className="absolute inset-0 grid place-items-center">
           <div
@@ -262,7 +290,7 @@ export function BurnTransition() {
             <MagicCircle draw="external" className="absolute size-[min(86vw,72svh)] opacity-80" />
           </div>
 
-          {/* The summoning: void, shadow wisps, the devil */}
+          {/* The summoning: void, smoke, the greatsword */}
           <div data-summoning className="pointer-events-none invisible absolute inset-0">
             <div
               data-dark
@@ -272,29 +300,48 @@ export function BurnTransition() {
               data-void
               className="absolute top-[64%] left-1/2 h-[16svh] w-[min(70vw,56svh)] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(ellipse,#000_40%,rgb(194_39_45/0.5)_62%,transparent_72%)] opacity-0"
             />
+            <SummonSmoke ref={smoke} originY={0.36} className="absolute inset-0 h-full w-full" />
             <svg
-              data-wisps
-              viewBox="0 0 1600 1000"
-              preserveAspectRatio="xMidYMid slice"
-              className="absolute inset-0 h-full w-full [filter:blur(2px)_drop-shadow(0_0_10px_rgb(194_39_45/0.35))]"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              className="absolute inset-0 h-full w-full [filter:drop-shadow(0_0_5px_rgb(194_39_45/0.8))]"
             >
-              {WISPS.map((d, i) => (
-                <path
-                  key={i}
-                  data-wisp
-                  d={d}
-                  fill="#050304"
-                  stroke="var(--agni)"
-                  strokeWidth="1.5"
-                  strokeOpacity="0.6"
+              {CRACKS.map((pts) => (
+                <polyline
+                  key={pts}
+                  data-crack
+                  points={pts}
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="3"
+                  strokeLinejoin="bevel"
+                  vectorEffect="non-scaling-stroke"
                 />
               ))}
             </svg>
+            {/* the sword only exists above the void line: it rises out of it and sinks into it */}
+            <div className="absolute inset-x-0 top-0 h-[64%] overflow-hidden">
+              <div
+                data-sword
+                className="absolute bottom-0 left-1/2 h-[min(60svh,34rem)] -translate-x-1/2"
+              >
+                <div className="bg-black/60 absolute -inset-x-6 inset-y-0 blur-2xl" />
+                <Greatsword className="relative h-full w-auto [filter:drop-shadow(0_0_10px_rgb(194_39_45/0.7))_drop-shadow(0_0_30px_#000)]" />
+              </div>
+            </div>
             <div
-              data-devil
-              className="absolute bottom-[30%] left-1/2 w-[min(100vw,70svh)] -translate-x-1/2 [filter:drop-shadow(0_0_18px_rgb(194_39_45/0.45))] [clip-path:inset(0%_0%_100%_0%)]"
-            >
-              <Devil className="w-full" />
+              data-shock
+              className="absolute top-[64%] left-1/2 h-[4svh] w-[16svh] -translate-x-1/2 -translate-y-1/2 rounded-[50%] border-[3px] border-washi opacity-0 shadow-[0_0_20px_var(--agni)]"
+            />
+            <div className="absolute top-[64%] left-1/2">
+              {DEBRIS.map((_, i) => (
+                <span
+                  key={i}
+                  data-debris
+                  className="absolute size-3 bg-[#0b0708] opacity-0 [clip-path:polygon(50%_0,100%_70%,30%_100%,0_40%)]"
+                  style={{ width: 8 + (i % 4) * 5, height: 8 + (i % 3) * 5 }}
+                />
+              ))}
             </div>
             <svg
               data-summon-bolts
@@ -303,8 +350,8 @@ export function BurnTransition() {
               className="absolute inset-0 h-full w-full animate-[bolt-flicker_0.14s_steps(2)_infinite] opacity-0"
             >
               {[
-                "8,20 14,34 10,38 18,56",
-                "92,18 86,30 90,36 80,52",
+                "44,62 40,48 46,40 42,24",
+                "56,62 60,50 55,42 59,26",
                 "20,80 30,70 28,64 40,60",
                 "80,82 70,72 73,66 60,60",
               ].map((pts) => (
@@ -329,9 +376,15 @@ export function BurnTransition() {
             </svg>
             <p
               data-summon-word
-              className="absolute top-[14%] right-[8%] sfx text-56 text-kiln opacity-0 [text-shadow:0_0_18px_var(--agni)] md:text-96"
+              className="absolute top-[16%] left-[8%] sfx text-36 text-kiln opacity-0 [text-shadow:0_0_14px_var(--agni)] md:text-56"
             >
               {transitionCopy.summonWord}
+            </p>
+            <p
+              data-slam-word
+              className="absolute top-[10%] right-[6%] sfx text-56 text-washi opacity-0 [text-shadow:0_0_24px_var(--agni)] md:text-[9rem] md:leading-none"
+            >
+              {sfxCopy.slam}
             </p>
           </div>
 

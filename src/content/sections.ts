@@ -87,6 +87,39 @@ export const aboutCopy = {
     "CGPA 9.09. Not bad for zero talent.",
   ],
   tapHint: "Tap a panel",
+  /** Stickman sparring panel: each hover or tap plays the next move. */
+  fight: {
+    title: "Sparring",
+    hint: "Hover or tap for the next move",
+    next: "Play the next sparring move",
+    moves: ["Slash", "Dodge", "Counter", "Anti-magic finisher"],
+    sfx: ["ZAN!", "SHU!", "GIN!", "DOON!"],
+  },
+  /** Scroll-driven training montage. */
+  montage: {
+    title: "Training arc",
+    sub: "Daily swings",
+    rep: "Rep",
+    done: "1000!",
+  },
+  /** Character profile sheet. Every value comes from the owner's real details. */
+  sheet: {
+    title: "Character profile",
+    name: "Name",
+    alias: "Alias",
+    attribute: "Magic attribute",
+    attributeValue: "Fire",
+    attributeNote: "Agni means fire",
+    grimoire: "Grimoire",
+    home: "Home",
+    training: "Training ground",
+    learning: "Learning",
+    quest: "Current quest",
+    gauges: "Power gauges",
+    cgpa: "First-year CGPA",
+    prs: "GSSoC pull requests",
+    outOf: "out of 10",
+  },
 };
 
 export const skillsCopy = {

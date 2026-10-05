@@ -8,6 +8,9 @@ import { Panel } from "@/components/ui/Panel";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { InkBlot } from "@/components/ui/InkBlot";
 import { Silhouette } from "@/components/ui/Silhouette";
+import { ProfileSheet } from "./about/ProfileSheet";
+import { StickFight } from "./about/StickFight";
+import { TrainingMontage } from "./about/TrainingMontage";
 import { DUR, gsap, ScrollTrigger, SplitText, STAGGER } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
@@ -213,6 +216,7 @@ export function About() {
         {/* 1: photo (silhouette until the owner's photo arrives) */}
         <Panel
           data-about-panel
+          breakout
           {...bubble(0)}
           page={2}
           tape
@@ -234,6 +238,7 @@ export function About() {
         {/* 2: bio + origin */}
         <Panel
           data-about-panel
+          breakout
           {...bubble(1)}
           page={3}
           className="md:min-h-[22rem] lg:col-span-8"
@@ -254,6 +259,7 @@ export function About() {
         {/* 3: where from, off the clock */}
         <Panel
           data-about-panel
+          breakout
           {...bubble(2)}
           page={4}
           className="md:min-h-[18rem] lg:col-span-3"
@@ -295,6 +301,7 @@ export function About() {
         {bigLine && (
           <Panel
             data-about-panel
+            breakout
             {...bubble(3)}
             page={5}
             shape="cut-right"
@@ -312,6 +319,7 @@ export function About() {
         {/* 5: studying */}
         <Panel
           data-about-panel
+          breakout
           {...bubble(4)}
           page={6}
           shape="cut-left"
@@ -338,6 +346,13 @@ export function About() {
         >
           {aboutCopy.sfx}
         </p>
+      </div>
+
+      {/* Second page: sparring, the character sheet, the training arc */}
+      <div className="mt-gutter grid gap-gutter md:mt-16 lg:grid-cols-12">
+        <StickFight className="lg:col-span-7" />
+        <ProfileSheet className="lg:col-span-5" />
+        <TrainingMontage className="lg:col-span-12" />
       </div>
     </section>
   );

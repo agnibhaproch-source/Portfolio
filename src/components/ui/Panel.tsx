@@ -77,6 +77,8 @@ type PanelProps = {
   page?: number;
   /** A strip of tape holding the panel to the page. */
   tape?: boolean;
+  /** On hover the art bursts out past the border, which cracks at the corner. */
+  breakout?: boolean;
 } & Omit<ComponentPropsWithoutRef<"div">, "className" | "children">;
 
 /**
@@ -95,6 +97,7 @@ export function Panel({
   overlay,
   page,
   tape = false,
+  breakout = false,
   ...rest
 }: PanelProps) {
   // All panel tags share div attributes; narrow for the JSX checker.
@@ -103,7 +106,18 @@ export function Panel({
   const clip = clipPolygon(points);
 
   return (
-    <Tag className={cn("group/panel relative isolate", className)} {...rest}>
+    <Tag
+      className={cn("group/panel relative isolate", breakout && "breakout", className)}
+      {...rest}
+    >
+      {breakout && (
+        <div
+          aria-hidden
+          data-breakout-shadow
+          className="pointer-events-none absolute inset-0 bg-sumi/70"
+          style={{ clipPath: clip }}
+        />
+      )}
       <div
         data-panel-content
         className={cn("relative h-full", fill && "bg-bg", tone && "tone", innerClassName)}
@@ -127,6 +141,27 @@ export function Panel({
           vectorEffect="non-scaling-stroke"
         />
       </svg>
+      {breakout && (
+        <svg
+          aria-hidden
+          data-breakout-crack
+          className="pointer-events-none absolute inset-0 z-[3] h-full w-full overflow-visible"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          <path
+            pathLength={100}
+            d="M0 0 L7 4 L5 9 L12 13 L10 19 M7 4 L13 2 L18 6 M5 9 L0 12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            vectorEffect="non-scaling-stroke"
+          />
+          <polygon data-shard="1" points="2,1 6,2 3,5" fill="currentColor" />
+          <polygon data-shard="2" points="9,0 13,1 10,4" fill="currentColor" />
+          <polygon data-shard="3" points="0,6 3,8 0,10" fill="currentColor" />
+        </svg>
+      )}
       {tape && (
         <span
           aria-hidden

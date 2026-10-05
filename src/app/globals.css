@@ -761,3 +761,50 @@ html[data-casting] * {
     opacity: 0.25;
   }
 }
+
+/* ---------- Panel break-out: the art bursts past the border on hover ---------- */
+.breakout > [data-panel-content] {
+  transition:
+    translate 0.35s var(--ease-heat),
+    scale 0.35s var(--ease-heat),
+    rotate 0.35s var(--ease-heat);
+}
+.breakout > [data-breakout-shadow] {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.breakout > [data-breakout-crack] path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.3s steps(5);
+}
+.breakout > [data-breakout-crack] polygon {
+  opacity: 0;
+  transition:
+    translate 0.4s var(--ease-heat),
+    opacity 0.4s;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .breakout:hover > [data-panel-content] {
+    z-index: 2;
+    translate: -10px -12px;
+    scale: 1.035;
+    rotate: -0.6deg;
+  }
+  .breakout:hover > [data-breakout-shadow] {
+    opacity: 1;
+  }
+  .breakout:hover > [data-breakout-crack] path {
+    stroke-dashoffset: 0;
+  }
+  .breakout:hover > [data-breakout-crack] polygon {
+    opacity: 1;
+    translate: -6px -8px;
+  }
+  .breakout:hover > [data-breakout-crack] polygon[data-shard="2"] {
+    translate: 2px -12px;
+  }
+  .breakout:hover > [data-breakout-crack] polygon[data-shard="3"] {
+    translate: -10px 2px;
+  }
+}
