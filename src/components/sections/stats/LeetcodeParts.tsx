@@ -72,8 +72,8 @@ export function Ring({ lc }: { lc: LeetcodeStats }) {
             data-arc-pop
             className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-1/2 font-display text-18 opacity-0"
             style={{
-              left: `${50 + Math.cos(a) * 54}%`,
-              top: `${50 + Math.sin(a) * 52}%`,
+              left: `${(50 + Math.cos(a) * 54).toFixed(2)}%`,
+              top: `${(50 + Math.sin(a) * 52).toFixed(2)}%`,
               color: p.color,
               textShadow: "0 0 10px var(--agni)",
             }}

@@ -264,12 +264,12 @@ export function Nav() {
                   return (
                     <rect
                       key={i}
-                      x={20 + Math.cos(a) * 18 - 1.5}
-                      y={20 + Math.sin(a) * 18 - 1.5}
+                      x={Math.round((20 + Math.cos(a) * 18 - 1.5) * 100) / 100}
+                      y={Math.round((20 + Math.sin(a) * 18 - 1.5) * 100) / 100}
                       width="3"
                       height="3"
                       fill="currentColor"
-                      transform={`rotate(45 ${20 + Math.cos(a) * 18} ${20 + Math.sin(a) * 18})`}
+                      transform={`rotate(45 ${(20 + Math.cos(a) * 18).toFixed(2)} ${(20 + Math.sin(a) * 18).toFixed(2)})`}
                     />
                   );
                 })}

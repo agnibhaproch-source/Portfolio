@@ -171,7 +171,7 @@ export function BurnTransition() {
         .from(q("[data-ring]"), { drawSVG: "0%", duration: 0.25, stagger: 0.04, ease: "none" }, 0.3)
         .from(
           q("[data-runes] > *"),
-          { opacity: 0, scale: 0, transformOrigin: "50% 50%", duration: 0.1, stagger: 0.005 },
+          { opacity: 0, duration: 0.1, ease: "steps(2)", stagger: 0.005 },
           0.45,
         )
         .from(q("[data-star]"), { drawSVG: "0%", duration: 0.25, ease: "steps(14)" }, 0.5)

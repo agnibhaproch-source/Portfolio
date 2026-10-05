@@ -30,6 +30,9 @@ function register() {
   CustomEase.create("heat", "M0,0 C0.3,1.4 0.5,1 1,1");
 
   gsap.defaults({ ease: "ink", duration: 0.6 });
+  // Shared timelines animate optional parts (a chapter without devices, a
+  // mission without grades); an empty selection is expected, not a bug.
+  gsap.config({ nullTargetWarn: false });
   registered = true;
 }
 

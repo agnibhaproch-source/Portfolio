@@ -344,7 +344,10 @@ export function OrbitSocials({ links }: { links: { label: string; href: string }
               rel="noreferrer"
               tabIndex={-1}
               className="absolute grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center"
-              style={{ left: `${50 + Math.cos(a) * 46}%`, top: `${50 + Math.sin(a) * 46}%` }}
+              style={{
+                left: `${(50 + Math.cos(a) * 46).toFixed(2)}%`,
+                top: `${(50 + Math.sin(a) * 46).toFixed(2)}%`,
+              }}
             >
               <span className="grid size-11 animate-[rune-spin_18s_linear_infinite_reverse] place-items-center rounded-full border-2 border-washi bg-sumi transition-transform duration-300 group-hover/orbit:[animation-play-state:paused] hover:scale-125 hover:border-kiln hover:shadow-[0_0_14px_var(--agni)] motion-reduce:animate-none">
                 <svg viewBox="0 0 24 24" className="size-5 text-washi">

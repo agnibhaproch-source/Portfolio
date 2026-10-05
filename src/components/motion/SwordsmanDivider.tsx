@@ -135,10 +135,9 @@ export function SwordsmanDivider({ label }: { label: string }) {
           d="M 30 4 Q 88 6 82 78"
           fill="none"
           stroke="var(--washi)"
-          strokeWidth="10"
+          strokeWidth="1.4"
           strokeLinecap="round"
           opacity="0"
-          vectorEffect="non-scaling-stroke"
         />
         <line
           data-cut

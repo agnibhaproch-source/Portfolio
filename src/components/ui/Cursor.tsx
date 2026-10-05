@@ -6,6 +6,9 @@ import { comboCopy } from "@/content";
 import { gsap } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
 
+/** Round to 2 decimals so server and browser render identical SVG numbers. */
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 type Mode = "default" | "link" | "charge" | "drag" | "text";
 
 const SLASHES = 4;
@@ -33,7 +36,7 @@ const SPLAT_SHAPES = [3, 11, 23].map((seed) => {
   const drops = Array.from({ length: 4 }, () => {
     const a = rand() * Math.PI * 2;
     const d = 26 + rand() * 14;
-    return { x: Math.cos(a) * d, y: Math.sin(a) * d, r: 1.5 + rand() * 2.5 };
+    return { x: r2(Math.cos(a) * d), y: r2(Math.sin(a) * d), r: r2(1.5 + rand() * 2.5) };
   });
   return { pts, drops };
 });

@@ -10,6 +10,7 @@ import { education, profile, topSkills } from "@/content";
 import { siteUrl } from "@/lib/site";
 import { SlashWipeProvider } from "@/components/motion/SlashWipe";
 import { LazyOverlays } from "@/components/LazyOverlays";
+import { OffscreenPause } from "@/components/OffscreenPause";
 import { AntiMagicLayer } from "@/components/ui/AntiMagicLayer";
 import { Cursor } from "@/components/ui/Cursor";
 import { Nav } from "@/components/ui/Nav";
@@ -142,6 +143,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <AntiMagicLayer />
             <Toast />
             <LazyOverlays />
+            <OffscreenPause />
             <Cursor />
           </SlashWipeProvider>
         </SmoothScroll>

@@ -81,14 +81,7 @@ export function Constellation() {
     const q = gsap.utils.selector(el);
     gsap
       .timeline({ scrollTrigger: { trigger: el, start: "top 75%", once: true } })
-      .from(q("[data-star]"), {
-        scale: 0,
-        opacity: 0,
-        duration: 0.3,
-        stagger: 0.03,
-        transformOrigin: "50% 50%",
-        ease: "back.out(2)",
-      })
+      .from(q("[data-star]"), { opacity: 0, duration: 0.25, stagger: 0.03, ease: "steps(3)" })
       .from(
         q("[data-link]"),
         { drawSVG: "0%", duration: 0.5, stagger: 0.02, ease: "power1.inOut" },

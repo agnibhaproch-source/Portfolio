@@ -197,6 +197,8 @@ export function About() {
     <section
       ref={ref}
       id={sections.about.id}
+      // Its pin adds page height: set up at once so restored scroll lands right.
+      data-motion-now
       data-mode="print"
       aria-labelledby={`${sections.about.id}-heading`}
       className="relative overflow-x-clip px-4 pt-24 pb-24 md:px-10 md:pt-32 md:pb-32"

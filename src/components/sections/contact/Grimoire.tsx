@@ -7,6 +7,9 @@ import { gsap } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
+/** Round to 2 decimals so server and browser render identical SVG numbers. */
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 const C = 100;
 const ARCS = 3;
 
@@ -23,7 +26,7 @@ function arc(i: number) {
 
 const RUNES = Array.from({ length: 18 }, (_, i) => {
   const a = (i / 18) * Math.PI * 2;
-  return { x: C + Math.cos(a) * 72, y: C + Math.sin(a) * 72, k: i % 3 };
+  return { x: r2(C + Math.cos(a) * 72), y: r2(C + Math.sin(a) * 72), k: i % 3 };
 });
 
 /**

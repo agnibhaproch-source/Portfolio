@@ -30,6 +30,9 @@ import {
 } from "./contact/ContactParts";
 import { Crow, DriftingLetters, Envelope, Feathers, Pillar, SuccessComic } from "./contact/SendFx";
 
+/** Round to 2 decimals so server and browser render identical SVG numbers. */
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 type Field = "name" | "email" | "message";
 type Errors = Partial<Record<Field, string>>;
 
@@ -594,10 +597,10 @@ export function Contact() {
                     <line
                       key={i}
                       data-ray
-                      x1={Math.cos(a) * 18}
-                      y1={Math.sin(a) * 18}
-                      x2={Math.cos(a) * (60 + (i % 3) * 18)}
-                      y2={Math.sin(a) * (60 + (i % 3) * 18)}
+                      x1={r2(Math.cos(a) * 18)}
+                      y1={r2(Math.sin(a) * 18)}
+                      x2={r2(Math.cos(a) * (60 + (i % 3) * 18))}
+                      y2={r2(Math.sin(a) * (60 + (i % 3) * 18))}
                       stroke={i % 2 ? "var(--kiln)" : "var(--agni)"}
                       strokeWidth={i % 3 ? 2 : 4}
                       strokeLinecap="round"

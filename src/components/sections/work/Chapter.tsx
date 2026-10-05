@@ -237,8 +237,13 @@ export function Chapter({ project, index }: { project: Project; index: number })
         {["top-5 left-5", "top-5 right-5", "bottom-5 left-5", "bottom-5 right-5"].map((pos) => (
           <span key={pos} className={cn("absolute size-3 rotate-45 border-2 border-aura", pos)} />
         ))}
+        <div
+          aria-hidden
+          data-cover-veil
+          className="pointer-events-none absolute inset-0 z-10 bg-sumi opacity-0"
+        />
         <div data-cover-inner>
-          <p className="font-display text-18 text-muted md:text-24">{chapterLabel(index)}</p>
+          <p className="font-display text-18 text-washi/80 md:text-24">{chapterLabel(index)}</p>
           <p className="foil-title mt-2 font-display text-56 md:text-[clamp(3rem,9vw,8rem)] md:leading-none">
             {project.name}
           </p>

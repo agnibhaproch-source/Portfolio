@@ -1,5 +1,8 @@
 import { cn } from "@/lib/utils";
 
+/** Round to 2 decimals so server and browser render identical SVG numbers. */
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 function seeded(seed: number) {
   let s = (seed * 2654435761) % 2147483647 || 1;
   const next = () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646;
@@ -18,7 +21,7 @@ export function InkBlot({ seed = 1, className }: { seed?: number; className?: st
   const drops = Array.from({ length: 5 }, () => {
     const a = rand() * Math.PI * 2;
     const d = 34 + rand() * 12;
-    return { x: 50 + Math.cos(a) * d, y: 50 + Math.sin(a) * d, r: 1.5 + rand() * 3 };
+    return { x: r2(50 + Math.cos(a) * d), y: r2(50 + Math.sin(a) * d), r: r2(1.5 + rand() * 3) };
   });
   return (
     <svg

@@ -10,6 +10,9 @@ import { sound } from "@/lib/sound";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
 
+/** Round to 2 decimals so server and browser render identical SVG numbers. */
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 /*
  * "Power level" of the top six skills, as a radar or as gauge bars.
  *
@@ -32,7 +35,7 @@ const VB = { x: -80, y: -60, w: 560, h: 520 };
 
 const angle = (i: number) => (i / N) * Math.PI * 2 - Math.PI / 2;
 const at = (i: number, r: number) =>
-  [C + r * Math.cos(angle(i)), C + r * Math.sin(angle(i))] as const;
+  [r2(C + r * Math.cos(angle(i))), r2(C + r * Math.sin(angle(i)))] as const;
 const pts = (radii: number[]) =>
   radii
     .map((r, i) =>

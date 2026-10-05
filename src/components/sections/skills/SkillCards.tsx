@@ -20,6 +20,9 @@ import { sound } from "@/lib/sound";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
 
+/** Round to 2 decimals so server and browser render identical SVG numbers. */
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 const COMBO = 3;
 
 /** Card back: an original rune seal on dark cloth. */
@@ -334,10 +337,10 @@ export function SkillCards({ onActive }: { onActive: (g: SkillGroup | null) => v
                               return (
                                 <line
                                   key={k}
-                                  x1={Math.cos(a) * 14}
-                                  y1={Math.sin(a) * 10}
-                                  x2={Math.cos(a) * 26}
-                                  y2={Math.sin(a) * 20}
+                                  x1={r2(Math.cos(a) * 14)}
+                                  y1={r2(Math.sin(a) * 10)}
+                                  x2={r2(Math.cos(a) * 26)}
+                                  y2={r2(Math.sin(a) * 20)}
                                   stroke="var(--kiln)"
                                   strokeWidth="2"
                                   strokeLinecap="round"

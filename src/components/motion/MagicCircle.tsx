@@ -6,6 +6,9 @@ import { triggerFor, type Trigger } from "@/lib/motion";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
 
+/** Round to 2 decimals so server and browser render identical SVG numbers. */
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 /*
  * Original rune circle (no symbols from any show): two rings, a band of
  * made-up geometric runes, a seven-point star and an inner ring.
@@ -15,7 +18,7 @@ const RUNES = 21;
 
 function polar(r: number, deg: number) {
   const a = ((deg - 90) * Math.PI) / 180;
-  return [C + r * Math.cos(a), C + r * Math.sin(a)] as const;
+  return [r2(C + r * Math.cos(a)), r2(C + r * Math.sin(a))] as const;
 }
 
 const round = (n: number) => Math.round(n * 100) / 100;
@@ -75,17 +78,18 @@ export function MagicCircle({ trigger = "scroll", spin = true, draw = "self", cl
         gsap
           .timeline({ scrollTrigger: triggerFor(el, trigger) })
           .from(q("[data-ring]"), { drawSVG: "0%", duration: 0.9, ease: "ink", stagger: 0.12 })
+          // Runes flicker on one by one while the band turns into place. No
+          // per-rune transform origin: measuring 21 boxes forced 21 page
+          // layouts and stalled WebKit for seconds.
           .from(
             q("[data-runes] > *"),
-            {
-              opacity: 0,
-              scale: 0,
-              transformOrigin: "50% 50%",
-              duration: 0.25,
-              ease: "heat",
-              stagger: 0.02,
-            },
+            { opacity: 0, duration: 0.2, ease: "steps(2)", stagger: 0.02 },
             "-=0.5",
+          )
+          .from(
+            q("[data-runes]"),
+            { rotation: -40, svgOrigin: `${C} ${C}`, duration: 0.6, ease: "heat" },
+            "<",
           )
           .from(q("[data-star]"), { drawSVG: "0%", duration: 1, ease: "steps(14)" }, "-=0.4")
           .from(q("[data-core]"), { drawSVG: "50% 50%", duration: 0.5 }, "-=0.2");

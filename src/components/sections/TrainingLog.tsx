@@ -98,15 +98,18 @@ export function TrainingLog({
 
       q("[data-stat-panel]").forEach((panel) => {
         const p = gsap.utils.selector(panel);
-        const sheet = p("[data-sheet]")[0];
-        const bottom = p("[data-rod='bottom']")[0] as HTMLElement | undefined;
+        // The scroll rods wrap the panel, so look outward for them.
+        const unroll = panel.closest("[data-unroll]");
+        const sheet = unroll?.querySelector<HTMLElement>("[data-sheet]") ?? undefined;
+        const bottom = unroll?.querySelector<HTMLElement>("[data-rod='bottom']") ?? undefined;
+        const has = (sel: string) => p(sel).length > 0;
         const tl = gsap.timeline({
           scrollTrigger: { trigger: panel, start: "top 75%", once: true },
         });
-        if (!calm) {
+        if (!calm && sheet && bottom) {
           // Unroll: the sheet reveals top-down while the bottom rod travels with it.
           tl.fromTo(
-            sheet ?? {},
+            sheet,
             { clipPath: "inset(0% 0% 100% 0%)" },
             {
               clipPath: "inset(0% 0% 0% 0%)",
@@ -116,8 +119,8 @@ export function TrainingLog({
             },
           )
             .fromTo(
-              bottom ?? {},
-              { y: () => -((sheet as HTMLElement | undefined)?.offsetHeight ?? 0) },
+              bottom,
+              { y: () => -sheet.offsetHeight },
               { y: 0, duration: 0.7, ease: "power2.inOut" },
               0,
             )
@@ -153,12 +156,13 @@ export function TrainingLog({
               at + i * 0.45 + 0.35,
             );
         });
-        tl.fromTo(
-          p("[data-defeat]"),
-          { scale: 2.2, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.18, stagger: 0.15, ease: "steps(3)" },
-          at + 1.3,
-        );
+        if (has("[data-defeat]"))
+          tl.fromTo(
+            p("[data-defeat]"),
+            { scale: 2.2, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.18, stagger: 0.15, ease: "steps(3)" },
+            at + 1.3,
+          );
         // Rank scouter: the reticle sweeps in and locks; digits scramble to the real rank.
         const rank = p("[data-rank]")[0] as HTMLElement | undefined;
         if (rank) {
@@ -189,11 +193,12 @@ export function TrainingLog({
             at,
           )
             .set(p("[data-scan]"), { opacity: 0 })
+            // Radius, not scale: scaling 365 SVG dots around their centres means
+            // measuring each one, which stalls WebKit.
             .from(
               dots,
               {
-                scale: 0,
-                transformOrigin: "50% 50%",
+                attr: { r: 0 },
                 duration: 0.25,
                 ease: "back.out(3)",
                 stagger: (i: number, t: Element) =>
@@ -203,34 +208,35 @@ export function TrainingLog({
             )
             .fromTo(
               dots.filter((d) => (d as unknown as SVGElement).dataset.level === "4"),
-              { fill: "var(--kiln)", scale: 1.8 },
+              { fill: "var(--kiln)", attr: { r: 9 } },
               {
                 fill: "var(--washi)",
-                scale: 1,
+                attr: { r: 4.8 },
                 duration: 0.4,
-                transformOrigin: "50% 50%",
                 stagger: 0.05,
               },
               at + 1.2,
             );
         }
-        tl.from(
-          p("[data-liquid]"),
-          { attr: { y: 64 }, duration: 0.9, stagger: 0.1, ease: "power2.out" },
-          at + 0.6,
-        )
-          .from(
+        if (has("[data-liquid]"))
+          tl.from(
+            p("[data-liquid]"),
+            { attr: { y: 64 }, duration: 0.9, stagger: 0.1, ease: "power2.out" },
+            at + 0.6,
+          );
+        if (has("[data-flame]"))
+          tl.from(
             p("[data-flame]"),
             { scale: 0, transformOrigin: "50% 100%", duration: 0.5, ease: "back.out(2)" },
             at + 0.4,
-          )
-          // A shine sweeps across the numbers: they came straight from the source.
-          .fromTo(
-            p("[data-shine]"),
-            { xPercent: -120 },
-            { xPercent: 220, duration: 0.9, ease: "power2.inOut" },
-            at + 1.6,
           );
+        // A shine sweeps across the numbers: they came straight from the source.
+        tl.fromTo(
+          p("[data-shine]"),
+          { xPercent: -120 },
+          { xPercent: 220, duration: 0.9, ease: "power2.inOut" },
+          at + 1.6,
+        );
       });
     },
     ref,

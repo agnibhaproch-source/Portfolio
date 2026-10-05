@@ -269,7 +269,7 @@ export function RuneProgress() {
 /** A faint hint toward the Konami limit break that glitches in on hover. */
 export function Whisper() {
   return (
-    <p className="group/whisper text-14 text-muted italic opacity-70 transition-opacity hover:opacity-100">
+    <p className="group/whisper text-14 text-muted italic">
       <span className="inline-block group-hover/whisper:animate-[glitch_0.35s_steps(2)_2] group-hover/whisper:[text-shadow:2px_0_var(--agni),-2px_0_#4fb3c9]">
         {limitBreakCopy.consoleHint}
       </span>

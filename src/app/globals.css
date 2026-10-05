@@ -1062,3 +1062,9 @@ html[data-rewind] .rewind-fx {
   visibility: visible;
   opacity: 1;
 }
+
+/* Off-screen sections pause their looping CSS animations (see OffscreenPause). */
+[data-offscreen],
+[data-offscreen] * {
+  animation-play-state: paused !important;
+}

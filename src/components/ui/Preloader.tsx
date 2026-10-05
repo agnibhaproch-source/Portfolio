@@ -114,7 +114,8 @@ export function Preloader() {
   // Real loading progress: images present at load, the web fonts, and window load.
   useEffect(() => {
     if (!document.documentElement.hasAttribute("data-preload")) return;
-    const imgs = Array.from(document.images);
+    // Lazy images below the fold only load on scroll, so they don't count.
+    const imgs = Array.from(document.images).filter((img) => img.loading !== "lazy");
     let done = 0;
     const total = imgs.length + 2;
     const bump = () => setProgress(Math.min(++done / total, 1));
@@ -126,7 +127,7 @@ export function Preloader() {
     if (document.readyState === "complete") bump();
     else window.addEventListener("load", bump, { once: true });
     // never hold the gate on a stalled request
-    const t = window.setTimeout(() => setProgress(1), 6000);
+    const t = window.setTimeout(() => setProgress(1), 4000);
     return () => window.clearTimeout(t);
   }, []);
 

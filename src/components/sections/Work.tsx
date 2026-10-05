@@ -399,9 +399,25 @@ export function Work() {
           }),
           0,
         );
+        // The title lands: it scales in under a dark veil that lifts (the text
+        // itself stays fully opaque, so it never reads as low-contrast).
+        gsap.fromTo(
+          c("[data-cover-veil]"),
+          { opacity: 1 },
+          {
+            opacity: 0,
+            ease: "steps(5)",
+            scrollTrigger: {
+              containerAnimation: slide,
+              trigger: ch,
+              start: "left 100%",
+              end: "left 70%",
+              scrub: true,
+            },
+          },
+        );
         gsap.from(c("[data-cover-inner]"), {
           scale: 1.35,
-          opacity: 0,
           ease: "steps(5)",
           scrollTrigger: {
             containerAnimation: slide,
@@ -515,6 +531,8 @@ export function Work() {
     <section
       ref={ref}
       id={sections.work.id}
+      // Its pin adds page height: set up at once so restored scroll lands right.
+      data-motion-now
       data-mode="colour"
       aria-labelledby={`${sections.work.id}-heading`}
       className="relative overflow-x-clip"
@@ -580,7 +598,6 @@ export function Work() {
                   <button
                     type="button"
                     onClick={() => jumpRef.current(i)}
-                    aria-label={workCopy.jumpTo(c.label)}
                     className="group/toc flex w-full items-end gap-3 text-left text-18 md:text-24"
                   >
                     <span className="font-display transition-colors group-hover/toc:text-[#c2272d]">
@@ -664,7 +681,7 @@ export function Work() {
                       </div>
                       <span
                         aria-hidden
-                        className="absolute right-3 bottom-3 -rotate-12 border-2 border-[#c2272d] px-1 font-display text-[11px] text-[#c2272d]"
+                        className="absolute right-3 bottom-3 -rotate-12 border-2 border-[#9e1b20] px-1 font-display text-[11px] text-[#9e1b20]"
                       >
                         {workCopy.sideQuestStamp}
                       </span>
