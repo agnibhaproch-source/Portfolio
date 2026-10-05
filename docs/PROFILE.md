@@ -28,7 +28,7 @@ Single source of truth. `ASK` = not known yet, ask at the phase that needs it. `
 
 - GSSoC 2026 (GirlScript Summer of Code), open-source contributor: 7 pull requests. Repos, rank, months active: not given
 - Internships: none yet; looking for one
-- Hackathons: took part in 1, no award (name not given; not shown until named)
+- Hackathons: Smart India Hackathon 2026, built SENTINEL-X (GRU world model forecasting attacks across the kill chain; FastAPI + Next.js 16; 96.4% pre-compromise warning rate, owner's figure). No award. Mentioned in the dev log; not yet a Work chapter (ASK for repo/screenshots if wanted).
 - Clubs, freelance: none given
 
 ## Projects
@@ -65,11 +65,11 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 - Phone: kept private, not shown on the site (owner decision)
 - LeetCode: https://leetcode.com/u/8MuNcqZBRp/ (60 solved on 2026-10-04: 11 easy, 42 medium, 7 hard; no contests)
 - X, Instagram, others: none given
-- Resume PDF, drop at `public/resume.pdf`: not yet, owner will send later (button hidden until then)
+- Resume: owner chose to keep the printable /resume page as the resume (2026-10-05). No PDF.
 
 ## Assets
 
-- Portrait photo, high resolution, plain background if possible, drop at `public/me/portrait.jpg`: not yet, owner will send later (silhouette panel until then)
+- Portrait photo: received 2026-10-05, `public/me/portrait.jpg` (mountain road, snow peaks). Used in the hero, About, character sheet, /quick and the share image.
 - Optional second photo, full body or action pose, `public/me/pose.jpg`: ASK
 - Optional original illustrated avatar that the owner owns the rights to, `public/me/avatar.png`: ASK
 - Favicon preference: ASK
@@ -93,4 +93,14 @@ For each project collect: one-line pitch, problem, the owner's role, stack, 2 to
 - Info: live GitHub stats (contribution heatmap as screentone, repo count, top languages); more projects: UBuy and nexus as side quests (UBuy live site currently shows "Error loading collection.", so it is shown without live link or screenshot until fixed); coding profiles: LeetCode 8MuNcqZBRp
 - Animation: spell-cast hover on skill cards (rune burst + radar axis highlight + projects using it); manga speech bubbles on About panels (owner: "you select"; lines chosen by Claude); ink-splatter click with combo counter; phone tilt parallax on the hero
 - Features: hidden rune hunt (five original runes, unlocks a secret page); anime watch list: shown as a static favourites list (Black Clover, One Piece, Naruto, Attack on Titan). Crunchyroll link not used: it is a login-only profile-management page with no public API; real message delivery via Resend: key in .env.local (send-only, git-ignored)
-- Extras: print reading mode toggle; dev log / blog ("Training arc log"): first post "My first year at Kalvium", bullets: ASK (post unpublished until given); interactive printable /resume page; Vercel Web Analytics
+- Extras: print reading mode toggle; dev log / blog ("Training arc log"): first post "My first year at Kalvium": owner's bullets received 2026-10-05, published word for word; interactive printable /resume page; Vercel Web Analytics
+
+## From the dev log (2026-10-05), not yet elsewhere on the site
+
+Mentioned by the owner in "My first year at Kalvium". Shown only in that post until the owner wants them as chapters (ASK for links, stacks and screenshots):
+
+- Projects: TrueVoice (voice impersonation detection), DigiVault, Ascend (first version), FinTrack (Server Components → server actions → services → Prisma, 27 unit tests), U-Sewa (local service marketplace, Expo + Firebase, pre-launch audit), SENTINEL-X (SIH 2026)
+- Open source: recreating SparkFun boards for tscircuit (besides GSSoC 2026)
+- Stack learned: Next.js, TypeScript, PostgreSQL, Prisma, Firebase, Expo (Prisma, Firebase, Expo not yet in the skills list)
+- Next up: Kavach (zero-knowledge document vault), live bus tracking
+- Moved from Windows to a MacBook Air

@@ -7,7 +7,7 @@ import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Panel } from "@/components/ui/Panel";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { InkBlot } from "@/components/ui/InkBlot";
-import { Silhouette } from "@/components/ui/Silhouette";
+import { Portrait } from "@/components/ui/Portrait";
 import { ProfileSheet } from "./about/ProfileSheet";
 import { StickFight } from "./about/StickFight";
 import { TrainingMontage } from "./about/TrainingMontage";
@@ -215,7 +215,7 @@ export function About() {
           seed={8}
           className="absolute right-[8%] -bottom-6 z-10 hidden size-10 opacity-70 lg:block"
         />
-        {/* 1: photo (silhouette until the owner's photo arrives) */}
+        {/* 1: photo */}
         <Panel
           data-about-panel
           breakout
@@ -226,8 +226,8 @@ export function About() {
           className="min-h-72 md:min-h-[22rem] lg:col-span-4"
           innerClassName="overflow-hidden"
         >
-          {/* TODO: public/me/pose.jpg or cropped portrait once it arrives */}
-          <Silhouette className="absolute inset-x-0 bottom-0 mx-auto h-[82%] text-sumi" />
+          {/* the owner's photo, cropped around the owner */}
+          <Portrait sizes="(min-width: 1024px) 33vw, 100vw" position="55% 66%" zoom={1.45} />
           <p
             lang="ja"
             aria-hidden

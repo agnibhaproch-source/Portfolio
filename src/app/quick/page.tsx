@@ -15,6 +15,7 @@ import {
 } from "@/content";
 import { buttonClass } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
+import { Portrait } from "@/components/ui/Portrait";
 import { getGithubStats, getLeetcodeStats } from "@/lib/stats";
 
 export const metadata: Metadata = {
@@ -48,6 +49,11 @@ export default async function QuickPage() {
     <main id="main" data-mode="print" className="min-h-svh px-4 pt-28 pb-24 md:px-10">
       <div className="mx-auto grid max-w-5xl gap-gutter">
         <Panel tape className="text-fg" innerClassName="p-6 md:p-10">
+          {profile.portrait && (
+            <div className="absolute top-8 right-8 hidden aspect-[4/5] w-40 -rotate-2 overflow-hidden border-[3px] border-fg shadow-[4px_4px_0_var(--agni)] lg:block">
+              <Portrait sizes="160px" position="55% 66%" zoom={1.6} />
+            </div>
+          )}
           <p className="text-14 text-muted">{quickCopy.title}</p>
           <h1 className="mt-1 text-56 md:text-96">{profile.name.full}</h1>
           <p className="mt-2 text-18 md:text-24">

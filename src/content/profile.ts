@@ -28,8 +28,11 @@ export const profile: Profile = {
     },
     others: [{ label: "LeetCode", href: "https://leetcode.com/u/8MuNcqZBRp/" }],
   },
-  resume: null, // TODO: "/resume.pdf" once the owner sends it
-  portrait: null, // TODO: public/me/portrait.jpg once the owner sends it
+  resume: null, // Owner: keep the printable /resume page as the resume (no PDF).
+  portrait: {
+    src: "/me/portrait.jpg",
+    alt: "Agnibha in sunglasses, a patterned sweater and a plaid scarf, on a mountain road with snow-covered peaks behind",
+  },
   pose: null, // TODO(phase 4): public/me/pose.jpg (optional)
 };
 

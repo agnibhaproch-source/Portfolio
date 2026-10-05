@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { aboutCopy, profile, sheetGauges, sheetQuest, sheetRows, sheetTally } from "@/content";
 import { Panel } from "@/components/ui/Panel";
-import { Silhouette } from "@/components/ui/Silhouette";
+import { Portrait } from "@/components/ui/Portrait";
 import { gsap } from "@/lib/gsap";
 import { useMotion } from "@/lib/use-motion";
 import { cn } from "@/lib/utils";
@@ -57,7 +57,7 @@ export function ProfileSheet({ className }: { className?: string }) {
       <Panel tape breakout className="h-full" innerClassName="h-full p-5 md:p-7">
         <header className="flex items-start gap-4 border-b-[3px] border-fg pb-3">
           <div className="relative size-16 shrink-0 overflow-hidden border-[3px] border-fg tone">
-            <Silhouette className="absolute inset-x-0 bottom-0 mx-auto h-[85%] text-sumi" />
+            <Portrait sizes="64px" position="54% 54%" zoom={2.6} tone={false} />
           </div>
           <div className="min-w-0">
             <p className="text-14 text-muted">{copy.title}</p>

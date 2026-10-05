@@ -123,6 +123,7 @@ export const credits = {
     "Vercel",
   ],
   rewind: "REWIND",
+  devLog: "Dev log",
   holdHint: "Hold to charge",
 };
 
@@ -216,6 +217,7 @@ export const experienceCopy = {
   builtLabel: "Built",
   opensInNewTab: "(opens GitHub)",
   status: { cleared: "CLEARED", "in-progress": "IN PROGRESS" },
+  devLog: "Read the dev log",
   objectives: "Objectives",
   /** Sound words for the hover replay, by mission order. */
   words: ["MERGE!", "LEVEL UP!", "GO!"],

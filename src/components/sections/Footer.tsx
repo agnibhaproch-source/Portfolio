@@ -10,6 +10,7 @@ import { JaggedEdge } from "@/components/ui/JaggedEdge";
 import { Rune } from "@/components/ui/Rune";
 import { credits, profile, sfxCopy } from "@/content";
 import { Signature } from "@/components/sections/hero/Signature";
+import { TransitionLink } from "@/components/ui/TransitionLink";
 import { impactFrame } from "@/lib/impact";
 import { sound } from "@/lib/sound";
 import {
@@ -383,6 +384,9 @@ export function Footer() {
         </div>
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
           <RuneProgress />
+          <TransitionLink href="/log" className="ink-link text-14">
+            {credits.devLog}
+          </TransitionLink>
           <Whisper />
           <UpdatedStamp />
         </div>

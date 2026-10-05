@@ -21,9 +21,33 @@ export const posts: LogPost[] = [
     title: "My first year at Kalvium",
     date: "2026-10-05",
     summary: "What a year of Software Product Engineering at LPU with Kalvium taught me.",
-    // TODO: waiting for the owner's bullet points; stays unpublished until then.
-    body: [],
-    published: false,
+    // The owner's own notes, word for word.
+    body: [
+      {
+        type: "list",
+        items: [
+          "Started the Software Product Engineering program at LPU through Kalvium's work-integrated track: code from week one, theory alongside.",
+          'Went from "it runs on my machine" to full-stack: Next.js, TypeScript, PostgreSQL, Prisma, Firebase, Expo.',
+          "Shipped TrueVoice (voice impersonation detection), DigiVault, and the first version of Ascend.",
+          "Built SENTINEL-X for Smart India Hackathon 2026: a GRU world model forecasting attacks across the kill chain, with a FastAPI backend and a Next.js 16 frontend. 96.4% pre-compromise warning rate.",
+          "Learned to layer properly with FinTrack: Server Components → server actions → services → Prisma, backed by 27 passing unit tests.",
+          "Took U-Sewa (local service marketplace, Expo + Firebase) to a pre-launch audit.",
+          "Made my first open-source contributions: GSSoC 2026, and recreating SparkFun boards for tscircuit.",
+          "Moved from Windows to a MacBook Air and rebuilt my whole toolchain.",
+        ],
+      },
+      { type: "h2", text: "Biggest lesson" },
+      {
+        type: "p",
+        text: "Finishing beats starting. Docs, tests, and audits are part of the build.",
+      },
+      { type: "h2", text: "Next" },
+      {
+        type: "p",
+        text: "Kavach (zero-knowledge document vault) and live bus tracking, both real-world scale.",
+      },
+    ],
+    published: true,
   },
 ];
 

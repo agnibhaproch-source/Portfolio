@@ -7,7 +7,7 @@ import { Flame } from "@/components/gl/Flame";
 import { Button, buttonClass } from "@/components/ui/Button";
 import { TransitionLink } from "@/components/ui/TransitionLink";
 import { Panel } from "@/components/ui/Panel";
-import { Silhouette } from "@/components/ui/Silhouette";
+import { Portrait } from "@/components/ui/Portrait";
 import { antiMagic } from "@/lib/anti-magic";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { onIntroDone } from "@/lib/intro";
@@ -408,9 +408,19 @@ export function Hero() {
             <Flame className="absolute inset-0" />
           </div>
           <div data-depth="20" className="relative h-full">
-            {/* TODO: cut-out portrait with halftone once public/me/portrait.jpg arrives */}
+            {/* the owner's photo, with a screentone and flame light so it sits in the panel */}
             <Panel shape="cut-left" fill={false} className="h-full text-washi">
-              <Silhouette className="absolute inset-x-0 bottom-0 mx-auto h-[85%] text-sumi [filter:drop-shadow(-3px_-2px_0_var(--agni))_drop-shadow(0_0_14px_rgb(226_98_43/0.45))]" />
+              <Portrait
+                priority
+                sizes="(min-width: 1024px) 28rem, 90vw"
+                position="55% 68%"
+                zoom={1.7}
+              />
+              {/* flame light washing up from the bottom of the panel */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgb(194_39_45/0.45),transparent_45%)] mix-blend-screen"
+              />
             </Panel>
           </div>
         </div>

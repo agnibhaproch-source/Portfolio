@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 import { heroCopy, profile } from "@/content";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { C, OgFrame, ogFonts, ogSize } from "@/lib/og";
 
 export const alt = `${profile.name.full}, ${profile.role}`;
@@ -7,8 +9,35 @@ export const size = ogSize;
 export const contentType = "image/png";
 
 export default async function Image() {
+  const photo = profile.portrait
+    ? `data:image/jpeg;base64,${(await readFile(join(process.cwd(), "public", profile.portrait.src))).toString("base64")}`
+    : null;
   return new ImageResponse(
     <OgFrame>
+      {photo && (
+        <div
+          style={{
+            position: "absolute",
+            right: 70,
+            top: 70,
+            width: 300,
+            height: 380,
+            display: "flex",
+            overflow: "hidden",
+            border: `4px solid ${C.washi}`,
+            boxShadow: `10px 10px 0 ${C.agni}`,
+            transform: "rotate(2deg)",
+          }}
+        >
+          <img
+            src={photo}
+            width={760}
+            height={570}
+            style={{ objectFit: "cover", marginLeft: -262, marginTop: -200 }}
+            alt=""
+          />
+        </div>
+      )}
       <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 26, color: C.muted }}>
         <div
           style={{ width: 14, height: 14, borderRadius: 7, background: C.kiln, display: "flex" }}

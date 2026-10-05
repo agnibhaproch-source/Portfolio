@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { Rune } from "@/components/ui/Rune";
-import { arcs, experienceCopy, sections } from "@/content";
+import { arcs, experienceCopy, publishedPosts, sections } from "@/content";
+import { TransitionLink } from "@/components/ui/TransitionLink";
 import { ImpactWord, type ImpactWordHandle } from "@/components/motion/ImpactWord";
 import { SpeedLines } from "@/components/motion/SpeedLines";
 import { Panel } from "@/components/ui/Panel";
@@ -535,6 +536,16 @@ export function Experience() {
                       <XpGauges arc={arc} />
                       <ResultSlip arc={arc} />
                       <Polaroids arc={arc} />
+                      {arc.grades && publishedPosts[0] && (
+                        <TransitionLink
+                          href={`/log/${publishedPosts[0].slug}`}
+                          transition="page"
+                          turnLabel={publishedPosts[0].title}
+                          className="mt-6 inline-block ink-link font-display text-18"
+                        >
+                          {experienceCopy.devLog}: {publishedPosts[0].title} →
+                        </TransitionLink>
+                      )}
 
                       {arc.stack.length > 0 && (
                         <ul className="mt-6 flex flex-wrap gap-2">
