@@ -260,6 +260,23 @@ export const statsCopy = {
   profile: "View profile",
   heatmapLabel: (n: number) => `${n} contributions in the last year, one dot per day`,
   asOf: "Live from GitHub and LeetCode, as of",
+  live: "LIVE",
+  updated: (hours: number) =>
+    hours < 1
+      ? "updated less than an hour ago"
+      : `updated ${hours} hour${hours === 1 ? "" : "s"} ago`,
+  status: "STATUS",
+  cutIn: { leetcode: "SOLVE!", github: "GRIND!" },
+  defeated: "DEFEATED",
+  notFaced: "Not yet faced",
+  tiers: { easy: "Easy tier", medium: "Medium tier", hard: "Hard tier" },
+  levels: ["no contributions", "light day", "moderate day", "busy day", "very busy day"],
+  streak: "Current streak",
+  longest: "Longest streak",
+  days: (n: number) => `${n} day${n === 1 ? "" : "s"}`,
+  ofRepos: "of repos",
+  milestones: "Milestones",
+  skyline: "Skyline view of the same year",
 };
 
 /** The 60-second version: a calm one-page summary for recruiters. */

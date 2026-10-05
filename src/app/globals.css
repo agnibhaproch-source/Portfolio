@@ -861,3 +861,35 @@ html[data-calm] .calm-hide {
     opacity: 0.45;
   }
 }
+
+@keyframes rune-fall {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+@keyframes ecg {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+@keyframes flame-flicker {
+  50% {
+    transform: scaleY(1.08) scaleX(0.95);
+  }
+}
+@keyframes bubble-rise {
+  from {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(-34px);
+    opacity: 0;
+  }
+}
