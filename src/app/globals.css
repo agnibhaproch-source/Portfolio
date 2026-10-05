@@ -893,3 +893,20 @@ html[data-calm] .calm-hide {
     opacity: 0;
   }
 }
+
+@keyframes polaroid-swing {
+  25% {
+    rotate: 6deg;
+  }
+  55% {
+    rotate: -4deg;
+  }
+  80% {
+    rotate: 2deg;
+  }
+}
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}

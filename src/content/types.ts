@@ -55,6 +55,10 @@ export type Arc = {
   /** Big numbers that count up, e.g. CGPA. */
   stats?: Stat[];
   links?: Link[];
+  /** Shown as the dossier stamp. */
+  status?: "cleared" | "in-progress";
+  /** Per-term results for the result slip. */
+  grades?: { label: string; value: number }[];
 };
 
 export type SkillGroup = { name: string; items: string[] };

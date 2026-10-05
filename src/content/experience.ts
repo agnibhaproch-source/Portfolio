@@ -11,6 +11,7 @@ const roles: Arc[] = [
     outcomes: [],
     stack: [],
     stats: [{ value: 7, decimals: 0, label: "pull requests" }],
+    status: "cleared",
   },
 ];
 
@@ -24,6 +25,12 @@ const educationArc: Arc = {
   stats: [
     { value: 9.09, decimals: 2, label: "first-year CGPA" },
     { value: 9.65, decimals: 2, label: "semester 2" },
+  ],
+  status: "in-progress",
+  // From the owner: 8.65 in semester 1, 9.65 in semester 2 (first-year CGPA 9.09).
+  grades: [
+    { label: "Semester 1", value: 8.65 },
+    { label: "Semester 2", value: 9.65 },
   ],
   // TODO: add Nova-Ai once the owner sends a working link
   links: [

@@ -175,6 +175,17 @@ export const experienceCopy = {
   to: "to",
   builtLabel: "Built",
   opensInNewTab: "(opens GitHub)",
+  status: { cleared: "CLEARED", "in-progress": "IN PROGRESS" },
+  objectives: "Objectives",
+  /** Sound words for the hover replay, by mission order. */
+  words: ["MERGE!", "LEVEL UP!", "GO!"],
+  slip: { title: "Result slip", cgpa: "First-year CGPA", up: (d: number) => `+${d.toFixed(2)}` },
+  outOf: "/10",
+  next: {
+    title: "Internship",
+    sub: "Your team?",
+    cta: "Recruit me",
+  },
 };
 
 export const transitionCopy = {
